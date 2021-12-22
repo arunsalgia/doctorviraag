@@ -41,16 +41,17 @@ async function hasSubscribed(cid, subscriptionPackList) {
 		let tmp = arun_subscriptionList[cid].find(x => x.name == subscriptionPackList[i].name);
 
 		if (tmp) {
-		// also check if it has not expired. i.e. still active
+			// also check if it has not expired. i.e. still active
 			if (compareDate(tmp.expiryDate, new Date()) >= 0) {
-				hasSub = true;
+				//hasSub = true;
 				subCount = subscriptionPackList[i].count;
+				return subCount;
 			}
-			break;
 		}
 	}
-	console.log(subCount);
-	return 	subCount;
+	//console.log(subCount);
+	//	return 	subCount;
+	return 0;
 }
 
 async function getSubscribed(cid, subscriptionName) {
@@ -182,6 +183,17 @@ addOnRouter.get('/unsubscribe/:cid/:addonname', async function(req, res, next) {
 	sendok(res, tmpRec);
 
 });
+
+addOnRouter.get('/hassubscribedpaneldoctor/:cid', async function(req, res, next) {
+  setHeader(res);
+  
+  var { cid } = req.params;
+	
+	let count = await hasSubscribed(cid, AddOnList.panel);
+	sendok(res, {status: (count > 0) });
+
+});
+
 
 addOnRouter.get('/subscribelist/:cid', async function(req, res, next) {
   setHeader(res);

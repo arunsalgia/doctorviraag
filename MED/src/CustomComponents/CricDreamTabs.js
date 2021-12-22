@@ -413,6 +413,9 @@ export function CricDreamTabs() {
 									<MenuItem onClick={handleSummary}>
 									<Typography className={classes.menuStyle}>Summary</Typography>
 									</MenuItem>
+									<MenuItem onClick={handleInventory}>
+									<Typography className={classes.menuStyle}>Inventory</Typography>
+									</MenuItem>
 									<Divider className={classes.divider} />
 									</div>
 								} 

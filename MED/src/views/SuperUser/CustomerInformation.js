@@ -1,7 +1,8 @@
 import React, {useEffect, useState, createContext }  from 'react';
+import { Container } from '@material-ui/core';
 import axios from "axios";
 import Drawer from '@material-ui/core/Drawer';
-import lodashSortBy from "lodash/sortBy"
+//import lodashSortBy from "lodash/sortBy"
 import lodashCloneDeep from 'lodash/cloneDeep';
 import { useAlert } from 'react-alert'
 import Grid from "@material-ui/core/Grid";
@@ -15,7 +16,7 @@ import "react-datetime/css/react-datetime.css";
 import moment from "moment";
 import VsCancel from "CustomComponents/VsCancel";
 import VsButton from "CustomComponents/VsButton";
-import VsCheckBox from "CustomComponents/VsCheckBox";
+//import VsCheckBox from "CustomComponents/VsCheckBox";
 
 import Wallet from "views/SuperUser/Wallet"
 
@@ -33,6 +34,10 @@ import { dispEmail, disablePastDt, vsDialog,  encrypt} from 'views/functions';
 import { DATESTR, MONTHNUMBERSTR } from 'views/globals';
 import { dispMobile } from 'views/functions';
 import { compareDate } from 'views/functions';
+
+import EditIcon from '@material-ui/icons/Edit';
+import CancelIcon from '@material-ui/icons/Cancel';
+//import CloseIcon from '@material-ui/icons/Close';
 
 
 /*
@@ -310,7 +315,7 @@ export default function CustomerInformations(props) {
 	const [custFee, setCustFee] = useState(1000);
 	const [registerStatus, setRegisterStatus] = useState(0);
 
-
+	const [panelSubscribed, setPanelSubscribed] = useState(false);
 
 	
 	const [custOption, setCustOption] = useState("");
@@ -336,12 +341,13 @@ export default function CustomerInformations(props) {
 	const [emurText2, setEmurText2] = useState("");
 	const [emurAmount, setEmurAmount] = useState(0);
 
+	/*
 	const [emurCb1, setEmurCb1] = useState(false);
 	const [emurCb2, setEmurCb2] = useState(false);
 	const [emurCb3, setEmurCb3] = useState(false);
 	const [emurCb4, setEmurCb4] = useState(false);
 	const [emurCb5, setEmurCb5] = useState(false);
-	
+*/	
 
 	const [doctorTypeArray, setDoctorTypeArray] = useState([]);
 	const [addOnTypeArray, setAddOnTypeArray] = useState([]);
@@ -360,6 +366,7 @@ export default function CustomerInformations(props) {
 		setCurrentCustomerData(cData);
 		setCurrentCustomer(cData.name)
 		getWalletBalance(userCid);
+		checkIfPanelSubscribed();
   }, []);
 
 
@@ -376,6 +383,17 @@ export default function CustomerInformations(props) {
 		</Grid>
 		)}
 
+	async function checkIfPanelSubscribed() {
+		//	http://localhost:4000/addon/hassubscribedpaneldoctor/61454cba236fba38bc29bce4
+		try {
+			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/addon/hassubscribedpaneldoctor/${userCid}`;
+			let resp = await axios.get(myUrl);
+			setPanelSubscribed(resp.data.status);
+		} catch (e) {
+			console.log(e)
+			alert.error(`Error in checking panel subscription.`);
+		}
+	}
 
 	async function handleSubscribe(d) {
 		if (balance < d.charges) {
@@ -481,6 +499,7 @@ export default function CustomerInformations(props) {
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<DisplayFunctionItem item="Profile"  match={currentCustomerSelection} onClick={setSummaryCustomerSelect} />
+		<DisplayFunctionItem item="Panel"  match={currentCustomerSelection}  onClick={setSummaryCustomerSelect} />
 		{/*<DisplayFunctionItem item="Sms"  match={currentCustomerSelection}  onClick={setSummaryCustomerSelect} />*/}
 		<DisplayFunctionItem item="AddOn"  match={currentCustomerSelection} onClick={setSummaryCustomerSelect} />
 		<DisplayFunctionItem item="Wallet"  match={currentCustomerSelection}  onClick={setSummaryCustomerSelect} />
@@ -512,7 +531,7 @@ export default function CustomerInformations(props) {
 		}
 	}
 
-
+/*
 	async function getDoctorTypes() {
 		try {
 			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/doctortype/list`;
@@ -524,7 +543,7 @@ export default function CustomerInformations(props) {
 			setDoctorTypeArray([]);
 		}
 	}
-	
+*/
 
 
 	function addToWallet() {
@@ -733,45 +752,128 @@ export default function CustomerInformations(props) {
 	
 		)} 
 
-		function DisplayCustomerDetails() {
-		let t = new Date();
-		let e = new Date(currentCustomerData.expiryDate);
-		let hasexpired = compareDate(e, t);
-		let expiryDate = `${DATESTR[e.getDate()]}/${MONTHNUMBERSTR[e.getMonth()]}/${e.getFullYear()}`;
-		return (
-		<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-			<div align="right" >
-			{(hasexpired < 0) &&
-			<VsButton name="Recharge Plan" onClick={() => handleCustomerPlanRecharge(currentCustomerData)} />
-			}
-			<VsButton name="Edit Details" onClick={() => handleEditCustomer(currentCustomerData)} />
-			</div>
-			<DisplaySingleLine msg1="Name" msg2={currentCustomerData.name} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Plan Status" msg2={(hasexpired < 0) ? "Plan expired" : "Plan Valid"} />
-			<DisplaySingleLine msg1="Plan Expiry" msg2={expiryDate} />
-			<DisplaySingleLine msg1="Plan Charges" msg2={currentCustomerData.fee} />
-			<DisplaySingleLine msg1="Doctor Name" msg2={currentCustomerData.doctorName} />
-			<DisplaySingleLine msg1="" msg2={currentCustomerData.type} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Clinic Name" msg2={currentCustomerData.clinicName} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Clinic Addres" msg2={currentCustomerData.addr1} />
-			<DisplaySingleLine msg1="" msg2={currentCustomerData.addr2} />
-			<DisplaySingleLine msg1="" msg2={currentCustomerData.addr3} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Mobile" msg2={dispMobile(currentCustomerData.mobile)} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Email" msg2={dispEmail(currentCustomerData.email)} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Location" msg2={currentCustomerData.location} />
-			<BlankArea />
-			<DisplaySingleLine msg1="Pin Code" msg2={currentCustomerData.pinCode} />
-			<BlankArea />
-		</Box>	
-		)}
-		
+	function DisplayCustomerDetails() {
+	let t = new Date();
+	let e = new Date(currentCustomerData.expiryDate);
+	let hasexpired = compareDate(e, t);
+	let expiryDate = `${DATESTR[e.getDate()]}/${MONTHNUMBERSTR[e.getMonth()]}/${e.getFullYear()}`;
+	return (
+	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+		<div align="right" >
+		{(hasexpired < 0) &&
+		<VsButton name="Recharge Plan" onClick={() => handleCustomerPlanRecharge(currentCustomerData)} />
+		}
+		<VsButton name="Edit Details" onClick={() => handleEditCustomer(currentCustomerData)} />
+		</div>
+		<DisplaySingleLine msg1="Name" msg2={currentCustomerData.name} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Plan Status" msg2={(hasexpired < 0) ? "Plan expired" : "Plan Valid"} />
+		<DisplaySingleLine msg1="Plan Expiry" msg2={expiryDate} />
+		<DisplaySingleLine msg1="Plan Charges" msg2={currentCustomerData.fee} />
+		<DisplaySingleLine msg1="Doctor Name" msg2={currentCustomerData.doctorName} />
+		<DisplaySingleLine msg1="" msg2={currentCustomerData.type} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Clinic Name" msg2={currentCustomerData.clinicName} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Clinic Addres" msg2={currentCustomerData.addr1} />
+		<DisplaySingleLine msg1="" msg2={currentCustomerData.addr2} />
+		<DisplaySingleLine msg1="" msg2={currentCustomerData.addr3} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Mobile" msg2={dispMobile(currentCustomerData.mobile)} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Email" msg2={dispEmail(currentCustomerData.email)} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Location" msg2={currentCustomerData.location} />
+		<BlankArea />
+		<DisplaySingleLine msg1="Pin Code" msg2={currentCustomerData.pinCode} />
+		<BlankArea />
+	</Box>	
+	)}
+	
+	
+	function addNewPanelDoctor() {
+		setEmurText1("");
+		setEmurText2("");
+		setIsDrawerOpened("ADDPANEL");
+	}
 
+	function editPanelDoctor(d)  {
+		setEmurData(d);
+		setEmurText1(d.name);
+		setEmurText2(d.mobile);
+		setIsDrawerOpened("EDITPANEL");
+	}
+
+	function cancelPanelDoctor(name) {
+		vsDialog("Remove Panel Doctor", `Are you sure you want to remove ${name} from Panel?`,
+			{label: "Yes", onClick: () => cancelPanelDoctorConfirm(name) },
+			{label: "No" }
+		);
+	}
+
+	function cancelPanelDoctorConfirm(name) {
+		
+		let myIndex = currentCustomerData.doctorPanel.indexOf(name);
+		let myDoctor = currentCustomerData.doctorPanel.filter(x => x !== name);
+
+		let mobile = currentCustomerData.doctorMobile[myIndex];
+		let myMobile = currentCustomerData.doctorMobile.filter(x => x !== mobile);
+	
+		console.log(myDoctor, myMobile);
+		updatePanelDoctors(myDoctor, myMobile);
+	}
+
+	async function handleAddEditPanel() 
+	{
+		setIsDrawerOpened("");
+	}
+
+	async function updatePanelDoctors(newDocList, newMobList) {
+		let tmp = JSON.stringify({name: newDocList, mobile: newMobList});
+		try {
+			await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/customer/updatepaneldoctors/${userCid}/${tmp}`);
+			setCurrentCustomerData(resp.data);
+			//setDoctorName(resp.data.doctorPanel);
+			//set
+		} catch (e) {
+			alert.error("Error updating panel doctors");
+		}
+	}
+
+	function DisplayPanelDoctors() {
+		console.log(currentCustomerData.doctorPanel);
+		console.log(currentCustomerData.doctorMobile);
+	return (
+	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+	<VsButton name="Add new Doctor" align="right" onClick={addNewPanelDoctor} />
+	{(panelSubscribed) &&
+	<Container component="main" maxWidth="sm">
+	{currentCustomerData.doctorPanel.map( (d, index) => {
+		console.log(d);
+		console.log(currentCustomerData.doctorMobile[index]);
+	return(
+		<Box key={"PD"+index} className={gClasses.boxStyle} borderColor="black" borderRadius={15} border={1}>
+		<Grid className={gClasses.noPadding} key={"PANEL"+index} container >
+		<Grid align="left" item xs={5} sm={5} md={5} lg={5} >
+			<span className={gClasses.patientInfo2Blue}>{d}</span>
+		</Grid>
+		<Grid item xs={5} sm={5} md={5} lg={5} >
+			<span className={gClasses.patientInfo2Blue}>{currentCustomerData.doctorMobile[index]}</span>
+		</Grid>
+		<Grid align="right" item xs={2} sm={2} md={2} lg={2} >
+			<EditIcon color="primary" size="small" onClick={() => editPanelDoctor({ name: d, mobile: currentCustomerData.doctorMobile[index] } )} />
+			<CancelIcon color="secondary" size="small" onClick={() => cancelPanelDoctor(d) } />
+		</Grid>
+		</Grid>
+		</Box>
+	)})}
+	</Container>
+	}
+	{(!panelSubscribed) &&
+	<Typography>Panel not subscribed</Typography>
+	}
+	</Box>	
+	)}
 
 	function handleDate1(d) {
 		//console.log(d);
@@ -847,6 +949,9 @@ export default function CustomerInformations(props) {
 		}
 		{(currentCustomerSelection == "Wallet") &&
 			<Wallet customer={currentCustomerData} />
+		}
+		{(currentCustomerSelection == "Panel") &&
+			<DisplayPanelDoctors customer={currentCustomerData} />
 		}
 	</div>
 	}
@@ -950,6 +1055,28 @@ export default function CustomerInformations(props) {
 			<VsButton align="center" name={"Add"} type="submit" />
 			<ValidComp />  
     </ValidatorForm>
+	}
+	{((isDrawerOpened === "ADDPANEL") || (isDrawerOpened === "EDITPANEL")) &&
+	<ValidatorForm className={gClasses.form} onSubmit={handleAddEditPanel}>
+ 		<Typography className={gClasses.title}>{(isDrawerOpened === "ADDPANEL") ? "Add New Panel Doctor" : "Edit Panel Doctor details"}</Typography>
+		 <br />
+		<TextValidator fullWidth label="Panel Doctor Name" className={gClasses.vgSpacing}
+			value={emurText1}
+			onChange={(event) => setEmurText1(event.target.value)}
+			validators={['noSpecialCharacters']}
+			errorMessages={[`Special Characters not permitted`]}
+		/>
+		<TextValidator required fullWidth label="Panel Doctor Mobile Number" type="number" className={gClasses.vgSpacing}
+			value={emurText2}
+			onChange={(event) => setEmurText2(event.target.value)}
+			validators={['minNumber:1000000000', 'maxNumber:9999999999']}
+			errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
+		/>
+		<ShowResisterStatus/>
+		<BlankArea/>
+		<VsButton align="center"  type="submit" name={(isDrawerOpened === "ADDPANEL") ? "Add Panel Doctor" : "Edit Panel Doctor"} />
+		<ValidComp /> 
+	</ValidatorForm>
 	}
 	</Box>
 	</Drawer>		

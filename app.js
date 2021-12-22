@@ -483,10 +483,15 @@ InventorySchema = mongoose.Schema({
 
 InventoryListSchema = mongoose.Schema({
 	cid: String,
+	inventoryId: Number,
 	id: Number,
-	inventoryNumber: Number,
+	subId: Number,			// 0 for purchase and > 0 for withdraw
+	vendor: String,
+	unitRate: Number,
 	quantity: Number,
 	date:		Date,
+	expiryDate: Date,
+	expired: Boolean,
 	enabled: Boolean
 });
 

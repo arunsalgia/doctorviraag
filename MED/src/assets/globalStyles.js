@@ -178,6 +178,16 @@ const globalStyles = makeStyles((theme) => ({
 		fontSize: theme.typography.pxToRem(16),
 		fontWeight: theme.typography.fontWeightBold,
 	},
+  titleOrange: {
+		fontSize: theme.typography.pxToRem(18),
+		fontWeight: theme.typography.fontWeightBold,	
+		color: deepOrange[900],
+	},
+  patientInfo2Orange: {
+		fontSize: theme.typography.pxToRem(16),
+		fontWeight: theme.typography.fontWeightBold,
+		color: deepOrange[900],
+	},
 	patientInfo2Green: {
 		fontSize: theme.typography.pxToRem(16),
 		fontWeight: theme.typography.fontWeightBold,
@@ -210,6 +220,10 @@ const globalStyles = makeStyles((theme) => ({
 		width: '100%',
 		height: '100%',
 		backgroundColor: 'white',
+	},
+  fullWidth: {
+		display: "flex-root",
+    width: "100%"
 	},
 	signInWelcome: {
 		align: "center",

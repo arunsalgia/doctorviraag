@@ -512,4 +512,5 @@ function setHeader(res) {
 module.exports = {
 	patientRouter,
 	getPatientByPid,
+	getAllPatients,
 }

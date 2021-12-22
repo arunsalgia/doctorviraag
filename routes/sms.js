@@ -144,6 +144,7 @@ async function fast2SmsSendVisit(destMobile, docName, clinicName, visitDateStr, 
 
 async function fast2SmsCancel(destMobile, docName, clinicName, cancelDateStr, clinicMobile) {
 	let myParams = `${docName}|${clinicName}|${cancelDateStr}|${clinicMobile}`;
+	console.log(myParams);
 	getSMSIds();
 	let status = await fast2SmsSend(headerIdList[3], messageIdList[3], myParams, destMobile);
 	return status;
@@ -196,7 +197,7 @@ async function akshuUpdSmsLog(rec) {
 
 
 
-async function sendAppointmentSms(cid, pid, apptTime) {
+async function org_sendAppointmentSms(cid, pid, apptTime) {
 	// first find out if patinet has mobile number
 	//let patRec = await M_Patient.findOne({cid: cid, pid: pid});
 	let patRec = await getPatientByPid(cid, pid);
@@ -209,7 +210,7 @@ async function sendAppointmentSms(cid, pid, apptTime) {
 	let customerSmsLog = await akshuGetSmsLog(cid, d.getMonth(), d.getFullYear());
 	//console.log(customerSmsLog);
 	if (customerSmsLog.bulkSmsCount >= defaultPatientSms) {
-		// if default count has passed. CHeck if subscribed for bulk sms for patients
+		// if default count has passed. Check if subscribed for bulk sms for patients
 		if (await hasSubscribed(cid, AddOnList.bulk) === 0) {
 			console.log("Default Sms count Over");
 			// How to inform consumer
@@ -220,7 +221,7 @@ async function sendAppointmentSms(cid, pid, apptTime) {
 	// now prepare to send SMS
 	let customerRec = await akshuGetCustomer(cid);
 	//console.log("Customer",customerRec);
-
+	
 	fast2SmsSendAppointment(
 		patRec.mobile, 
 		customerRec.doctorName,
@@ -236,6 +237,74 @@ async function sendAppointmentSms(cid, pid, apptTime) {
 			console.log("Error sending message. ", error.status_code);
 		})
 }
+
+
+async function sendAppointmentSms(apptRec) {
+	var cid = apptRec.cid;
+	var pid = apptRec.pid;
+
+	// first find out if patinet has mobile number
+	//let patRec = await M_Patient.findOne({cid: cid, pid: pid});
+	let patRec = await getPatientByPid(cid, pid);
+	if (patRec.mobile < 1000000000) {
+		console.log("Mobile number not configured");
+		return;
+	}
+	// find out how many sms sent by user this month
+	let d = new Date();
+	let customerSmsLog = await akshuGetSmsLog(cid, d.getMonth(), d.getFullYear());
+	//console.log(customerSmsLog);
+	if (customerSmsLog.bulkSmsCount >= defaultPatientSms) {
+		// if default count has passed. Check if subscribed for bulk sms for patients
+		if (await hasSubscribed(cid, AddOnList.bulk) === 0) {
+			console.log("Default Sms count Over");
+			// How to inform consumer
+			return;
+		}
+	}
+
+	// now prepare to send SMS
+	let customerRec = await akshuGetCustomer(cid);
+	//console.log("Customer",customerRec);
+	//destMobile, docName, clinicName, apptDateStr, clinicMobile)
+	
+	fast2SmsSendAppointment(
+		patRec.mobile, 
+		apptRec.doctorName,
+		customerRec.clinicName,
+		makeIstDateTimeString(apptRec.apptTime),
+		customerRec.mobile
+		).
+		then((body) => {
+			++customerSmsLog.bulkSmsCount;
+			//akshuUpdSmsLog(customerSmsLog);
+		}).
+		catch((error) => {
+			console.log("Error sending message. ", error.status_code);
+		});
+
+		// if panel doctor then send message to panel doctor as well
+		//destMobile, docName, clinicName, apptDateStr, clinicMobile)
+	
+	if (apptRec.doctorName !== customerRec.doctorName) {
+		fast2SmsSendAppointment(
+			apptRec.doctorMobile, 
+			patRec.displayName,
+			customerRec.clinicName,
+			makeIstDateTimeString(apptRec.apptTime),
+			customerRec.mobile
+		).
+		then((body) => {
+				++customerSmsLog.bulkSmsCount;
+				//akshuUpdSmsLog(customerSmsLog);
+			}).
+		catch((error) => {
+			console.log("Error sending message. ", error.status_code);
+		});
+	}
+	akshuUpdSmsLog(customerSmsLog);
+}
+
 
 async function sendExpirySms(cid, pid, apptTime) {
 	// first find out if pastinet has mobile number
@@ -331,7 +400,7 @@ async function sendVisitSms(cid, pid, nextVisitTime, nextVisitUnit) {
 	})
 }
 
-async function sendCancelSms(cid, pid, cancelTime) {
+async function org_sendCancelSms(cid, pid, cancelTime) {
 	// first find out if patinet has mobile number
 	//let patRec = await M_Patient.findOne({cid: cid, pid: pid});
 	let patRec = await getPatientByPid(cid, pid);
@@ -373,6 +442,77 @@ async function sendCancelSms(cid, pid, cancelTime) {
 		console.log("Error sending message. ", error.status_code);
 	})
 }
+
+//async function sendCancelSms(cid, pid, cancelTime) {
+async function sendCancelSms(apptRec) {
+	var cid = apptRec.cid;
+	var pid = apptRec.pid;
+
+	// first find out if patinet has mobile number
+	//let patRec = await M_Patient.findOne({cid: cid, pid: pid});
+	let patRec = await getPatientByPid(cid, pid);
+	//console.log(patRec);
+
+	if (patRec.mobile < 1000000000) {
+		console.log("Mobile number not configured");
+		return;
+	}
+
+	// find out how many sms sent by user this month
+	let t = new Date();
+	let customerSmsLog = await akshuGetSmsLog(cid, t.getMonth(), t.getFullYear());
+	//console.log(customerSmsLog);
+	if (customerSmsLog.bulkSmsCount >= defaultPatientSms) {
+		// if default count has passed. CHeck if subscribed for bulk sms for patients
+		if (await hasSubscribed(cid, AddOnList.bulk) === 0) {
+			console.log("Bulk Sms count Over");
+			return;
+		}
+	}
+
+	// now prepare to send SMS
+	let customerRec = await akshuGetCustomer(cid);
+	//console.log(customerRec);
+	//destMobile, docName, clinicName, cancelDateStr, clinicMobile
+
+
+	fast2SmsCancel(
+		patRec.mobile, 
+		apptRec.doctorName,
+		customerRec.clinicName,
+		makeIstDateTimeString(apptRec.apptTime),
+		customerRec.mobile
+	).
+	then( (body) => {
+		++customerSmsLog.bulkSmsCount;
+		//akshuUpdSmsLog(customerSmsLog);
+	}).
+	catch((error) => {
+		console.log("Error sending message. ", error.status_code);
+	})
+
+	// if appointment of panel doctor
+		//destMobile, docName, clinicName, cancelDateStr, clinicMobile
+	if (apptRec.doctorName !== customerRec.doctorName) {
+		fast2SmsCancel(
+			apptRec.doctorMobile, 
+			patRec.displayName,
+			customerRec.clinicName,
+			makeIstDateTimeString(apptRec.apptTime),
+			customerRec.mobile
+		).
+		then( (body) => {
+			++customerSmsLog.bulkSmsCount;
+			//akshuUpdSmsLog(customerSmsLog);
+		}).
+		catch((error) => {
+			console.log("Error sending message. ", error.status_code);
+		})		
+	}
+
+	akshuUpdSmsLog(customerSmsLog);
+}
+
 
 async function sendReminderSms(cid, pid, apptTime) {
 	// first find out if patinet has mobile number

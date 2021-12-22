@@ -11,6 +11,7 @@ const {
 	akshuUpdateCustomer,
 	akshuGetAllCustomer,
 	rechargeCount,
+	compareDate,
 } = require('./functions');
 
 const { getPatientByPid  } = require("./patient");
@@ -26,7 +27,7 @@ const { getAllPatients  } = require("./patient");
 const { all } = require('.');
 
 
-const EARLYMORNINGSCHEDULEAT=2;
+const EARLYMORNINGSCHEDULEAT=2; 
 const MORNINGSCHEDULEAT=2;
 const AFTERNOONSCHEDULEAT=5;
 const OLDAPPTBACKDATE=3;
@@ -86,6 +87,8 @@ customerRouter.get('/update/:custData', async function(req, res, next) {
 		//console.log(tmp);
 		rec = new M_Customer();
 		rec.customerNumber = (tmp.length > 0) ? tmp[0].customerNumber+1 : 999;
+		rec.doctorPanel = [];
+		rec.doctorMobile = [];
 	}
 
 	rec.enabled = true;
@@ -140,6 +143,21 @@ customerRouter.get('/setworkinghours/:cid/:workingHours', async function(req, re
 	sendok(res, rec);
 })
 
+customerRouter.get('/updatepaneldoctors/:cid/:docList', async function(req, res, next) {
+  setHeader(res);
+	var {cid, docList} = req.params;
+	
+	return senderr(res, 601, "Currently not implemented");
+
+	let newList = JSON.parse(docList);
+	let rec = await akshuGetCustomer(cid);
+	
+	rec.doctorPanel = newList.name;
+	rec.doctorMobile = newList.mobile;``
+	
+	akshuUpdateCustomer(rec);
+	sendok(res, rec);
+})
 
 
 customerRouter.get('/closevisit', async function(req, res, next) {
@@ -151,6 +169,12 @@ customerRouter.get('/closevisit', async function(req, res, next) {
 customerRouter.get('/expireappointment', async function(req, res, next) {
   setHeader(res);
 	await expireAppoint();
+	sendok(res, "Done");
+})
+
+customerRouter.get('/expireinventory', async function(req, res, next) {
+  setHeader(res);
+	await expireInventory();
 	sendok(res, "Done");
 })
 
@@ -487,6 +511,50 @@ async function expireAppoint() {
 	
 
 }
+
+
+async function expireInventory() {
+	let today = new Date();
+	//console.log(today);
+	let allPurchases = await M_InventoryList.find({subId: 0});
+	for(let i=0; i<allPurchases.length; ++i) {
+		//console.log(allPurchases[i].expiryDate);
+		let status = compareDate(allPurchases[i].expiryDate, today);
+		//console.log(status);
+		if (status < 0) {
+			allPurchases[i].expired = true;
+			await allPurchases[i].save();
+
+			// this items has expired
+			let countQuery = [
+				{ $match: { cid: allPurchases[i].cid, inventoryId: allPurchases[i].inventoryId, id: allPurchases[i].id } },
+				{ $group: { _id: '$inventoryId', count: { $sum: '$quantity' } } }
+			];
+			//console.log(countQuery);
+			let countRec = await M_InventoryList.aggregate(countQuery)
+			console.log(countRec);
+			if (countRec[0].count > 0) {
+				let expRec = new M_InventoryList();
+				expRec.cid = allPurchases[i].cid;
+
+				expRec.inventoryId = allPurchases[i].inventoryId;
+				expRec.id = allPurchases[i].id;
+				expRec.subId = 99999;
+
+				expRec.vendor = '';
+				expRec.unitRate = 0;
+				expRec.quantity = -countRec[0].count;
+				expRec.date = today;
+
+				expRec.expiryDate = allPurchases[i].expiryDate;
+				expRec.expired = true;
+				expRec.enabled = true;
+				await expRec.save();
+			}
+		}
+	}
+}
+
 
 async function clearOldAppointment() {
 

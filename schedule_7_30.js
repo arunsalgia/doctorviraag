@@ -39,7 +39,7 @@ async function processMessage(msgname) {
 	await processMessage("closevisit");
 	await processMessage("expireappointment");
 	await processMessage("clearoldappointment");
-
+	await processMessage("expireinventory");
 	ProgramExit();
 
 })();

@@ -478,7 +478,10 @@ export default function Appointment() {
 	
 	const [doctorList, setDoctorList] = useState([]);
 	const [mobileList, setMobileList] = useState([]);
+
 	const [currApptInfo, setCurrApptInfo] = useState({});
+	const [currSlot, setCurrSlot] = useState({});
+
 	const [currentDoctor, setCurrentDoctor] = useState("");
 
   useEffect(() => {	
@@ -977,11 +980,21 @@ export default function Appointment() {
 	}
 	
 
-	function selectPanelDoctor(apptInfo) {
+	function selectPanelDoctor(slot, apptInfo) {
+		setCurrSlot(slot);
 		setCurrApptInfo(apptInfo);
 		setCurrentDoctor(doctorList[0]);
 		setIsDrawerOpened("PANELDOCTOR");
 	}
+
+	async function handlePanelDoctorAppointmentSubmit() {
+		var myIndex = doctorList.indexOf(currentDoctor);
+		var myMobile = mobileList[myIndex];
+		console.log(currentDoctor, myMobile);
+		setIsDrawerOpened("");
+		sendAppointmentRequest(currSlot, currApptInfo, currentDoctor, myMobile)
+	}
+
 
 	async function sendAppointmentRequest(slot, apptInfo, doctorName, doctorMobile) {
 		apptInfo["doctorName"] = doctorName;
@@ -1069,7 +1082,7 @@ export default function Appointment() {
 		};
 		
 		if (doctorList.length > 1) {
-			selectPanelDoctor(tmp)
+			selectPanelDoctor(slot, tmp)
 		} else {
 			sendAppointmentRequest(slot, tmp, doctorList[0], mobileList[0]);
 		}
@@ -1667,13 +1680,13 @@ export default function Appointment() {
 		</ValidatorForm>    		
 		}
 		{(isDrawerOpened == "PANELDOCTOR") &&
-		<ValidatorForm align="center" className={gClasses.form}>
+		<ValidatorForm align="center" className={gClasses.form} onSubmit={handlePanelDoctorAppointmentSubmit}>
 			<Typography className={gClasses.title}>{"Select Doctor from the Panel List"}</Typography>
 			<br />
 			{doctorList.map( (d, index) =>
 				<VsRadio label={d} checked={currentDoctor === d} align="left" onClick={() => setCurrentDoctor(d)} />
 			)}
-			<VsButton name={"Select Panel Doctor"} /> 
+			<VsButton type="submit" name={"Select Panel Doctor"} /> 
 		</ValidatorForm>    		
 		}
 		</Box>

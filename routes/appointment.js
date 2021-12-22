@@ -53,7 +53,7 @@ router.get('/cancel/:cid/:pid/:order', async function (req, res) {
 		//console.log(hRec);
 		hRec.visit = VISITTYPE.cancelled;
 		hRec.save();
-		sendCancelSms(cid, pid, hRec.apptTime)
+		sendCancelSms(hRec)
 		sendok(res, "OK");
 	} else {
 		senderr(res, 601, "Appoint not found");
@@ -102,7 +102,7 @@ router.get('/add/:cid/:apptdata', async function (req, res) {
 
 	hRec.save();
 
-	sendAppointmentSms(cid, newData.pid, newData.apptTime)
+	sendAppointmentSms(hRec)
 	sendok(res, hRec);
 });	
 

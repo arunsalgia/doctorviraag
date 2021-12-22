@@ -119,44 +119,83 @@ router.get('/listallinventory/:cid', async function(req, res, next) {
   
   var { cid } = req.params;
 	
-	let allRecs = await M_InventoryList.find({cid: cid}).sort({date: -1});
+	let allRecs = await M_InventoryList.find({cid: cid}).sort({id: -1, subId: -1});
 	sendok(res, allRecs);
 });
 
-router.get('/addinventory/:cid/:inventoryNumber/:quantity', async function(req, res, next) {
+router.get('/listmasterinventory', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryNumber,  quantity } = req.params;
-	console.log(inventoryNumber, quantity);
+  var { cid } = req.params;
+	
+	let allRecs = await M_InventoryList.find({}).sort({date: -1});
+	sendok(res, allRecs);
+});
 
-	let tmpRec = await M_InventoryList.find({cid: cid, inventoryNumber: Number(inventoryNumber)}).limit(1).sort({id: -1});
+router.get('/test', async function(req, res, next) {
+  setHeader(res);
+  
+	await M_InventoryList.deleteMany({});
+
+	sendok(res, "Done");
+});
+
+
+router.get('/addinventory/:cid/:inventoryId/:quantity/:rate/:vendor/:expiryDateStr', async function(req, res, next) {
+  setHeader(res);
+  
+  var { cid, inventoryId,  quantity, rate, vendor, expiryDateStr } = req.params;
+
+	//console.log(inventoryId, quantity);
+
+	let tmpRec = await M_InventoryList.find({cid: cid, inventoryId: Number(inventoryId)}).limit(1).sort({id: -1});
 	
 	let iRec = new M_InventoryList();
 	iRec.cid = cid;
+	iRec.inventoryId = Number(inventoryId);
 	iRec.id = (tmpRec.length > 0) ? tmpRec[0].id + 1 : 1;
-	iRec.inventoryNumber = Number(inventoryNumber);
+	iRec.subId = 0;				// always 0 for purchse
+	iRec.vendor = vendor; 
+	iRec.unitRate = Number(rate);
 	iRec.quantity = Number(quantity);
 	iRec.date = new Date();
+	iRec.expiryDate = new Date(Number(expiryDateStr.substr(0,4)),
+		Number(expiryDateStr.substr(4,2))-1,
+		Number(expiryDateStr.substr(6,2)),
+		0, 0 , 0
+	)
+	iRec.expired = false;
 	iRec.enabled = true;
 	iRec.save();
+	
 	
 	sendok(res, iRec);
 });
 
-router.get('/subinventory/:cid/:inventoryNumber/:quantity', async function(req, res, next) {
+router.get('/subinventory/:cid/:inventoryId/:id/:quantity', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryNumber, quantity} = req.params;
+  var { cid, inventoryId, id, quantity} = req.params;
 	
-	let tmpRec = await M_InventoryList.find({cid: cid, inventoryNumber: Number(inventoryNumber)}).limit(1).sort({id: -1});
+	let tmpRec = await M_InventoryList.find({cid: cid, inventoryId: Number(inventoryId), id: Number(id)}).limit(1).sort({subId: -1});
 	
 	let iRec = new M_InventoryList();
 	iRec.cid = cid;
-	iRec.id = (tmpRec.length > 0) ? tmpRec[0].id + 1 : 1;
-	iRec.inventoryNumber = Number(inventoryNumber);
+
+	iRec.inventoryId = Number(inventoryId);
+	iRec.id = Number(id);
+	iRec.subId = tmpRec[0].subId + 1;
+
+	iRec.vendor = "";
+	iRec.unitRate = 0;
 	iRec.quantity = -Number(quantity);
 	iRec.date = new Date();
+
+	iRec.expiryDate = new Date(2030, 0, 1);
+	iRec.expired = false;
+
 	iRec.enabled = true;
+
 	iRec.save();
 	
 	sendok(res, iRec);
@@ -180,18 +219,27 @@ router.get('/editinventory/:cid/:inventoryNumber/:id/:quantity', async function(
 });
 
 
-router.get('/delinventory/:cid/:inventoryNumber/:id', async function(req, res, next) {
+router.get('/delinventory/:cid/:inventoryId/:id/:subId', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryNumber,  id} = req.params;
-	inventoryNumber = Number(inventoryNumber);
+  var { cid, inventoryId,  id, subId} = req.params;
+	inventoryId = Number(inventoryId);
 	id = Number(id);
-	
-	let iRec = await M_InventoryList.findOne({cid: cid, inventoryNumber: inventoryNumber, id: id});
-	if (!iRec) return senderr(res, 601, "Invalid Inventory number or Id");
-	await M_InventoryList.deleteOne({cid: cid, inventoryNumber: inventoryNumber, id: id});
-		
-	sendok(res, "Deleted");
+	subId = Number(subId);
+
+	if (subId === 0) {
+		if (id === 0) {
+			await M_InventoryList.deleteMany({cid: cid, inventoryId: inventoryId});
+			await M_Inventory.deleteOne({cid: cid, id: inventoryId});
+		} else {
+			await M_InventoryList.deleteMany({cid: cid, inventoryId: inventoryId, id: id});
+		}
+	} else {
+		await M_InventoryList.deleteOne({cid: cid, inventoryId: inventoryId, id: id, subId: subId});
+	}
+
+	let allTrans = await M_InventoryList.find({cid: cid}).sort({id: -1, subId: -1});	
+	sendok(res, allTrans);
 });
 
 
