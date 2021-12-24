@@ -237,7 +237,7 @@ export default function PanelDoctor() {
 	return (
   <div className={gClasses.webPage} align="center" key="main">
 	<br />
-	<DisplayPageHeader headerName="Patient Directory" groupName="" tournament=""/>
+	<DisplayPageHeader headerName="List of Panel Doctors" groupName="" tournament=""/>
 	<br />
 	{(!panelSubscribed) &&
 		<Typography>Panel not subscribed</Typography>
