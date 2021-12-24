@@ -1,8 +1,9 @@
-//var smsRouter = express.Router();
+var smsRouter = express.Router();
+
 const { akshuGetCustomer, getNextVisit,
  } = require("./functions");
 
- const { getPatientByPid  } = require("./patient");
+ const { getPatientByPid, getAllPatients  } = require("./patient");
  const { hasSubscribed  } = require("./addon");
 
  function makeIstDateString(dStr) {
@@ -557,6 +558,39 @@ async function sendReminderSms(cid, pid, apptTime) {
 	})
 }
 
+
+smsRouter.use('/', function(req, res, next) {
+  setHeader(res);
+  if (!db_connection) { senderr(res, DBERROR,  ERR_NODB); return; }
+ 
+  next('route');
+});
+
+smsRouter.use('/supervisor/:smsDetails', async function(req, res, next) {
+  setHeader(res);
+  
+	var { smsDetails } = req.params;
+	console.log(smsDetails);
+	
+	smsDetails = JSON.parse(smsDetails);
+	
+	for(let dr=0; dr < smsDetails.doctorList.length; ++dr) {
+		let myCustomer = await akshuGetCustomer(smsDetails.doctorList[dr]);
+		if (smsDetails.receiver === "Doctor") {
+			console.log(myCustomer.mobile);
+			await fast2SmsSend(smsDetails.header, smsDetails.messageId, smsDetails.params, myCustomer.mobile);
+		} else {
+			// send sms to patients of the selected doctor
+			let allPatients = await getAllPatients(myCustomer._id);
+			for(let pt=0; pt<allPatients.length; ++pt) {
+				patRec = allPatients[pt];
+				await fast2SmsSend(smsDetails.header, smsDetails.messageId, smsDetails.params, patRec.mobile);
+			}
+		}
+	}
+	sendok(res, "SMS Sent");
+});
+
 function sendok(res, usrmsg) { res.send(usrmsg); }
 function senderr(res, errcode, errmsg) { res.status(errcode).send(errmsg); }
 function setHeader(res) { 
@@ -578,7 +612,7 @@ function getSMSLog() {
 }
 
 module.exports = {
-	// smsRouter,
+	smsRouter,
 	dummyCall,
 	clearSMSLog, getSMSLog,
 	generateSMSLogs,

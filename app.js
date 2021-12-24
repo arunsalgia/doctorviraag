@@ -60,7 +60,7 @@ io = require('socket.io')(httpServer, {
 
 // Routers
 router = express.Router();
-//const { smsRouter } = require('./routes/sms');
+const { smsRouter } = require('./routes/sms');
 const { patientRouter } = require('./routes/patient');
 const { customerRouter } = require('./routes/customer');
 const { addOnRouter } = require('./routes/addon');
@@ -146,7 +146,7 @@ app.use('/addon', addOnRouter);
 app.use('/doctortype', doctorTypeRouter);
 app.use('/festival', festivalRouter);
 app.use('/nextvisit', nextVisitRouter);
-//app.use('/sms', smsRouter);
+app.use('/sms', smsRouter);
 app.use('/inventory', inventoryRouter);
 
 //Schema
