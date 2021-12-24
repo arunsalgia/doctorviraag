@@ -141,11 +141,21 @@ router.get('/test', async function(req, res, next) {
 });
 
 
-router.get('/addinventory/:cid/:inventoryId/:quantity/:rate/:vendor/:expiryDateStr', async function(req, res, next) {
+router.get('/addinventory/:cid/:inventoryId/:quantity/:rate/:vendor/:purchaseDateStr/:expiryMonth', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryId,  quantity, rate, vendor, expiryDateStr } = req.params;
-
+  var { cid, inventoryId,  quantity, rate, vendor, purchaseDateStr, expiryMonth } = req.params;
+	let purchaseDate = new Date(Number(purchaseDateStr.substr(0,4)),
+		Number(purchaseDateStr.substr(4,2))-1,
+		Number(purchaseDateStr.substr(6,2)),
+		0, 0 , 0
+	);
+	let expiryDate = new Date(Number(purchaseDateStr.substr(0,4)),
+		Number(purchaseDateStr.substr(4,2))-1,
+		Number(purchaseDateStr.substr(6,2)),
+		0, 0 , 0
+	);
+	expiryDate.setMonth(expiryDate.getMonth()+Number(expiryMonth));
 	//console.log(inventoryId, quantity);
 
 	let tmpRec = await M_InventoryList.find({cid: cid, inventoryId: Number(inventoryId)}).limit(1).sort({id: -1});
@@ -158,12 +168,43 @@ router.get('/addinventory/:cid/:inventoryId/:quantity/:rate/:vendor/:expiryDateS
 	iRec.vendor = vendor; 
 	iRec.unitRate = Number(rate);
 	iRec.quantity = Number(quantity);
-	iRec.date = new Date();
-	iRec.expiryDate = new Date(Number(expiryDateStr.substr(0,4)),
-		Number(expiryDateStr.substr(4,2))-1,
-		Number(expiryDateStr.substr(6,2)),
+	iRec.date = purchaseDate;
+	iRec.expiryDate = expiryDate;
+	iRec.expired = false;
+	iRec.enabled = true;
+	iRec.save();
+	
+	
+	sendok(res, iRec);
+});
+
+router.get('/updateinventory/:cid/:inventoryId/:id/:quantity/:rate/:vendor/:purchaseDateStr/:expiryMonth', async function(req, res, next) {
+  setHeader(res);
+  
+  var { cid, inventoryId, id, quantity, rate, vendor, purchaseDateStr, expiryMonth } = req.params;
+	inventoryId = Number(inventoryId);
+	id = Number(id);
+	
+	let iRec = await M_InventoryList.findOne({cid: cid, inventoryId: inventoryId, id: id, subId: 0});
+	if (!iRec) return senderr(res, 601, "Not found");
+	
+	let purchaseDate = new Date(Number(purchaseDateStr.substr(0,4)),
+		Number(purchaseDateStr.substr(4,2))-1,
+		Number(purchaseDateStr.substr(6,2)),
 		0, 0 , 0
-	)
+	);
+	let expiryDate = new Date(Number(purchaseDateStr.substr(0,4)),
+		Number(purchaseDateStr.substr(4,2))-1,
+		Number(purchaseDateStr.substr(6,2)),
+		0, 0 , 0
+	);
+	expiryDate.setMonth(expiryDate.getMonth()+Number(expiryMonth));
+
+	iRec.vendor = vendor; 
+	iRec.unitRate = Number(rate);
+	iRec.quantity = Number(quantity);
+	iRec.date = purchaseDate;
+	iRec.expiryDate = expiryDate;
 	iRec.expired = false;
 	iRec.enabled = true;
 	iRec.save();
@@ -201,7 +242,26 @@ router.get('/subinventory/:cid/:inventoryId/:id/:quantity', async function(req, 
 	sendok(res, iRec);
 });
 
-router.get('/editinventory/:cid/:inventoryNumber/:id/:quantity', async function(req, res, next) {
+router.get('/updatesubinventory/:cid/:inventoryId/:id/:subId/:quantity', async function(req, res, next) {
+  setHeader(res);
+  
+  var { cid, inventoryId, id, subId, quantity} = req.params;
+	inventoryId = Number(inventoryId);
+	id = Number(id);
+	subId = Number(subId);
+	
+	
+	let iRec = await M_InventoryList.findOne({ cid: cid, inventoryId: inventoryId, id: id, subId: subId });
+	if (!iRec) return senderr(res, 601, "Not found");
+	
+	iRec.quantity = -Number(quantity);
+	
+	iRec.save();
+	
+	sendok(res, iRec);
+});
+
+router.get('/orgeditinventory/:cid/:inventoryNumber/:id/:quantity', async function(req, res, next) {
   setHeader(res);
   
   var { cid, inventoryNumber,  id, quantity} = req.params;

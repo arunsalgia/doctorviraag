@@ -346,8 +346,7 @@ export default function Patient() {
   }
 
 
-	async function handleCancelPatient(rec) {
-		console.log("handleCancelPatient", rec.displayName);
+	async function junked_handleCancelPatient(rec) {
 		let myData = await getVisitCount(rec);
 		console.log(myData);
 		if (myData != null) {
@@ -435,21 +434,17 @@ export default function Patient() {
 		setIsDrawerOpened(true);
 	}
 
-	async function handleCancel(rec) {
-			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/patient/visitcount/${userCid}/${rec.pid}`;
+	async function handleDelete(rec) {
+		let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/appointment/pendingcount/patient/${userCid}/${rec.pid}`;
 		try {
-			let resp = await axios.get(myUrl);
 			let msg = "";
-			if ((resp.data.pending > 0) && (resp.data.visit > 0)) {
-				msg = `${rec.displayName} has appointment and ${resp.data.visit} visit(s).`;
-			} else if (resp.data.pending > 0) {
-				msg = `${rec.displayName} has appointment.`;
-			} else if (resp.data.visit > 0) {
-				msg = `${rec.displayName} has ${resp.data.visit} visit(s).`;
-			}
-			msg += " Are you sure you want to delete?";
+			let resp = await axios.get(myUrl);
+			if (resp.data.pending > 0) {
+				msg = `${rec.displayName} has pending appointment. `;
+			} 
+			msg += "Are you sure you want to delete?";
 			vsDialog("Delete patient", msg,
-				{label: "Yes", onClick: () => handleCancelConfirm(rec) },
+				{label: "Yes", onClick: () => handleDeleteConfirm(rec) },
 				{label: "No" }
 			);		
 		} catch (e) {
@@ -458,9 +453,41 @@ export default function Patient() {
 		}		
 	}
 	
-	function handleCancelConfirm(rec) {
-		alert.error("Delete all info of "+rec.displayName);
-		//console.log(rec);
+	async function deletePatient(rec) {
+		let status = false;
+		let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/patient/delete/${userCid}/${rec.pid}`;
+		try {
+			await axios.get(myUrl);
+			setPatientArray(patientArray.filter(x => x.pid !== rec.pid));
+			status = true;
+		} catch (e) {
+			console.log(e);
+			alert.error("Error deleting patient record");
+		}		
+	}
+	
+	async function deleteAppointment(rec) {
+
+	}
+	
+	async function deleteReport(rec) {
+	}
+		
+	async function deleteVisit(rec) {
+		
+	}
+	
+	async function deleteInvestigation(rec) {
+		
+	}
+	async function handleDeleteConfirm(rec) {
+		if (await deletePatient(rec)) {
+			await deleteAppointment(rec);
+			await deleteReport(rec);
+			await deleteVisit(rec);
+			await deleteInvestigation(rec);
+			// any thing else
+		}
 	}
 
 
@@ -567,7 +594,7 @@ export default function Patient() {
 			</IconButton>
 		}
 		button3={
-			<IconButton color="secondary" size="small" onClick={() => {handleCancel(m)}}  >
+			<IconButton color="secondary" size="small" onClick={() => {handleDelete(m)}}  >
 				<CancelIcon />
 			</IconButton>
 		}

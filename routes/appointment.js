@@ -274,6 +274,24 @@ router.get('/count/patient/:cid/:pid', async function (req, res) {
 });		
 
 
+router.get('/pendingcount/patient/:cid/:pid', async function (req, res) {
+  setHeader(res);
+  var {cid, pid, year } = req.params;
+	pid = Number(pid);
+	
+	let pendingQuery = [
+		{ $match: { cid: cid, pid: pid, visit: VISITTYPE.pending } },
+		{ $group: { _id: '$pid', count: { $sum: 1 } } }
+  ];
+	
+	let p = await M_Appointment.aggregate(pendingQuery)
+		
+	let pCount = (p.length > 0) ? p[0].count : 0;
+	
+	sendok(res, {pending: pCount});
+});		
+
+
 router.get('/count/month/:cid/:year/:month', async function (req, res) {
   setHeader(res);
   var {cid, month, year } = req.params;

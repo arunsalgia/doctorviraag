@@ -53,6 +53,14 @@ router.get('/delete/:cid/:pid/:title', async function(req, res, next) {
 });
 
 
+router.get('/deletepatient/:cid/:pid', async function(req, res, next) {
+  setHeader(res);
+	var {cid, pid, title} = req.params;
+	
+	let rec = await M_Image.deleteMany({cid: cid, pid: pid});
+	sendok(res, "Ok");
+});
+
 router.post('/upload', (req, res, next) => {
 	const newpath = __dirname + "/";
 	console.log(req);

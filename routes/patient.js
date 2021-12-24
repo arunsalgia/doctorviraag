@@ -309,17 +309,14 @@ patientRouter.get('/update/:cid/:pName/:pAge/:pGender/:pEmail/:pMobile', async f
     senderr(res, 601, `Patient ${pName} not in database.`);
 });
 
-patientRouter.get('/delete/:cid/:patient', async function(req, res, next) {
+patientRouter.get('/delete/:cid/:pid', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, patient } = req.params;
+  var { cid, pid } = req.params;
 	
 	clearPatient(cid);
 	
-	let id = getLoginName(patient);
-	console.log(id);
-	
-	M_Patient.deleteOne({cid: cid, name: id}).then(function(){
+	M_Patient.deleteOne({cid: cid, pid: pid}).then(function(){
     console.log("Data deleted"); // Success
 		sendok(res, "1 document deleted");
 	}).catch(function(error){

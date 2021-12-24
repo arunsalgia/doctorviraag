@@ -27,6 +27,7 @@ import { BlankArea } from 'CustomComponents/CustomComponents';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
+/*
 let welcomeMESSAGE = `${process.env.REACT_APP_WELCOME}`;
 
 const useStyles = makeStyles((theme) => ({
@@ -74,11 +75,13 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '0px',
 },
 }));
+*/
+
 
 let deviceIsMobile=isMobile();
 
 export default function SignIn() {
-  const classes = useStyles();
+  //const classes = useStyles();
   const gClasses = globalStyles();
   const history = useHistory();
   const [userName, setUserName] = useState();
@@ -131,12 +134,12 @@ export default function SignIn() {
 	}
 };
 
-  function handleForgot() {
-    console.log("Call forgot password here")
-    // history.push('/admin/emailpassword');
-    sessionStorage.setItem("currentLogin", "FORGOT");
-    cdRefresh();
-  }
+function handleForgot() {
+  console.log("Call forgot password here")
+  // history.push('/admin/emailpassword');
+  sessionStorage.setItem("currentLogin", "FORGOT");
+  cdRefresh();
+}
 
 
   const handleClick = async () => {
@@ -197,7 +200,8 @@ export default function SignIn() {
      
     }
   }
-  
+
+ 
   async function handleAndroid() {
     try {
       setDownloadMessage("APL Android app download started. Please wait...")
@@ -263,9 +267,9 @@ export default function SignIn() {
   return (
 	<Container component="main" maxWidth="xs">
 	<CssBaseline />
-	<div className={classes.paper}>
+	<div className={gClasses.paper}>
 	<CricDreamLogo />
-	<ValidatorForm align="center" className={classes.form} onSubmit={handleSubmit}>
+	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
 		<Typography component="h1" variant="h5" align="center">Sign in</Typography>
 		<BlankArea />
 		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
@@ -275,6 +279,7 @@ export default function SignIn() {
 			validators={['noSpecialCharacters']}
 			errorMessages={['Special characters not permitted']}
 		/>
+    <br/>
 		{(showPassword) &&
 			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
 				id="password" label="Password" type={"text"}
@@ -309,7 +314,7 @@ export default function SignIn() {
 		}
 		<Typography className={(errorMessage.isError) ? gClasses.error : gClasses.nonerror} align="left">{errorMessage.msg}</Typography>
 		<ValidComp />
-		<Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
+		<Button type="submit" fullWidth variant="contained" color="primary" className={gClasses.submit}>
 			Sign In
 		</Button>
 		</ValidatorForm>	

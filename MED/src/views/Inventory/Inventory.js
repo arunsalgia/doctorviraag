@@ -73,7 +73,7 @@ import {
 import { 
 	vsDialog,
 	disablePastDt,
-	//disableFutureDt,
+	disableFutureDt,
  } from "views/functions.js"
 
 import {
@@ -241,8 +241,6 @@ export default function Inventory() {
   //const classes = useStyles();
 	const gClasses = globalStyles();
 	const alert = useAlert();
-
-//	const [searchText, setSearchText] = useState("");
 	
 	const [registerStatus, setRegisterStatus] = useState("");
 	
@@ -253,25 +251,26 @@ export default function Inventory() {
 	const [emurData1, setEmurData1] = useState("");
 	const [emurData2, setEmurData2] = useState("");
 	const [emurBalance, setEmurBalance] = useState("");
-	const [emurInventory, setEmurInventory] = useState(0);
-	const [emurExpiryDate, setEmurExpiryDate] = useState(moment());
+	const [emurInventory, setEmurInventory] = useState( {inventoryId: -1, id: -1 });
+	const [emurPurchaseDate, setEmurPurchaseDate] = useState(moment());
 	const [emurRate, setEmurRate] = useState("0");
 	const [emurVendor, setEmurVendor] = useState("");
-
+	const [emurExpiryMonth, setEmurExpiryMonth] = useState("3");
 	// 
-
+	const [emurMaxMin, setEmurMaxMin] = useState( {min: 1, max: 1} );
 	const [isDrawerOpened, setIsDrawerOpened] = useState("");
   const [expandedPanel, setExpandedPanel] = useState(false);
 
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedPanel(isExpanded ? panel : false);
+		setExpandedPanel2(false);
   };
 	
   const [expandedPanel2, setExpandedPanel2] = useState(false);
   const handleAccordionChange2 = (panel) => (event, isExpanded2) => {
     setExpandedPanel2(isExpanded2 ? panel : false);
 	};
-  //const [page, setPage] = useState(0);
+  
 	
 	
   useEffect(() => {
@@ -326,34 +325,28 @@ export default function Inventory() {
 		{props.list.map( (i, index) => {
 			let d = new Date(i.date);
 			let dateStr = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
-			let expiryStr = "";
-			let desc = "";
-			if (i.subId === 0) {
-				d =  new Date(i.expiryDate);
-				console.log(d);
-				expiryStr = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
-				console.log(expiryStr);
-				desc = "Purchased";
-			} else if (i.expired) {
-				desc = "Expired"
-			} else {
-				desc = "Used";
-			}
 		return (
 		<TableRow align="Center" key={"DATA"+index} className={(i.subId === 0) ? gClasses.normalAccordian : gClasses.selectedAccordian} >
 			<TableCell >
 			<Typography className={gClasses.patientInfo2}>{dateStr}</Typography>
 			</TableCell>	
-			<TableCell >
-			<Typography className={gClasses.patientInfo2}>{desc}</Typography>
+			<TableCell align="left" >
+			<div>
+			{(i.expired) &&
+				<Typography className={gClasses.patientInfo2Red}>Expired</Typography>
+			}
+			{(!i.expired) &&
+				<Typography className={gClasses.patientInfo2}>Used</Typography>
+			}
+			</div>
 			</TableCell>
-			<TableCell >
+			<TableCell align="left" >
 			<Typography className={gClasses.patientInfo2}>{Math.abs(i.quantity)}</Typography>
 			</TableCell>
-			<TableCell >
+			<TableCell align="right">
 				{(!props.expired) &&
 				<div>
-				<EditIcon color="primary" size="small" onClick={() => { handleEditItem(i)}} />
+				<EditIcon color="primary" size="small" onClick={() => { handleSubEditFromInventory(i)}} />
 				<CancelIcon color="secondary" size="small" onClick={() => { handleDeleteTransaction(i.inventoryId, i.id, i.subId)}} />
 				</div>
 				}
@@ -380,13 +373,14 @@ export default function Inventory() {
 	)}	
 		
 	function DisplayInventoryPurchases(props) {
-		console.log(props.list);
+		//console.log(props.list);
 		let myShopping = props.list.filter( x => x.subId === 0);
 
 		//console.log(myShopping);
 		//let myConsumption = props.list.filter( x => x.subId !== 0);
 	return (
 		<div className={gClasses.fullWidth} >
+		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 		<DisplayInventoryToolTips list={myShopping} />
 		{myShopping.map((i, index) => {
 
@@ -412,7 +406,7 @@ export default function Inventory() {
 		<Accordion className={gClasses.fullWidth} key={"INVAC"+myStr2} expanded={expandedPanel2 === myStr2} onChange={handleAccordionChange2(myStr2)}>
 				<AccordionSummary  className={(expandedPanel2 === myStr2) ? gClasses.selectedAccordian : gClasses.normalAccordian} key={"INVAS"+myStr2} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
 				<Grid className={gClasses.noPadding} container align="center">
-				<Grid key={"INVITEM1"+myStr2} item xs={6} sm={6} md={4} lg={4} >
+				<Grid align="left" key={"INVITEM1"+myStr2} item xs={6} sm={6} md={4} lg={4} >
 					<Typography >
 						<span className={gClasses.patientInfo2}>{"Vendor: "+i.vendor}</span>
 						<span align="left"
@@ -424,16 +418,22 @@ export default function Inventory() {
 						</span>
 					</Typography>
 				</Grid>	
-				<Grid key={"INVITEM2"+myStr2} item xs={6} sm={6} md={3} lg={3} >
-					<Typography className={gClasses.patientInfo2}>{"Expiry: "+expiryStr + ((i.expired) ? "(expired)" : "")}</Typography>
-				</Grid>	
-				<Grid key={"INVITEM3"+myStr2} item xs={6} sm={6} md={3} lg={3} >
+				{(!i.expired) &&
+					<Grid align="left" key={"INVITEM2"+myStr2} item xs={6} sm={6} md={3} lg={3} >
+						<Typography className={gClasses.patientInfo2}>{ "Expiry: "+expiryStr}</Typography>
+					</Grid>	
+				}
+				{(i.expired) &&
+					<Grid align="left" key={"INVITEM2"+myStr2} item xs={6} sm={6} md={3} lg={3} >
+						<Typography className={gClasses.patientInfo2Red}>{"Expired"}</Typography>
+					</Grid>	
+				}				<Grid align="left" key={"INVITEM3"+myStr2} item xs={6} sm={6} md={3} lg={3} >
 					<Typography className={gClasses.patientInfo2}>{"Balance: " + balance }</Typography>
 				</Grid>	
-				<Grid key={"INVITEM4"+myStr2} item xs={6} sm={6} md={2} lg={2} >
+				<Grid align="right" key={"INVITEM4"+myStr2} item xs={6} sm={6} md={2} lg={2} >
 					{(!i.expired) &&
 					<div>
-					<EditIcon color="primary" size="small" onClick={() => { handleEditItem(i)}} />
+					<EditIcon color="primary" size="small" onClick={() => { handleEditPurchaseInvevtory(i)}} />
 					<MinusIcon color="primary" size="small" onClick={() => { handleSubFromInventory(i)}} />
 					<CancelIcon color="secondary" size="small" onClick={() => { handleDeleteTransaction(i.inventoryId, i.id, 0)}} />
 					</div>
@@ -452,19 +452,19 @@ export default function Inventory() {
 		</Accordion>
 		)}
 		)}
+		</Box>
 	</div>
 	)}
 
+	
 	function DisplayInventorySummary() {
 	return (
 		<div>
-			<VsButton name="Add new Inventory Item" align="right" onClick={handleAddItem} />
-			<br />
 			{inventoryItems.map((i, index) => {
 				let myTransactions = inventoryTransactions.filter(x => x.inventoryId === i.id);
 				let balance =  lodashSumBy(myTransactions, 'quantity');
 				let temp = myTransactions.filter(x => x.subId === 0);
-				console.log(temp);
+				//console.log(temp);
 				let totalAmount =  0; ///temp.quantity * temp.unitRate;
 				for(let ar=0; ar<temp.length; ++ar) {
 					totalAmount += temp[ar].quantity * temp[ar].unitRate;
@@ -477,13 +477,13 @@ export default function Inventory() {
 					<Grid key={"ITEM1"+index} item xs={6} sm={6} md={4} lg={4} >
 						<Typography className={gClasses.patientInfo2Orange}>{i.name}</Typography>
 					</Grid>	
-					<Grid key={"ITEM2"+index} item xs={6} sm={6} md={3} lg={3} >
+					<Grid align="left" key={"ITEM2"+index} item xs={6} sm={6} md={3} lg={3} >
 						<Typography className={gClasses.patientInfo2Orange}>{"Balance Qty: " + balance }</Typography>
 					</Grid>	
-					<Grid key={"ITEM2"+index} item xs={6} sm={6} md={3} lg={3} >
+					<Grid align="left" key={"ITEM3"+index} item xs={8} sm={8} md={3} lg={3} >
 						<Typography className={gClasses.patientInfo2Orange}>{"Total Amount: " + totalAmount + "/-"}</Typography>
 					</Grid>	
-					<Grid key={"ITEM4"+index} item xs={6} sm={6} md={2} lg={2} >
+					<Grid align="right" key={"ITEM4"+index} item xs={4} sm={4} md={2} lg={2} >
 						<EditIcon color="primary" size="small" onClick={() => { handleEditItem(i)}} />
 						<AddIcon color="primary" size="small" onClick={() => { handleAddToInventory(i)}} />
 						<CancelIcon color="secondary" size="small" onClick={() => { handleDeleteTransaction(i.id, 0, 0)}} />
@@ -505,12 +505,34 @@ export default function Inventory() {
 		setEmurData2(1);
 		setEmurVendor("");
 		setEmurRate("1");
-		setEmurBalance(10000000);
-		setEmurInventory(item.id);
-		setEmurExpiryDate(moment());
+		//setEmurBalance(10000000);
+		setEmurMaxMin({min: 1, max: 10000000});
+		setEmurInventory({inventoryId: item.id, id: -1 });
+		setEmurPurchaseDate(moment());
+		setEmurExpiryMonth("3");
 		setIsDrawerOpened("ADDINVENTORY");
 	}
 
+
+	function handleEditPurchaseInvevtory(item) {
+		//console.log(item);
+		let tmp = inventoryItems.find(x => x.id === item.inventoryId);
+		setEmurData1(tmp.name);
+		setEmurData2(item.quantity);
+		setEmurVendor(item.vendor);
+		setEmurRate(item.unitRate);
+		tmp = inventoryTransactions.filter(x => x.inventoryId === item.inventoryId && x.id === item.id && x.subId !== 0);
+		setEmurMaxMin({min: Math.abs(lodashSumBy(tmp, 'quantity')), max: 10000000});
+		setEmurInventory({inventoryId: item.inventoryId, id: item.id});
+		let pdate = new Date(item.date);
+		let edate = new Date(item.expiryDate);
+		setEmurPurchaseDate(moment(pdate));
+		tmp = (edate.getFullYear()*12 + edate.getMonth()) - (pdate.getFullYear()*12 +pdate.getMonth());
+		console.log(pdate, edate, tmp);
+		setEmurExpiryMonth(tmp);
+		setIsDrawerOpened("EDITINVENTORY");
+	}
+	
 	function handleSubFromInventory(item) {
 		console.log(item);
 		let balance = lodashSumBy(
@@ -521,37 +543,109 @@ export default function Inventory() {
 		console.log(tmp);
 		setEmurData1(tmp.name);
 		setEmurData2(1);
-		setEmurBalance(balance);
+		//setEmurBalance(balance);
+		setEmurMaxMin({min: 1, max: balance});
 		setEmurInventory({inventoryId: item.inventoryId, id: item.id});
 		setEmurVendor("");
 		setEmurRate("1");
-		setIsDrawerOpened("SUBINVENTORY");
+		setIsDrawerOpened("NEWSUBINVENTORY");
+	}
+
+	function handleSubEditFromInventory(item) {
+		setEmurInventory({inventoryId: item.inventoryId, id: item.id, subId: item.subId});
+		let balance = lodashSumBy(
+			inventoryTransactions.filter(x => x.inventoryId === item.inventoryId && x.id === item.id), 
+			'quantity')
+		setEmurMaxMin({min: 1, max: balance+Math.abs(item.quantity)});
+		setEmurData2(Math.abs(item.quantity));
+		setIsDrawerOpened("EDITSUBINVENTORY");
 	}
 
 
-	async function handleAddSubFromInventory() {
-		console.log(emurInventory);
+	async function handleAddEditFromInventory() {
+		//console.log(emurInventory);
 		try {
-			let myCmd;
+			let myCmd = (isDrawerOpened === "EDITINVENTORY") ? "updateinventory" : "addinventory";
 			let myUrl;
-			if (isDrawerOpened === "ADDINVENTORY") {
-				myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/inventory/addinventory/${userCid}/${emurInventory}/${emurData2}`;
-				let d = emurExpiryDate.toDate();
-				let myDateStr = `${d.getFullYear()}${MONTHNUMBERSTR[d.getMonth()]}${DATESTR[d.getDate()]}`;
-				console.log(myDateStr);
-				myUrl += `/${emurRate}/${emurVendor}/${myDateStr}`;
-			} else {
-				myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/inventory/subinventory/${userCid}/${emurInventory.inventoryId}/${emurInventory.id}/${emurData2}`;
+			myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/inventory/${myCmd}/${userCid}/${emurInventory.inventoryId}`;
+			if (isDrawerOpened === "EDITINVENTORY") {
+				myUrl += `/${emurInventory.id}`;
 			}
-			console.log(myUrl);
+			let d = emurPurchaseDate.toDate();
+			let myDateStr = `${d.getFullYear()}${MONTHNUMBERSTR[d.getMonth()]}${DATESTR[d.getDate()]}`;
+			myUrl += `/${emurData2}/${emurRate}/${emurVendor}/${myDateStr}/${emurExpiryMonth}`;
+			//console.log(myUrl);
 			let resp = await axios.get(myUrl);
-			let tmpArray = [resp.data].concat(inventoryTransactions);			
-			//setInventoryTransactions(lodashSortBy(tmpArray, 'id', 'subId'));
-			setInventoryTransactions(tmpArray);
+			if (isDrawerOpened === "EDITINVENTORY") {
+				let tmpArray = inventoryTransactions;
+				//let idx = tmpArray.indexOf(x => x.inventoryId === emurInventory.inventoryId && x.id === emurInventory.id && x.subId === 0);
+				for(let i=0; i<tmpArray.length; ++i) {
+					if ((tmpArray[i].inventoryId === emurInventory.inventoryId) && 
+						(tmpArray[i].id === emurInventory.id) && 
+						(tmpArray[i].subId === 0)) 
+					{
+						tmpArray[i] = resp.data;
+						setInventoryTransactions(tmpArray);	
+						break;
+					}
+				}
+			} else {
+				let tmpArray = [resp.data].concat(inventoryTransactions);			
+				setInventoryTransactions(tmpArray);
+			}
+
 		} catch (e) {
 			console.log(e);
 			alert.error("Error adding new Inventory transaction");
 		}
+		setIsDrawerOpened("");
+	}
+
+	async function handleNewWithdrawal() {
+		console.log(emurInventory);
+		try {
+			let myCmd;
+			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/inventory/subinventory/${userCid}/${emurInventory.inventoryId}/${emurInventory.id}/${emurData2}`;
+			console.log(myUrl);
+			let resp = await axios.get(myUrl);
+			let tmpArray = [resp.data].concat(inventoryTransactions);			
+			setInventoryTransactions(tmpArray);
+		} catch (e) {
+			console.log(e);
+			alert.error("Error updating withdrawal of Inventory");
+		}
+	}
+	
+	async function handleEditWithdrawals() {
+		//console.log(emurInventory);
+		try {
+			let myCmd;
+			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/inventory/updatesubinventory/${userCid}/${emurInventory.inventoryId}/${emurInventory.id}/${emurInventory.subId}/${emurData2}`;
+			let resp = await axios.get(myUrl);
+			let tmpArray = inventoryTransactions;	
+			for(let i=0; i<tmpArray.length; ++i) {
+				if ((tmpArray[i].inventoryId === emurInventory.inventoryId) &&
+					(tmpArray[i].id === emurInventory.id) &&
+					(tmpArray[i].subId === emurInventory.subId)) {
+					//console.log("found");
+					console.log(tmpArray[i].quantity, resp.data.quantity);
+					tmpArray[i] = resp.data;
+					setInventoryTransactions(tmpArray);
+					setExpandedPanel2(false);
+					break;
+				}
+			}
+		} catch (e) {
+			console.log(e);
+			alert.error("Error updating withdrawal of Inventory");
+		}
+	}
+	
+	async function handleSubFromInventorySubmit() {
+		if (isDrawerOpened === "NEWSUBINVENTORY")
+			handleNewWithdrawal();
+		else 
+			handleEditWithdrawals();
 		setIsDrawerOpened("");
 	}
 
@@ -592,8 +686,6 @@ export default function Inventory() {
 		setIsDrawerOpened("");
 	}
 	
-
-
 	function handleDeleteTransaction(inventoryId, id, subId) {
 		// first check if banace goes below zero
 		let myMsg = "";
@@ -666,9 +758,9 @@ export default function Inventory() {
 	}
 	
 		
-	function handleExpiryDate(d) {
+	function handlePurchaseDate(d) {
 		//console.log(d);
-		setEmurExpiryDate(d);
+		setEmurPurchaseDate(d);
 	}
 
 
@@ -678,6 +770,8 @@ export default function Inventory() {
 		<DisplayPageHeader headerName="Inventory" groupName="" tournament=""/>
 		<br />
 		<CssBaseline />
+		<VsButton name="Add new Inventory Item" align="right" onClick={handleAddItem} />
+		<br />
 		<DisplayInventorySummary />
 		<Drawer className={gClasses.drawer} anchor="right" variant="temporary" open={isDrawerOpened !== ""} >
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
@@ -695,18 +789,14 @@ export default function Inventory() {
 			<VsButton type="submit" name={(isDrawerOpened === "ADDITEM") ? "Add Inventory Item" : "Update Inventory Item"} />
 			</ValidatorForm>    						
 		}
-		{((isDrawerOpened === "ADDINVENTORY") || (isDrawerOpened === "SUBINVENTORY")) &&
-			<ValidatorForm align="center" className={gClasses.form} onSubmit={handleAddSubFromInventory}>
-			<Typography className={gClasses.title}>{(isDrawerOpened === "ADDINVENTORY")  ? `Add to Inventry of ${emurData1}` : `Withdraw from Inventry of ${emurData1}`}</Typography>
-			{(isDrawerOpened === "ADDINVENTORY") &&
+		{((isDrawerOpened === "ADDINVENTORY") || (isDrawerOpened === "EDITINVENTORY")) &&
+			<ValidatorForm align="center" className={gClasses.form} onSubmit={handleAddEditFromInventory}>
+			<Typography className={gClasses.title}>{(isDrawerOpened === "ADDINVENTORY")  ? `Add Inventory of ${emurData1}` : `Edit Inventory of ${emurData1}`}</Typography>
 			<TextValidator fullWidth className={gClasses.vgSpacing}
 				id="vendor" label="Vendor" 
 				value={emurVendor} 
 				onChange={(event) => { setEmurVendor(event.target.value) }}
 			/>
-			}
-			{(isDrawerOpened === "ADDINVENTORY") &&
-			<div>
 			<TextValidator fullWidth required className={gClasses.vgSpacing}
 				id="Rate" label="Unit Rate" type="number"
 				value={emurRate} 
@@ -715,40 +805,50 @@ export default function Inventory() {
 				errorMessages={['Invalid Amount']}
 			/>
 			<br/>
-			</div>
-			}
-			{(isDrawerOpened === "ADDINVENTORY") &&
-			<div>
-			<Grid className={gClasses.noPadding} container align="center">
-				<Grid key={"ITEM2"} item xs={4} sm={4} md={4} lg={4} >
-					<Datetime 
-						className={gClasses.dateTimeBlock}
-						inputProps={{className: gClasses.dateTimeNormal}}
-						timeFormat={false} 
-						initialValue={emurExpiryDate}
-						dateFormat="DD/MM/yyyy"
-						isValidDate={disablePastDt}
-						onClose={handleExpiryDate}
-						closeOnSelect={true}
-					/>
-				</Grid>	
-				<Grid key={"ITEM1"} item xs={4} sm={4} md={4} lg={4} >
-					<Typography className={gClasses.patientInfo2Blue}>Expiry Date</Typography>
-				</Grid>	
-			</Grid>
-			<br />
-			</div>
-			}
+			<Typography className={gClasses.patientInfo2Blue}>Purchase Date</Typography>
+			<Datetime 
+				className={gClasses.dateTimeBlock}
+				inputProps={{className: gClasses.dateTimeNormal}}
+				timeFormat={false} 
+				initialValue={emurPurchaseDate}
+				dateFormat="DD/MM/yyyy"
+				isValidDate={disableFutureDt}
+				onClose={handlePurchaseDate}
+				closeOnSelect={true}
+			/>
+			<br />			
+			<TextValidator fullWidth required className={gClasses.vgSpacing}
+				id="Rate" label="Expiry after number of months" type="number"
+				value={emurExpiryMonth} 
+				onChange={(event) => { setEmurExpiryMonth(event.target.value) }}
+				validators={['minNumber:1']}
+				errorMessages={['Invalid Expiry Month']}
+			/>
 			<TextValidator fullWidth required className={gClasses.vgSpacing}
 				id="newPatientName" label="Inventory Quantity" type="number"
 				value={emurData2} 
 				onChange={(event) => { setEmurData2(Number(event.target.value)) }}
-				validators={['minNumber:1', `maxNumber:${emurBalance}`]}
+				validators={[`minNumber:${emurMaxMin.min}`, `maxNumber:${emurMaxMin.max}`]}
 				errorMessages={['Invalid Amount', 'Invalid Amount']}
       />
 			<ShowResisterStatus />
 			<BlankArea />
-			<VsButton type="submit" name={(isDrawerOpened === "ADDINVENTORY") ? "Add" : "Withdraw"} />
+			<VsButton type="submit" name={(isDrawerOpened === "ADDINVENTORY") ? "Add" : "Update"} />
+			</ValidatorForm>    						
+		}
+		{((isDrawerOpened === "NEWSUBINVENTORY") || (isDrawerOpened === "EDITSUBINVENTORY")) &&
+			<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubFromInventorySubmit}>
+			<Typography className={gClasses.title}>{((isDrawerOpened === "NEWSUBINVENTORY") ? "New" : "Edit")+` withdraw from Inventory of ${emurData1}`}</Typography>
+			<TextValidator fullWidth required className={gClasses.vgSpacing}
+				id="newPatientName" label="Inventory Quantity" type="number"
+				value={emurData2} 
+				onChange={(event) => { setEmurData2(Number(event.target.value)) }}
+				validators={[`minNumber:${emurMaxMin.min}`, `maxNumber:${emurMaxMin.max}`]}
+				errorMessages={['Invalid Amount', 'Invalid Amount']}
+      />
+			<ShowResisterStatus />
+			<BlankArea />
+			<VsButton type="submit" name={((isDrawerOpened === "NEWSUBINVENTORY") ? "New" : "Edit")+" Withdrawal"} />
 			</ValidatorForm>    						
 		}
 		</Box>
