@@ -184,11 +184,15 @@ async function akshuGetAllCustomer() {
   return retUser;
 }  
 
-function akshuUpdateCustomer(cidData) {
+async function akshuUpdateCustomer(cidData) {
+	cidData.email = svrToDbText(cidData.email);
+	await cidData.save();
   arun_customer = [];
 } 
 
-function akshuAddCustomer(cidData) {
+async function akshuAddCustomer(cidData) {
+	cidData.email = svrToDbText(cidData.email);
+	await cidData.save();
   arun_customer = [];
 } 
 

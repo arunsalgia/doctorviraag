@@ -499,7 +499,6 @@ export default function CustomerInformations(props) {
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<DisplayFunctionItem item="Profile"  match={currentCustomerSelection} onClick={setSummaryCustomerSelect} />
-		<DisplayFunctionItem item="Panel"  match={currentCustomerSelection}  onClick={setSummaryCustomerSelect} />
 		{/*<DisplayFunctionItem item="Sms"  match={currentCustomerSelection}  onClick={setSummaryCustomerSelect} />*/}
 		<DisplayFunctionItem item="AddOn"  match={currentCustomerSelection} onClick={setSummaryCustomerSelect} />
 		<DisplayFunctionItem item="Wallet"  match={currentCustomerSelection}  onClick={setSummaryCustomerSelect} />
@@ -1055,28 +1054,6 @@ export default function CustomerInformations(props) {
 			<VsButton align="center" name={"Add"} type="submit" />
 			<ValidComp />  
     </ValidatorForm>
-	}
-	{((isDrawerOpened === "ADDPANEL") || (isDrawerOpened === "EDITPANEL")) &&
-	<ValidatorForm className={gClasses.form} onSubmit={handleAddEditPanel}>
- 		<Typography className={gClasses.title}>{(isDrawerOpened === "ADDPANEL") ? "Add New Panel Doctor" : "Edit Panel Doctor details"}</Typography>
-		 <br />
-		<TextValidator fullWidth label="Panel Doctor Name" className={gClasses.vgSpacing}
-			value={emurText1}
-			onChange={(event) => setEmurText1(event.target.value)}
-			validators={['noSpecialCharacters']}
-			errorMessages={[`Special Characters not permitted`]}
-		/>
-		<TextValidator required fullWidth label="Panel Doctor Mobile Number" type="number" className={gClasses.vgSpacing}
-			value={emurText2}
-			onChange={(event) => setEmurText2(event.target.value)}
-			validators={['minNumber:1000000000', 'maxNumber:9999999999']}
-			errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
-		/>
-		<ShowResisterStatus/>
-		<BlankArea/>
-		<VsButton align="center"  type="submit" name={(isDrawerOpened === "ADDPANEL") ? "Add Panel Doctor" : "Edit Panel Doctor"} />
-		<ValidComp /> 
-	</ValidatorForm>
 	}
 	</Box>
 	</Drawer>		

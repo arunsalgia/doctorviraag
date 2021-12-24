@@ -47,6 +47,7 @@ import WorkingHours from "views/Settings/WorkingHours";
 import Holiday from "views/Settings/Holiday";
 import Assistant from "views/Settings/Assistant";
 import Inventory from "views/Inventory/Inventory";
+import PanelDoctor from "views/PanelDoctor/PanelDoctor";
 
 import Modal from 'react-modal';
 // import download from 'js-file-downloader';
@@ -251,7 +252,8 @@ export function CricDreamTabs() {
 	const handleHome = () => { setMenuValue(1);  }
   const handleAppointment = () => { setMenuValue(2);  }
 	const handleInventory = () => { setMenuValue(4);  }
-
+	const handlePanelDoctor = () => { setMenuValue(5);  }
+	
 /*
   //const handleVisit = () => { setMenuValue(3);  }
 	const handleNextVisit = () => { handleClose(); setMenuValue(904);}
@@ -286,6 +288,7 @@ export function CricDreamTabs() {
       case 2: return <Appointment/>;
       case 3: return <Visit/>; 	
 			case 4: return <Inventory />; 
+			case 5: return <PanelDoctor />; 
       case 101: 
         if (window.sessionStorage.getItem("userType") === "Developer")
           return <Customer />
@@ -295,13 +298,9 @@ export function CricDreamTabs() {
 			case 103: return <ChangePassword />;
 			case 104: return <Summary />;
 
-			//case 801: return <Sample />
-			//case 802: return <Customer />
 
       case 901: return <Patient />;
-			//case 903: return <Sample />
-			//case 904: return <NextVisit />
-			//case 905: return <Report />
+
 
 			case 701: return <WorkingHours />
 			case 702: return <Holiday />
@@ -416,6 +415,9 @@ export function CricDreamTabs() {
 									<MenuItem onClick={handleInventory}>
 									<Typography className={classes.menuStyle}>Inventory</Typography>
 									</MenuItem>
+									<MenuItem onClick={handlePanelDoctor}>
+									<Typography className={classes.menuStyle}>PanelDoctor</Typography>
+									</MenuItem>
 									<Divider className={classes.divider} />
 									</div>
 								} 
@@ -472,6 +474,7 @@ export function CricDreamTabs() {
 						<Button color="inherit" className={classes.visitButton} onClick={handlePatient}>Patient</Button>
 						<Button color="inherit" className={classes.visitButton} onClick={handleSummary}>Summary</Button>
 						<Button color="inherit" className={classes.visitButton} onClick={handleInventory}>Inventory</Button>
+						<Button color="inherit" className={classes.visitButton} onClick={handlePanelDoctor}>PanelDoctor</Button>
 						</div>
 					}
 					{(false) &&

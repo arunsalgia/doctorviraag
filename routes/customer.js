@@ -94,7 +94,7 @@ customerRouter.get('/update/:custData', async function(req, res, next) {
 	rec.enabled = true;
 	rec.name =  custData.name;
 	rec.type = custData.type;
-	rec.email = svrToDbText(custData.email)
+	rec.email = custData.email;
 	rec.mobile = custData.mobile;
 
 	rec.doctorName = custData.doctorName;
@@ -123,10 +123,11 @@ customerRouter.get('/update/:custData', async function(req, res, next) {
 	// now create user 
 
 	if (oldName !== "")
-		akshuUpdateCustomer(rec);
+		await akshuUpdateCustomer(rec);
 	else
-		akshuAddCustomer(rec); 
-	await rec.save();
+		await akshuAddCustomer(rec); 
+	
+	//await rec.save();
 	
 	rec.email = dbToSvrText(rec.email);
 	sendok(res, rec);
@@ -139,7 +140,8 @@ customerRouter.get('/setworkinghours/:cid/:workingHours', async function(req, re
 	
 	let rec = await akshuGetCustomer(cid);
 	rec.workingHours = JSON.parse(workingHours);
-	akshuUpdateCustomer(rec);
+	await akshuUpdateCustomer(rec);
+	rec.email = dbToSvrText(rec.email);
 	sendok(res, rec);
 })
 
@@ -147,7 +149,7 @@ customerRouter.get('/updatepaneldoctors/:cid/:docList', async function(req, res,
   setHeader(res);
 	var {cid, docList} = req.params;
 	
-	return senderr(res, 601, "Currently not implemented");
+	//return senderr(res, 601, "Currently not implemented");
 
 	let newList = JSON.parse(docList);
 	let rec = await akshuGetCustomer(cid);
@@ -155,7 +157,8 @@ customerRouter.get('/updatepaneldoctors/:cid/:docList', async function(req, res,
 	rec.doctorPanel = newList.name;
 	rec.doctorMobile = newList.mobile;``
 	
-	akshuUpdateCustomer(rec);
+	await akshuUpdateCustomer(rec);
+	rec.email = dbToSvrText(rec.email);
 	sendok(res, rec);
 })
 
