@@ -395,7 +395,7 @@ export default function Inventory() {
 			//myInfo += "Vendor: "+ i.vendor + "<br />";
 			myInfo += "Quantity: " + i.quantity + "<br />";
 			myInfo += "UnitRate: " + parseFloat(i.unitRate).toFixed(2) + "/- <br />";
-			myInfo += "Amount: " + parseFloat(i.unitRate*i.quantity).toFixed(2) + "/- <br />";
+			myInfo += "Value: " + parseFloat(i.unitRate*i.quantity).toFixed(2) + "/- <br />";
 			//myInfo += "Expiry: " + expiryStr;
 
 			let myUsage = props.list.filter( x => x.id === i.id && x.subId !== 0);
@@ -481,7 +481,7 @@ export default function Inventory() {
 						<Typography className={gClasses.patientInfo2Orange}>{"Balance Qty: " + balance }</Typography>
 					</Grid>	
 					<Grid align="left" key={"ITEM3"+index} item xs={8} sm={8} md={3} lg={3} >
-						<Typography className={gClasses.patientInfo2Orange}>{"Total Amount: " + totalAmount + "/-"}</Typography>
+						<Typography className={gClasses.patientInfo2Orange}>{"Inventory Value: " + totalAmount + "/-"}</Typography>
 					</Grid>	
 					<Grid align="right" key={"ITEM4"+index} item xs={4} sm={4} md={2} lg={2} >
 						<EditIcon color="primary" size="small" onClick={() => { handleEditItem(i)}} />

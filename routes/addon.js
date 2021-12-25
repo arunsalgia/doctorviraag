@@ -164,6 +164,35 @@ addOnRouter.get('/subscribe/:cid/:addonname/:amount', async function(req, res, n
 
 });
 
+
+addOnRouter.get('/dvsubscribe/:cid/:addonname/:expiryStr', async function(req, res, next) {
+  setHeader(res);
+  
+  var { cid, addonname, expiryStr } = req.params;
+	amount = Number(amount);
+	
+	let tmpRec = await getSubscribed(cid, addonname);    //await M_Subscribe.findOne({cid: cid, name: addonname});
+	if (!tmpRec) {
+		tmpRec = new M_Subscribe();
+		tmpRec.cid = cid;
+		tmpRec.name = addonname
+	}
+	let d = new Date(
+		Number(expiryStr,substr(0,4)),
+		Number(expiryStr,substr(4,2)),
+		Number(expiryStr,substr(6,2)),
+		0,0,0
+	);
+	tmpRec.expiryDate = d;
+	tmpRec.enabled = true;
+	tmpRec.save();
+
+	clearSubscritonList(cid);
+
+	sendok(res, tmpRec);
+
+});
+
 addOnRouter.get('/unsubscribe/:cid/:addonname', async function(req, res, next) {
   setHeader(res);
   
