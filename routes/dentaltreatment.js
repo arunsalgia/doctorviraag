@@ -62,6 +62,27 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 	sendok(res, 'Done');
 });
 
+router.get('/close/:cid/:pid', async function(req, res, next) {
+  setHeader(res);
+  
+  var {cid, pid } = req.params;
+	pid = Number(pid);
+
+  var iRec = await M_DentalTreatment.findOne({cid: cid, pid: pid, treatmentNumber: MAGICNUMBER});
+  if (!iRec) return sendok(res, {treatmentNumber: -1});
+	
+	let tmp = await M_DentalTreatment.find({cid: cid, pid: pid, treatmentNumber: {$lt: MAGICNUMBER} }).limit(1).sort({treatmentNumber: -1});	
+	console.log(tmp);
+
+	let newNumber = (tmp.length > 0) ? tmp[0].treatmentNumber + 1 : 1;
+	console.log(newNumber);			
+	iRec.treatmentNumber = newNumber;
+	await iRec.save();
+
+	sendok(res, {treatmentNumber: newNumber});
+});
+
+
 router.get('/list/:cid/:pid', async function(req, res, next) {
   setHeader(res);
   

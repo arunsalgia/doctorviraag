@@ -344,35 +344,23 @@ export default function Visit(props) {
 	}
 	
 	function DisplayVisitDates() {
-	if (visitArray.length === 0) {
-		return (
-			<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-			<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
-				<Grid key={"VISIST"} item xs={12} sm={12} md={12} lg={12} >
-					<Typography className={gClasses.indexSelection} >
-						{"No Visit history available"}
-					</Typography>
-				</Grid>
-			</Grid>	
-			</Box>
-		);
-	}
-	
-	let v = visitArray[visitIndex];
-	let myDate;
-	if (v.visitNumber === MAGICNUMBER)
-			myDate = "Today's new Visit";
-	else {
-		let d = new Date(v.visitDate);
-		myDate = `Visit dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
-	}
+		let myDate = "No Visit history available";
+		if (visitArray.length > 0) {
+			let v = visitArray[visitIndex];
+			let d = new Date(v.visitDate);
+			myDate = `Visit dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;	
+			if (v.visitNumber === MAGICNUMBER)
+					myDate += " ( New )";
+		}
 	return (
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
-		<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >	
+		<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >
+		{(visitArray.length > 0)  &&
 			<IconButton color={'primary'} onClick={() => {changIndex(-1)}}  >
 				<LeftIcon />
 			</IconButton>
+		}
 		</Grid>
 		<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
 			<Typography className={gClasses.indexSelection} >
@@ -380,9 +368,11 @@ export default function Visit(props) {
 			</Typography>
 		</Grid>
 		<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
+		{(visitArray.length > 0)  &&
 			<IconButton color={'primary'} onClick={() => {changIndex(1)}}  >
 					<RightIcon />
 				</IconButton>
+		}
 		</Grid>
 	</Grid>	
 	</Box>
@@ -477,8 +467,8 @@ export default function Visit(props) {
 		if ((visitArray.length > 0) && (visitArray[lastIndex].visitNumber === MAGICNUMBER)) return null;
 		return (
 			<div align="right">
-				<VsButton name="Add Blank Visit" onClick={handleCreateNewVisit} />
-				{(visitArray.length > 0) &&
+				<VsButton name="Add new Visit" onClick={handleCreateNewVisit} />
+				{(false) &&
 				<VsButton name="Duplicate Visit" onClick={handleCopyNew} />
 				}
 			</div>
@@ -549,11 +539,17 @@ export default function Visit(props) {
 	
 	async function closeVisitDocument() {
 		try {
-			let response = await axios.get (`${process.env.REACT_APP_AXIOS_BASEPATH}/visit/closevisit/${userCid}/${currentPatientData.pid}`);
-			let tmpArray = visitArray.filter(x => x.visitNumber !== MAGICNUMBER );
-			tmpArray.push(response.data);
-			setVisitArray(tmpArray);
-			setShowCloseVisit(false);
+			let resp = await axios.get (`${process.env.REACT_APP_AXIOS_BASEPATH}/visit/close/${userCid}/${currentPatientData.pid}`);
+			let tmpArray = lodashCloneDeep(visitArray);
+			if (resp.data.visitNumber < 0) {
+				tmpArray.pop();
+				setVisitIndex(tmpArray.length - 1);
+				setVisitArray(tmpArray);
+			} else {
+				let lastIndex = tmpArray.length - 1;
+				tmpArray[lastIndex].visitNumber = resp.data.visitNumber;
+				setVisitArray(tmpArray);
+			}
 		} catch (e) {
 			console.log(e)
 			alert.error("Error closing visit");
@@ -1133,9 +1129,7 @@ export default function Visit(props) {
 
 	return (
 		<div align="right">
-			{(showCloseVisit) &&
-				<VsButton name="Close Visit"  onClick={closeVisitDocument} />
-			}
+			<VsButton name="Close Visit"  onClick={closeVisitDocument} />
 			<VsButton name="Print Visit"  onClick={generateVisitDocument} />
 			{/*<VsButton name="Download Visit Document"  onClick={printVisit} />*/}
 		</div>

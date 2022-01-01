@@ -437,21 +437,21 @@ router.post('/update/:cid/:visitInfo', async function(req, res, next) {
 	sendok(res, myRec);
 });
 
-router.get('/closevisit/:cid/:pid', async function(req, res, next) {
+router.get('/close/:cid/:pid', async function(req, res, next) {
   setHeader(res);
   var {cid, pid} = req.params;
 	pid = Number(pid); 
 	
 	// visistNUmber as MAGICNUMER is current active visist. Get it
 	let myRec = await M_Visit.findOne({cid: cid, pid: pid, visitNumber: MAGICNUMBER});
-	if (!myRec) return senderr(res, 601, "No current visit");
+	if (!myRec) return sendok(res, {visitNumber: -1 })
 	
-	// change MAGICNUMBer to visit number
-	let visitCountRec = await M_Visit.find({cid: cid, pid: pid});
-	myRec.visitNumber = visitCountRec.length;
-	myRec.save();
+	// change MAGICNUMBer to latest visit number
+	let tmp = await M_Visit.find({cid: cid, pid: pid, visitNumber: {$lt: MAGICNUMBER} }).limit(1).sort({visitNumber: -1});
+	myRec.visitNumber = (tmp.length > 0) ? tmp[0].visitNumber + 1	: 1;						//visitCountRec.length;
+	await myRec.save();
 	sendVisitSms(cid, pid, myRec.nextVisitTime, myRec.nextVisitUnit);
-	sendok(res, myRec);	
+	sendok(res, {visitNumber: myRec.visitNumber});	
 });
 
 

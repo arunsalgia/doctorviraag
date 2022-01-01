@@ -21,7 +21,7 @@ import Drawer from '@material-ui/core/Drawer';
 import { useAlert } from 'react-alert'
 import lodashSortBy from "lodash/sortBy"
 import lodashSumBy from "lodash/sumBy"
-
+import lodashCloneDeep  from "lodash/cloneDeep";
 
 import Grid from "@material-ui/core/Grid";
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
@@ -364,7 +364,7 @@ export default function DentalTreatment(props) {
 		//setCurrentSelection("Medicine");
 	}
 
-	function DisplayTreatmentDates() {
+	function OrgDisplayTreatmentDates() {
 		if (treatmentArray.length === 0) {
 			return (
 				<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
@@ -381,12 +381,11 @@ export default function DentalTreatment(props) {
 		
 		//console.log(treatmentArray);
 		let v = treatmentArray[treatmentIndex];
-		let myDate;
+		let d = new Date(v.treatmentDate);
+		let myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
 		if (v.treatmentNumber === MAGICNUMBER)
-				myDate = "Today's new Treatment";
+				myDate += " ( New ) ";
 		else {
-			let d = new Date(v.treatmentDate);
-			myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
 		}
 		return (
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
@@ -411,6 +410,45 @@ export default function DentalTreatment(props) {
 		)
 	}
 
+	function DisplayTreatmentDates() {
+		let myDate = "No Treatment history available";
+		if (treatmentArray.length > 0) {
+			console.log(treatmentIndex, treatmentArray);
+			let v = treatmentArray[treatmentIndex];
+			let d = new Date(v.treatmentDate);
+			myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+			if (v.treatmentNumber === MAGICNUMBER)
+					myDate += " ( New ) ";
+			else {
+			}
+		}
+		return (
+		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
+		<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
+			<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >
+				{ (treatmentArray.length > 0)	 &&
+					<IconButton color={'primary'} onClick={() => {changIndex(-1)}}  >
+						<LeftIcon />
+					</IconButton>
+				}	
+			</Grid>
+			<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
+				<Typography className={gClasses.indexSelection} >
+					{myDate}
+				</Typography>
+			</Grid>
+			<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
+			{ (treatmentArray.length > 0)	 &&
+				<IconButton color={'primary'} onClick={() => {changIndex(1)}}  >
+						<RightIcon />
+					</IconButton>
+			}
+			</Grid>
+		</Grid>	
+		</Box>
+		)
+	}
+
 	function handleUpdate(num) {
 		//console.log(emurToothArray);
 		//console.log(num);
@@ -426,16 +464,16 @@ export default function DentalTreatment(props) {
 		setEmurToothArray(newTootlArray);
 	}
 	
-	function dummy(num) {};
 	
 	function DisplayNewBtn() {
 		let lastIndex = treatmentArray.length - 1;
-		if ((treatmentArray.length > 0) && (treatmentArray[lastIndex].treatmentNumber === MAGICNUMBER)) return null;
-		return (
-			<div align="right">
-				<VsButton name="Add New Treatment" onClick={handleCreateNewTreatment} />
-			</div>
-		)
+		let newBtn = true;
+		if ((lastIndex >= 0) &&	(treatmentArray[lastIndex].treatmentNumber === MAGICNUMBER))
+			newBtn = false;
+		//console.log(lastIndex, newBtn);
+		return ( newBtn ) 
+		? <VsButton align="right" name="Add New Treatment" onClick={handleCreateNewTreatment} />
+		: <VsButton align="right" name="Close Treatment" onClick={handleCloseNewTreatment} />
 	}
 	
 	function handleCreateNewTreatment() {
@@ -451,6 +489,30 @@ export default function DentalTreatment(props) {
 		setTreatmentIndex(myArray.length - 1);
 	}
 
+	async function handleCloseNewTreatment() {
+		try {
+			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/close/${userCid}/${currentPatientData.pid}`)
+			let tmpArray = lodashCloneDeep(treatmentArray);
+			if (resp.data.treatmentNumber < 0) {
+				console.log("Blank visit");
+				tmpArray.pop();
+				//console.log(tmpArray);
+				setTreatmentIndex(tmpArray.length - 1);
+				setTreatmentArray(tmpArray);	
+			} else {
+				let lastIndex = tmpArray.length - 1;
+				tmpArray[lastIndex].treatmentNumber = resp.data.treatmentNumber;
+				console.log(tmpArray[lastIndex].treatmentNumber)
+				setTreatmentArray(tmpArray);				
+			}
+		} catch(e) {
+			console.log(e);
+			console.log("Error close treatment");
+		}
+
+	}
+
+	
 	function handleVsTreatTypeDelete(treat) {
 		console.log(treat);
 	}

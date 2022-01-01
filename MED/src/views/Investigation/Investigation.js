@@ -243,35 +243,24 @@ export default function Visit(props) {
 	}
 	
 	function DisplayInvestigationDates() {
-		if (investigationArray.length === 0) {
-		return (
-			<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-			<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
-				<Grid key={"VISIST"} item xs={12} sm={12} md={12} lg={12} >
-					<Typography className={gClasses.indexSelection} >
-						{"No Investigation history available"}
-					</Typography>
-				</Grid>
-			</Grid>	
-			</Box>
-		)};
-		
-		
-		let v = investigationArray[investigationIndex];
-		let myDate;
-		if (v.investigationNumber === MAGICNUMBER)
-				myDate = "Today's new Investigation";
-		else {
+		let myDate = "No Investigation history available";
+		if (investigationArray.length > 0) {	
+			let v = investigationArray[investigationIndex];
 			let d = new Date(v.investigationDate);
 			myDate = `Investigation dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+			if (v.investigationNumber === MAGICNUMBER) {
+					myDate += " ( New )";
+			}
 		}
 	return (
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >	
+		{(investigationArray.length > 0) &&
 			<IconButton color={'primary'} onClick={() => {changeIndex(-1)}}  >
 				<LeftIcon />
 			</IconButton>
+		}
 		</Grid>
 		<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
 			<Typography className={gClasses.indexSelection} >
@@ -279,9 +268,11 @@ export default function Visit(props) {
 			</Typography>
 		</Grid>
 		<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
+		{(investigationArray.length > 0) &&
 			<IconButton color={'primary'} onClick={() => {changeIndex(1)}}  >
-					<RightIcon />
-				</IconButton>
+				<RightIcon />
+			</IconButton>
+		}
 		</Grid>
 	</Grid>	
 	</Box>
@@ -740,7 +731,11 @@ export default function Visit(props) {
 
 	function DisplayNewBtn() {
 		let lastIndex = investigationArray.length - 1;
-		return ((investigationArray.length > 0) && (investigationArray[lastIndex].investigationNumber !== MAGICNUMBER)) 
+		let newBtn = true;
+		if ((lastIndex >= 0) &&	(investigationArray[lastIndex].investigationNumber === MAGICNUMBER))
+			newBtn = false;
+
+		return (newBtn) 
 			? <VsButton align="right" name="Add New Investigation" onClick={handleCreateNewInvestigation} />
 			: <VsButton align="right" name="Close Investigation" onClick={handleCloseNewInvestigation} />
 	}
