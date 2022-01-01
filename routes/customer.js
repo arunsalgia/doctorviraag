@@ -64,7 +64,7 @@ customerRouter.get('/add/:userName', async function(req, res, next) {
 	rec.plan = "YEARLY"
 	rec.expiryDate = new Date(2030, 12, 31);
 	rec.enabled = true;
-	akshuAddCustomer(rec);
+	await akshuAddCustomer(rec);
 	sendok(res, rec);
 });
 

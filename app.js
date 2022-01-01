@@ -17,6 +17,11 @@ axios = require('axios');
 multer = require('multer');
 unirest = require('unirest');
 
+// mongoose settings
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+
 app = express();
 
 PRODUCTION=(process.env.PRODUCTION.toUpperCase() === "TRUE");   
@@ -178,6 +183,7 @@ MedicineSchema = mongoose.Schema({
 	enabled: Boolean,
 	cid: String,
 });
+MedicineSchema.index({cid: 1});
 
 NoteSchema = mongoose.Schema({
 	id: String,
@@ -227,6 +233,8 @@ PatientSchema = mongoose.Schema({
 	enabled: Boolean,
 	cid: String,
 });
+PatientSchema.index({cid: 1});
+
 
 VisitSchema = mongoose.Schema({
   pid: Number,
@@ -243,7 +251,7 @@ VisitSchema = mongoose.Schema({
 	nextVisitUnit: String,
 	cid: String,
 });
-
+VisitSchema.index({cid: 1, pid: 1});
 
 InvestigationSchema = mongoose.Schema({
   pid: Number,
@@ -254,7 +262,7 @@ InvestigationSchema = mongoose.Schema({
 	enabled: Boolean,
 	cid: String,
 });
-
+InvestigationSchema.index({cid: 1, pid: 1});
 
 DentalTreatmentSchema = mongoose.Schema({
 	cid: String,
@@ -264,6 +272,7 @@ DentalTreatmentSchema = mongoose.Schema({
 	treatment: [{name: String, amount: Number, toothArray: [Number] }],
 	enabled: Boolean,
 });
+DentalTreatmentSchema.index({cid: 1, pid: 1});
 
 NextVisitSchema = mongoose.Schema({
   pid: Number,
@@ -284,6 +293,7 @@ ProfessionalChargesSchema = mongoose.Schema({
 	paymentMode: String,
 	enabled: Boolean,
 });
+ProfessionalChargesSchema.index({cid: 1, pid: 1});
 
 HolidaySchema = mongoose.Schema({
   date: Number,
@@ -310,6 +320,7 @@ AppointmentSchema = mongoose.Schema({
 	doctorMobile: String,
 	cid: String,
 });
+AppointmentSchema.index({cid: 1});
 
 // 1 info record per person
 // info field will have multiple entry.
@@ -416,6 +427,7 @@ PaymentSchema = mongoose.Schema({
   fee: Number,
 });
 
+
 DoctorTypeSchema = mongoose.Schema({
 	dtin: Number,
 	name: String,
@@ -480,6 +492,7 @@ InventorySchema = mongoose.Schema({
 	name: String,
 	enabled: Boolean
 });
+InventorySchema.index({cid: 1});
 
 InventoryListSchema = mongoose.Schema({
 	cid: String,
@@ -497,7 +510,7 @@ InventoryListSchema = mongoose.Schema({
 	inUse: Number,
 	discarded: Number,
 });
-
+InventoryListSchema.index({cid: 1});
 
 // models
 User = mongoose.model("user", UserSchema);
