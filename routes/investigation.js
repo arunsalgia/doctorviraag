@@ -40,6 +40,24 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 	sendok(res, 'Done');
 });
 
+router.get('/close/:cid/:pid', async function(req, res, next) {
+  setHeader(res);
+  
+  var {cid, pid } = req.params;
+	pid = Number(pid);
+	
+  var iRec = await M_Investigation.findOne({cid: cid, pid: pid, investigationNumber: MAGICNUMBER});
+  if (!iRec) return sendok(res, {investigationNumber: -1});
+
+	let tmp = await M_Investigation.find({cid: cid, pid: pid, investigationNumber: {$lt: MAGICNUMBER} }).limit(1).sort({investigationNumber: -1});	
+	console.log(tmp);
+	let newNumber = (tmp.length > 0) ? tmp[0].investigationNumber + 1 : 1;
+	console.log(newNumber);			
+	iRec.investigationNumber = newNumber;
+	await iRec.save();
+	sendok(res, {investigationNumber: newNumber});
+});
+
 router.get('/list/:cid/:pid', async function(req, res, next) {
   setHeader(res);
   
@@ -55,6 +73,9 @@ router.get('/list/:cid/:pid', async function(req, res, next) {
 	//console.log(allRecs);
 	sendok(res, allRecs);
 });
+
+
+
 
 function sendok(res, usrmsg) { res.send(usrmsg); }
 function senderr(res, errcode, errmsg) { res.status(errcode).send(errmsg); }

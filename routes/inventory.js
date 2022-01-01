@@ -119,7 +119,7 @@ router.get('/listallinventory/:cid', async function(req, res, next) {
   
   var { cid } = req.params;
 	
-	let allRecs = await M_InventoryList.find({cid: cid}).sort({id: -1, subId: -1});
+	let allRecs = await M_InventoryList.find({cid: cid, subId: 0}).sort({id: -1, subId: -1});
 	sendok(res, allRecs);
 });
 
@@ -141,21 +141,21 @@ router.get('/test', async function(req, res, next) {
 });
 
 
-router.get('/addinventory/:cid/:inventoryId/:quantity/:rate/:vendor/:purchaseDateStr/:expiryMonth', async function(req, res, next) {
+router.get('/addinventory/:cid/:inventoryId/:vendor/:purchaseDateStr/:expiryStr/:rate/:qtyPerBox/:numOfBoxes', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryId,  quantity, rate, vendor, purchaseDateStr, expiryMonth } = req.params;
+  var { cid, inventoryId, vendor, purchaseDateStr, expiryStr, rate,  numOfBoxes, qtyPerBox} = req.params;
+
 	let purchaseDate = new Date(Number(purchaseDateStr.substr(0,4)),
 		Number(purchaseDateStr.substr(4,2))-1,
 		Number(purchaseDateStr.substr(6,2)),
 		0, 0 , 0
 	);
-	let expiryDate = new Date(Number(purchaseDateStr.substr(0,4)),
-		Number(purchaseDateStr.substr(4,2))-1,
-		Number(purchaseDateStr.substr(6,2)),
-		0, 0 , 0
-	);
-	expiryDate.setMonth(expiryDate.getMonth()+Number(expiryMonth));
+	let expiryDate = new Date(Number(expiryStr.substr(0,4)),
+			Number(expiryStr.substr(4,2))-1,
+			Number(expiryStr.substr(6,2)),
+			0, 0 , 0
+		);
 	//console.log(inventoryId, quantity);
 
 	let tmpRec = await M_InventoryList.find({cid: cid, inventoryId: Number(inventoryId)}).limit(1).sort({id: -1});
@@ -164,24 +164,32 @@ router.get('/addinventory/:cid/:inventoryId/:quantity/:rate/:vendor/:purchaseDat
 	iRec.cid = cid;
 	iRec.inventoryId = Number(inventoryId);
 	iRec.id = (tmpRec.length > 0) ? tmpRec[0].id + 1 : 1;
-	iRec.subId = 0;				// always 0 for purchse
+	iRec.subId = 0;				// always 0 for purchse	This will be discarded
+
 	iRec.vendor = vendor; 
-	iRec.unitRate = Number(rate);
-	iRec.quantity = Number(quantity);
 	iRec.date = purchaseDate;
 	iRec.expiryDate = expiryDate;
+
+	iRec.unitRate = Number(rate);				// rate per box
+	iRec.boxes = Number(numOfBoxes);			// number of boxes
+	iRec.quantity = Number(qtyPerBox);		
+
 	iRec.expired = false;
 	iRec.enabled = true;
-	iRec.save();
+	
+	iRec.inUse = 0;
+	iRec.discarded = 0;
+	await iRec.save();
 	
 	
 	sendok(res, iRec);
 });
 
-router.get('/updateinventory/:cid/:inventoryId/:id/:quantity/:rate/:vendor/:purchaseDateStr/:expiryMonth', async function(req, res, next) {
+router.get('/updateinventory/:cid/:inventoryId/:id/:vendor/:purchaseDateStr/:expiryStr/:rate/:qtyPerBox/:numOfBoxes', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryId, id, quantity, rate, vendor, purchaseDateStr, expiryMonth } = req.params;
+  var { cid, id, inventoryId, vendor, purchaseDateStr, expiryStr, rate,  numOfBoxes, qtyPerBox} = req.params;
+
 	inventoryId = Number(inventoryId);
 	id = Number(id);
 	
@@ -193,23 +201,25 @@ router.get('/updateinventory/:cid/:inventoryId/:id/:quantity/:rate/:vendor/:purc
 		Number(purchaseDateStr.substr(6,2)),
 		0, 0 , 0
 	);
-	let expiryDate = new Date(Number(purchaseDateStr.substr(0,4)),
-		Number(purchaseDateStr.substr(4,2))-1,
-		Number(purchaseDateStr.substr(6,2)),
-		0, 0 , 0
-	);
-	expiryDate.setMonth(expiryDate.getMonth()+Number(expiryMonth));
-
+	let expiryDate = new Date(Number(expiryStr.substr(0,4)),
+			Number(expiryStr.substr(4,2))-1,
+			Number(expiryStr.substr(6,2)),
+			0, 0 , 0
+		);
+	
 	iRec.vendor = vendor; 
-	iRec.unitRate = Number(rate);
-	iRec.quantity = Number(quantity);
 	iRec.date = purchaseDate;
 	iRec.expiryDate = expiryDate;
+
+	iRec.unitRate = Number(rate);				// rate per box
+	iRec.boxes = Number(numOfBoxes);			// number of boxes
+	iRec.quantity = Number(qtyPerBox);		
+	
 	iRec.expired = false;
 	iRec.enabled = true;
-	iRec.save();
-	
-	
+		
+	await iRec.save();
+
 	sendok(res, iRec);
 });
 
@@ -242,21 +252,22 @@ router.get('/subinventory/:cid/:inventoryId/:id/:quantity', async function(req, 
 	sendok(res, iRec);
 });
 
-router.get('/updatesubinventory/:cid/:inventoryId/:id/:subId/:quantity', async function(req, res, next) {
+router.get('/updatesubinventory/:cid/:inventoryId/:id/:inUseQty/:discardedQty', async function(req, res, next) {
   setHeader(res);
   
-  var { cid, inventoryId, id, subId, quantity} = req.params;
+  var { cid, inventoryId, id, inUseQty, discardedQty} = req.params;
 	inventoryId = Number(inventoryId);
 	id = Number(id);
-	subId = Number(subId);
+	//subId = Number(subId);
 	
 	
-	let iRec = await M_InventoryList.findOne({ cid: cid, inventoryId: inventoryId, id: id, subId: subId });
+	let iRec = await M_InventoryList.findOne({ cid: cid, inventoryId: inventoryId, id: id, subId: 0 });
 	if (!iRec) return senderr(res, 601, "Not found");
 	
-	iRec.quantity = -Number(quantity);
+	iRec.inUse = Number(inUseQty);
+	iRec.discarded = Number(discardedQty);
 	
-	iRec.save();
+	await iRec.save();
 	
 	sendok(res, iRec);
 });
@@ -298,10 +309,52 @@ router.get('/delinventory/:cid/:inventoryId/:id/:subId', async function(req, res
 		await M_InventoryList.deleteOne({cid: cid, inventoryId: inventoryId, id: id, subId: subId});
 	}
 
-	let allTrans = await M_InventoryList.find({cid: cid}).sort({id: -1, subId: -1});	
-	sendok(res, allTrans);
+	//let allTrans = await M_InventoryList.find({cid: cid}).sort({id: -1, subId: -1});	
+	sendok(res, "Done");
 });
 
+
+router.get('/inuse/:cid', async function(req, res, next) {
+
+	var { cid } = req.params;
+
+	let allInv = await M_InventoryList.find({cid: cid, subId: 0}).sort({inventoryId: 1, id: 1});
+	for(let i=0; i<allInv.length; ++i) {
+		let tmp = await M_InventoryList.find({cid: cid, inventoryId: allInv[i].inventoryId, id: allInv[i].id, subId: {$ne: 0} });
+		let inUse = _.sumBy(tmp, 'quantity');
+		console.log(allInv[i].id, allInv[i].inventoryId, allInv[i].id, allInv[i].subId, allInv[i].inUse, inUse);
+		allInv[i]["inUse"] = Math.abs(inUse);
+		allInv[i]["discarded"] = 0;
+		allInv[i]["boxes"] = 1;
+		console.log(allInv[i])
+		await allInv[i].save();
+	}
+	sendok(res, "Done");
+});
+
+
+router.get('/ut', async function(req, res, next) {
+  setHeader(res);
+  var cid = '61777eaa2322fe1efc986116';
+
+	
+	let allInv = await M_InventoryList.find({cid: cid, subId: 0}).sort({id: 1});
+	//if (allRecs.length > 0) {
+	//	if (allRecs[allRecs.length-1].investigationNumber === 0) {	
+	//		allRecs = [allRecs[allRecs.length-1]].concat(allRecs.slice(0, allRecs.length-1));
+	//	}
+	//}
+	
+	for(let i=0; i<allInv.length; ++i) {
+		let tmp = await M_InventoryList.find({cid: cid, inventoryId: allInv[i].inventoryId, id: allInv[i].id, subId: {$ne: 0} });
+		let inUse = _.sumBy(tmp, 'quantity');
+		allInv[i].inUse = Math.abs(inUse);
+		await allInv[i].save();
+	}
+	
+	console.log(allInv.length);
+	sendok(res, "DOne");
+});
 
 
 function sendok(res, usrmsg) { res.send(usrmsg); }

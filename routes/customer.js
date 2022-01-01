@@ -423,48 +423,50 @@ async function closeVisit() {
 		await generateSMSLogs(allCustomers, tMonth, tYear);
 	}
 
+	if (process.env.CLOSEOPENVISIT === "TRUE") {
 	// STEP 2 ---> all visits to be closed
-	let allOpenVisits = await M_Visit.find({visitNumber: MAGICNUMBER});
-	for(let i=0; i<allOpenVisits.length; ++i) {
-		let visitRec = allOpenVisits[i];
-		//console.log(visitRec);
-		let countQuery = [
-			{ $match: { cid: visitRec.cid, pid: visitRec.pid } },
-			{ $group: { _id: '$pid', count: { $sum: 1 } } }
-		];
-		let countRec = await M_Visit.aggregate(countQuery)
-		//console.log(countRec);
-		visitRec.visitNumber = countRec[0].count;
-		//console.log(visitRec);
-		visitRec.save();
+		let allOpenVisits = await M_Visit.find({visitNumber: MAGICNUMBER});
+		for(let i=0; i<allOpenVisits.length; ++i) {
+			let visitRec = allOpenVisits[i];
+			//console.log(visitRec);
+			let countQuery = [
+				{ $match: { cid: visitRec.cid, pid: visitRec.pid } },
+				{ $group: { _id: '$pid', count: { $sum: 1 } } }
+			];
+			let countRec = await M_Visit.aggregate(countQuery)
+			//console.log(countRec);
+			visitRec.visitNumber = countRec[0].count;
+			//console.log(visitRec);
+			visitRec.save();
+		}
+	
+		// STEP 3 ---> all investigation to be closed
+		let allOpenInvest = await M_Investigation.find({investigationNumber: MAGICNUMBER});
+		for(let i=0; i<allOpenInvest.length; ++i) {
+			let investRec = allOpenInvest[i];
+			let countQuery = [
+				{ $match: { cid: investRec.cid, pid: investRec.pid } },
+				{ $group: { _id: '$pid', count: { $sum: 1 } } }
+			];
+			let investCount = await M_Investigation.aggregate(countQuery)
+			investRec.investigationNumber = investCount[0].count;
+			investRec.save();
+		}
+
+		// STEP 4 ---> all treatment to be closed  (1 loop each for doctor type)
+		let allOpenTreat = await M_DentalTreatment.find({treatmentNumber: MAGICNUMBER});
+		for(let i=0; i<allOpenTreat.length; ++i) {
+			let myRec = allOpenTreat[i];
+			let countQuery = [
+				{ $match: { cid: myRec.cid, pid: myRec.pid } },
+				{ $group: { _id: '$pid', count: { $sum: 1 } } }
+			];
+			let treatCount = await M_DentalTreatment.aggregate(countQuery)
+			myRec.treatmentNumber = treatCount[0].count;
+			myRec.save();
+		}
 	}
 	
-	// STEP 3 ---> all investigation to be closed
-	let allOpenInvest = await M_Investigation.find({investigationNumber: MAGICNUMBER});
-	for(let i=0; i<allOpenInvest.length; ++i) {
-		let investRec = allOpenInvest[i];
-		let countQuery = [
-			{ $match: { cid: investRec.cid, pid: investRec.pid } },
-			{ $group: { _id: '$pid', count: { $sum: 1 } } }
-		];
-		let investCount = await M_Investigation.aggregate(countQuery)
-		investRec.investigationNumber = investCount[0].count;
-		investRec.save();
-	}
-
-	// STEP 4 ---> all treatment to be closed  (1 loop each for doctor type)
-	let allOpenTreat = await M_DentalTreatment.find({treatmentNumber: MAGICNUMBER});
-	for(let i=0; i<allOpenTreat.length; ++i) {
-		let myRec = allOpenTreat[i];
-		let countQuery = [
-			{ $match: { cid: myRec.cid, pid: myRec.pid } },
-			{ $group: { _id: '$pid', count: { $sum: 1 } } }
-		];
-		let treatCount = await M_DentalTreatment.aggregate(countQuery)
-		myRec.treatmentNumber = treatCount[0].count;
-		myRec.save();
-	}
-
 	// Last Step ---> update age based on date of birth
 	// will be done of 1st of every month
 	if (tDate === 1) {

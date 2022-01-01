@@ -13,7 +13,7 @@ import axios from "axios";
 import Drawer from '@material-ui/core/Drawer';
 import { useAlert } from 'react-alert'
 import lodashSortBy from "lodash/sortBy"
-
+import lodashCloneDeep  from "lodash/cloneDeep";
 import Grid from "@material-ui/core/Grid";
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -45,11 +45,8 @@ import {
 } from "CustomComponents/CustomComponents.js"
 
 import {
-//SupportedMimeTypes, SupportedExtensions,
-//str1by4, str1by2, str3by4,
-//HOURSTR, MINUTESTR, 
-DATESTR, MONTHNUMBERSTR, MONTHSTR,
-MAGICNUMBER,
+	DATESTR, MONTHNUMBERSTR, MONTHSTR,
+	MAGICNUMBER,
 } from "views/globals.js";
 
 // icons
@@ -321,6 +318,27 @@ export default function Visit(props) {
 		setCurrentSelection("Symptom");
 	}
 	
+	async function handleCloseNewInvestigation() {
+		try {
+			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/investigation/close/${userCid}/${currentPatientData.pid}`)
+			let tmpArray = lodashCloneDeep(investigationArray);
+			if (resp.data.investigationNumber < 0) {
+				//console.log("Blank visit");
+				tmpArray.pop();
+				//console.log(tmpArray);
+				setInvestigationIndex(tmpArray.length - 1);
+				setInvestigationArray(tmpArray);	
+			} else {
+				let lastIndex = tmpArray.length - 1;
+				tmpArray[lastIndex].investigationNumber = resp.data.investigationNumber;
+				console.log(tmpArray[lastIndex].investigationNumber)
+				setInvestigationArray(tmpArray);				
+			}
+		} catch(e) {
+			console.log(e);
+			console.log("Error close visit");
+		}
+	}
 	
 	function updateInvestigation(sArray, dArray) {
 		//console.log(sArray);
@@ -722,12 +740,9 @@ export default function Visit(props) {
 
 	function DisplayNewBtn() {
 		let lastIndex = investigationArray.length - 1;
-		if ((investigationArray.length > 0) && (investigationArray[lastIndex].investigationNumber === MAGICNUMBER)) return null;
-		return (
-			<div align="right">
-				<VsButton name="Add New Investigation" onClick={handleCreateNewInvestigation} />
-			</div>
-		)
+		return ((investigationArray.length > 0) && (investigationArray[lastIndex].investigationNumber !== MAGICNUMBER)) 
+			? <VsButton align="right" name="Add New Investigation" onClick={handleCreateNewInvestigation} />
+			: <VsButton align="right" name="Close Investigation" onClick={handleCloseNewInvestigation} />
 	}
 	
 	return (

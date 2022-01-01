@@ -492,7 +492,10 @@ InventoryListSchema = mongoose.Schema({
 	date:		Date,
 	expiryDate: Date,
 	expired: Boolean,
-	enabled: Boolean
+	enabled: Boolean,
+	boxes: Number,
+	inUse: Number,
+	discarded: Number,
 });
 
 
