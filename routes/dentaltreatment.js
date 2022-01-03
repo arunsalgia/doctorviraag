@@ -27,7 +27,9 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
   }
 	iRec.treatmentDate = new Date();
 	iRec.treatment = newInfo.treatment;
-	//console.log(iRec);
+	iRec.plan = newInfo.plan;
+	iRec.notes = newInfo.notes;
+	console.log(iRec);
 	await iRec.save();
 	
 	// now update payment
@@ -90,6 +92,19 @@ router.get('/list/:cid/:pid', async function(req, res, next) {
 	pid = Number(pid);
 	
 	let allRecs = await M_DentalTreatment.find({cid: cid, pid: pid}).sort({treatmentNumber: 1})
+	//console.log(allRecs);
+	sendok(res, allRecs);
+});
+
+router.get('/noteplan', async function(req, res, next) {
+  setHeader(res);
+  
+	let allRecs = await M_DentalTreatment.find({})
+	for(let i=0; i<allRecs.length; ++i) {
+		allRecs[i]["plan"] = "";
+		allRecs[i]["notes"] = "";
+		await allRecs[i].save();
+	}
 	//console.log(allRecs);
 	sendok(res, allRecs);
 });

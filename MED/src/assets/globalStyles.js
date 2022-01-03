@@ -230,6 +230,19 @@ const globalStyles = makeStyles((theme) => ({
 		display: "flex-root",
     width: "100%"
 	},
+  textArea: {
+		display: "flex-root",
+    width: "100%",
+    fontSize: theme.typography.pxToRem(16),
+		fontWeight: theme.typography.fontWeightBold,
+	},
+  textAreaFixed: {
+		display: "flex-root",
+    width: "100%",
+    fontSize: theme.typography.pxToRem(16),
+		fontWeight: theme.typography.fontWeightBold,
+    resize: 'none',
+	},
 	signInWelcome: {
 		align: "center",
 		//position: "fixed",

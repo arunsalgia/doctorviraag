@@ -270,8 +270,11 @@ DentalTreatmentSchema = mongoose.Schema({
 	treatmentNumber: Number,
 	treatmentDate: Date,
 	treatment: [{name: String, amount: Number, toothArray: [Number] }],
+	plan: String,
+	notes: String,
 	enabled: Boolean,
 });
+
 DentalTreatmentSchema.index({cid: 1, pid: 1});
 
 NextVisitSchema = mongoose.Schema({

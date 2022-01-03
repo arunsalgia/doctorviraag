@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import TextField from '@material-ui/core/TextField';
-import { InputAdornment, makeStyles, Container, CssBaseline } from '@material-ui/core';
+import { TextareaAutosize, TextField, CssBaseline } from '@material-ui/core';
 import axios from "axios";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import SwitchBtn from '@material-ui/core/Switch';
@@ -23,27 +22,17 @@ import lodashSortBy from "lodash/sortBy"
 import lodashSumBy from "lodash/sumBy"
 import lodashCloneDeep  from "lodash/cloneDeep";
 
+import Box from '@material-ui/core/Box';
 import Grid from "@material-ui/core/Grid";
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
-import Select from "@material-ui/core/Select";
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import Box from '@material-ui/core/Box';
-import Modal from 'react-modal';
-import { borders } from '@material-ui/system';
-import {dynamicModal } from "assets/dynamicModal";
-import cloneDeep from 'lodash/cloneDeep';
-import StepProgressBar from 'react-step-progress';
+
+
 // import the stylesheet
 import 'react-step-progress/dist/index.css';
 
 // styles
 import globalStyles from "assets/globalStyles";
-import modalStyles from "assets/modalStyles";
 
 // icons
 import IconButton from '@material-ui/core/IconButton';
@@ -54,51 +43,37 @@ import EventNoteIcon from '@material-ui/icons/EventNote';
 import AddIcon from '@material-ui/icons/AddCircleOutline';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
-
-import Switch from "@material-ui/core/Switch";
-
-
-import Link from '@material-ui/core/Link';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Cancel';
 
 // import Table from "components/Table/Table.js";
 // import FormControlLabel from '@material-ui/core/FormControlLabel';
 // import Radio from '@material-ui/core/Radio';
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import Avatar from "@material-ui/core/Avatar"
 // import CardAvatar from "components/Card/CardAvatar.js";
 // import { useHistory } from "react-router-dom";
 // import { UserContext } from "../../UserContext";
 
-import {DisplayYesNo, DisplayPageHeader, ValidComp, BlankArea,
-LoadingMessage,
+import {
+	ValidComp,
 } from "CustomComponents/CustomComponents.js"
 
 import {
-HOURSTR, MINUTESTR, DATESTR, MONTHNUMBERSTR, MONTHSTR,
-MAGICNUMBER, INR,
+DATESTR, MONTHNUMBERSTR, MAGICNUMBER, INR,
 } from "views/globals.js";
 
-// icons
-//import FileCopyIcon from '@material-ui/icons/FileCopy';
-//import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-//import DeleteIcon from '@material-ui/icons/Delete';
-//import CloseIcon from '@material-ui/icons/Close';
-//import VisibilityIcon from '@material-ui/icons/Visibility';
 
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Cancel';
-
-
-//colours 
-import { red, blue, green, lightGreen, 
-} from '@material-ui/core/colors';
 
 import { 
 	validateInteger,
 	vsDialog,
 	ordinalSuffix,
 } from "views/functions.js";
+
+/*
+
+//colours 
+import { red, blue, green, lightGreen, 
+} from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
 	selectedTooth: {
@@ -227,12 +202,16 @@ const useStyles = makeStyles((theme) => ({
 			padding: '1px', 
 		}
   }));
+*/
 
+const DrawerWidth={drawerStyle: {width: 500, },};
+const MAXDISPLAYTEXTROWS=15;
+const MAXEDITTEXTROWS=25;
 
 var userCid;
 export default function DentalTreatment(props) {
   
-  const classes = useStyles();
+  //const classes = useStyles();
 	const gClasses = globalStyles();
 	const alert = useAlert();
 	
@@ -246,6 +225,8 @@ export default function DentalTreatment(props) {
 	
 	const [treatTypeArray, setTreatTypeArray] = useState([]);
 	
+	const [treatmentPlan, setTreatmentPlan] = useState("");
+	const [treatmentNotes, setTreatmentNotes] = useState("");
 	
 	const [treatmentIndex, setTreatmentIndex] = useState(0);
 	const [treatmentArray, setTreatmentArray] = useState([]);
@@ -313,7 +294,7 @@ export default function DentalTreatment(props) {
 			setTreatmentArray([]);
 			setTreatmentIndex(0);
 			}
-		setCurrentSelection("Treatment");	
+			//setCurrentSelection("Treatment");	
 	}
 	
 	async function getAllTreatType() {
@@ -329,14 +310,9 @@ export default function DentalTreatment(props) {
 		let itemName = props.item;
 		return (
 		<Grid key={"BUT"+itemName} item xs={6} sm={6} md={2} lg={2} >
-		{(itemName !== "NEW") &&		
-			<Typography onClick={() => setSelection(itemName)}>
-				<span 
-					className={(itemName === currentSelection) ? gClasses.functionSelected : gClasses.functionUnselected}>
-				{itemName}
-				</span>
-			</Typography>
-		}
+		<Typography className={(itemName === currentSelection) ? gClasses.functionSelected : gClasses.functionUnselected} onClick={() => setSelection(itemName)}>
+			{itemName}
+		</Typography>
 		</Grid>
 		)}
 	
@@ -350,6 +326,8 @@ export default function DentalTreatment(props) {
 	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<DisplayFunctionItem item="Treatment" />
+		<DisplayFunctionItem item="Plan" />
+		<DisplayFunctionItem item="Notes" />
 	</Grid>	
 	</Box>
 	)}
@@ -413,7 +391,7 @@ export default function DentalTreatment(props) {
 	function DisplayTreatmentDates() {
 		let myDate = "No Treatment history available";
 		if (treatmentArray.length > 0) {
-			console.log(treatmentIndex, treatmentArray);
+			//console.log(treatmentIndex, treatmentArray);
 			let v = treatmentArray[treatmentIndex];
 			let d = new Date(v.treatmentDate);
 			myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
@@ -574,7 +552,7 @@ export default function DentalTreatment(props) {
 		tmpArray[lastIndex].treatment = tmpArray[lastIndex].treatment.filter(x => x.name !== itemName);
 		//console.log(tmpArray);
 		setTreatmentArray(tmpArray);
-		updateNewTreatment(tmpArray[lastIndex].treatment);
+		updateNewTreatment(tmpArray[lastIndex].treatment, treatmentPlan, treatmentNotes);
 	}
 	
 
@@ -592,16 +570,16 @@ export default function DentalTreatment(props) {
 				let arr = lodashSortBy(un.toothArray).toString();
 				//console.log(arr);
 				return (
-					<Grid className={classes.noPadding} key={"NOTES"+index} container >
+					<Grid  key={"NOTES"+index} container >
 					<Grid item align="left" xs={10} sm={3} md={3} lg={3} >
-						<Typography className={classes.heading}>{"Treatment: "+un.name}</Typography>
+						<Typography className={gClasses.patientInfo2}>{"Treatment: "+un.name}</Typography>
 					</Grid>
 					<Grid item align="left" xs={10} sm={3} md={7} lg={7} >
 						{/*\<DisplayTeeth toothArray={un.toothArray} />*/}
-						<Typography className={classes.heading}>{arr}</Typography>
+						<Typography className={gClasses.patientInfo2}>{arr}</Typography>
 					</Grid>
 					<Grid item align="right" xs={10} sm={1} md={1} lg={1} >
-						<Typography className={classes.heading}>{INR+un.amount}</Typography>
+						<Typography className={gClasses.patientInfo2}>{INR+un.amount}</Typography>
 					</Grid>
 					<Grid item xs={1} sm={1} md={1} lg={1} >
 						{(x.treatmentNumber === MAGICNUMBER) &&
@@ -616,12 +594,12 @@ export default function DentalTreatment(props) {
 			)}
 			</Box>
 			{/*<Box borderColor="primary.main" border={1}>*/}
-			<Grid className={classes.noPadding} key={"PC"} container >
+			<Grid  key={"PC"} container >
 			<Grid item align="right" xs={10} sm={10} md={10} lg={10} >
-			<Typography className={classes.total}>{"Total Professional Charges"}</Typography>
+			<Typography className={gClasses.patientInfo2}>{"Total Professional Charges"}</Typography>
 			</Grid>
 			<Grid item align="right" xs={1} sm={1} md={1} lg={1} >
-			<Typography className={classes.heading}>{INR+" "+lodashSumBy(x.treatment, 'amount')}</Typography>
+			<Typography className={gClasses.patientInfo2}>{INR+" "+lodashSumBy(x.treatment, 'amount')}</Typography>
 			</Grid>
 			<Grid item align="right" xs={1} sm={1} md={1} lg={1} />
 			</Grid>
@@ -648,8 +626,13 @@ export default function DentalTreatment(props) {
 		}
 	}
 	
-	function updateNewTreatment(sArray) {
-		let tmp = JSON.stringify({treatment: sArray});
+	function updateNewTreatment(sArray, tPlan, tNotes) {
+		console.log(tPlan, tNotes);
+		let tmp = JSON.stringify({
+			treatment: sArray,
+			plan: tPlan,
+			notes: tNotes
+		});
 		let tmp1 = encodeURIComponent(tmp);
 		axios.post(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/update/${userCid}/${currentPatientData.pid}/${tmp1}`)
 	}	
@@ -684,7 +667,7 @@ export default function DentalTreatment(props) {
 		setIsDrawerOpened("");
 		
 		tmp[lastIndex].treatment[index].name = emurName;
-		updateNewTreatment(tmp[lastIndex].treatment)
+		updateNewTreatment(tmp[lastIndex].treatment, treatmentPlan, treatmentNotes);
 		setTreatmentArray(tmp);
 	}
 	
@@ -726,6 +709,80 @@ export default function DentalTreatment(props) {
 		setEmurToothArray(newTootlArray);
 	}
 	
+	function editNotes() {
+		setEmurName(treatmentArray[treatmentIndex].notes);
+		setIsDrawerOpened("EDITTREATMENTNOTES")
+	}
+
+	function handlEditNotes() {
+		updateEditNotes(emurName);
+	}
+	
+	function updateEditNotes(newText) {
+		let tmpArray = lodashCloneDeep(treatmentArray);
+		tmpArray[treatmentIndex].notes = newText;
+		setTreatmentArray(tmpArray);
+		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
+			tmpArray[treatmentIndex].plan, 
+			tmpArray[treatmentIndex].notes
+		);
+		setIsDrawerOpened("");
+	}
+
+	function ArunNotes() {
+		if (treatmentArray.length === 0) return null;
+		let myNotes = treatmentArray[treatmentIndex].notes;
+		let myNumber = treatmentArray[treatmentIndex].treatmentNumber;
+	return (
+		<Box borderColor="primary.main" border={1}>
+		{(myNumber === MAGICNUMBER) &&
+		<div align="right">
+			<EditIcon color="primary" size="small" onClick={editNotes} />
+			<CancelIcon color="secondary" size="small" onClick={() => updateEditNotes("")} />
+		</div>
+		}
+		<TextareaAutosize rowsMax={MAXDISPLAYTEXTROWS} className={gClasses.textAreaFixed} disabled value={myNotes} />
+		</Box>
+	)}
+		
+		
+	function editPlan() {
+		setEmurName(treatmentArray[treatmentIndex].plan);
+		setIsDrawerOpened("EDITTREATMENTPLAN")
+	}
+
+	function handlEditPlan() {
+		updateEditPlan(emurName);
+	}
+
+	function updateEditPlan(newText) {
+		let tmpArray = lodashCloneDeep(treatmentArray);
+		tmpArray[treatmentIndex].plan = newText;
+		setTreatmentArray(tmpArray);
+		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
+			tmpArray[treatmentIndex].plan, 
+			tmpArray[treatmentIndex].notes
+		);
+		setIsDrawerOpened("");
+	}
+
+	function ArunPlan() {
+		if (treatmentArray.length === 0) return null;
+		let myPlan =  treatmentArray[treatmentIndex].plan;
+		let myNumber = treatmentArray[treatmentIndex].treatmentNumber;
+		//setTreatmentPlan(myPlan);
+		return (
+		<Box borderColor="primary.main" border={1}>
+		{(myNumber === MAGICNUMBER) &&
+		<div align="right">
+			<EditIcon color="primary" size="small" onClick={editPlan} />
+			<CancelIcon color="secondary" size="small" onClick={() => updateEditPlan("")} />
+		</div>
+		}
+		<TextareaAutosize rowsMax={MAXDISPLAYTEXTROWS} className={gClasses.textAreaFixed} disabled value={myPlan} />
+		</Box>
+	)}
+
 	return (
 	<div>
 	{(sessionStorage.getItem("userType") === "Assistant") &&
@@ -743,20 +800,22 @@ export default function DentalTreatment(props) {
 			{(currentSelection === "Treatment") &&
 				<ArunTreatment />
 			}
+			{(currentSelection === "Plan") &&
+				<ArunPlan />
+			}
+			{(currentSelection === "Notes") &&
+				<ArunNotes />
+			}
 		</Box>
-		<Drawer className={classes.drawer}
-		anchor="right"
-		variant="temporary"
-		open={isDrawerOpened !== ""}
-		>
+		<Drawer anchor="right" variant="temporary" open={isDrawerOpened !== ""}>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 		<VsCancel align="right" onClick={() => {setIsDrawerOpened("")}} />
 		{((isDrawerOpened === "ADDTREAT") || (isDrawerOpened === "EDITTREAT")) &&
 			<ValidatorForm align="center" className={gClasses.form} onSubmit={updateTreatment}>
-				<Typography align="center" className={classes.modalHeader}>
+				<Typography align="center" className={gClasses.patientInfo2Blue}>
 					{((isDrawerOpened === "ADDTREAT") ? "New Treatment" : "Edit Treatment")+` for ${currentPatient}`}
 				</Typography>
-				<BlankArea />
+				<br />
 				{/*<TextValidator required fullWidth color="primary"
 					id="newName" label="Treatment type" name="newName"
 					onChange={(event) => setEmurNameWithFilter(event.target.value)}
@@ -768,7 +827,7 @@ export default function DentalTreatment(props) {
 				/>
 				<VsCheckBox align='left' label="Remember" checked={remember} onClick={() => setRemember(!remember)} />
 				<VsList listArray={filterItemArray} onSelect={handleVsSelect} onDelete={handleVsTreatTypeDelete} />
-				<BlankArea />
+				<br />
 				<VsCheckBox align="left" label="Is Child" checked={isChild} onClick={() => { setEmurToothArray([]); setIsChild(!isChild); }} />
 				{(isChild) &&
 					<VsChildTeeth toothArray={emurToothArray} onClick={handleToothUpdate} />
@@ -784,9 +843,41 @@ export default function DentalTreatment(props) {
 					errorMessages={['Invalid Amount']}
 				/>
 				<ModalResisterStatus />
-				<BlankArea />
+				<br />
 				<VsButton type ="submit" name= {(isDrawerOpened === "ADDTREAT") ? "Add" : "Update"} />
 			</ValidatorForm>
+		}  
+		{(isDrawerOpened === "EDITTREATMENTPLAN") &&
+			<div align="center">
+				<Typography className={gClasses.patientInfo2Blue}>Treatment Plan</Typography>
+				<br />
+				<TextareaAutosize
+					rowsMax={MAXEDITTEXTROWS}
+					aria-label="empty textarea"
+					placeholder="Treatment Plan..."
+					value={emurName}
+					onChange={(event) => setEmurName(event.target.value)}
+					className={gClasses.textArea}
+				/>
+				<br />
+				<VsButton name="Update" onClick={handlEditPlan} />
+			</div>
+		}
+		{(isDrawerOpened === "EDITTREATMENTNOTES") &&
+			<div align="center">
+				<Typography className={gClasses.patientInfo2Blue}>Treatment Notes</Typography>
+				<br />
+				<TextareaAutosize
+					rowsMax={MAXEDITTEXTROWS}
+					aria-label="empty textarea"
+					placeholder="Treatment Notes..."
+					value={emurName}
+					onChange={(event) => setEmurName(event.target.value)}
+					className={gClasses.textArea}
+				/>
+				<br />
+				<VsButton name="Update" onClick={handlEditNotes} />
+			</div>
 		}
 		</Box>
 		</Drawer>
