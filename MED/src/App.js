@@ -77,14 +77,15 @@ function checkSessionRequest() {
 
 function checkResetPasswordRequest() {
 	let resetLink = "";
+  console.log("-",location.pathname,"-" );
 	let x = location.pathname.split("/");
-  //console.log("Path is");
-  //console.log(x);
+  console.log(x);
 	if (x.length >= 4)
 	if (x[1] === "doctorviraag")
 	if (x[2] === "resetpassword") {
 		resetLink = x[3];
 	}
+  console.log(resetLink);
 	return resetLink;
 }
 
@@ -141,7 +142,7 @@ function AppRouter() {
 */
 		else  {
 			let myLink = checkResetPasswordRequest();
-			//console.log("Link", myLink);
+			console.log("Link", myLink);
 			if (myLink !== "") {
 				sessionStorage.setItem("currentUserCode", myLink);
 				hist.push("/");

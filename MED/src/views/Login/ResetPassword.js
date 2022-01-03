@@ -1,7 +1,5 @@
-import React from 'react';
-import useState from 'react';
-import useEffect  from 'react';
-//import useContext from 'react/useContext';
+import React, { useState, useContext, useEffect } from 'react';
+import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Link from '@material-ui/core/Link';
@@ -12,8 +10,6 @@ import Container from '@material-ui/core/Container';
 import InputAdornment from "@material-ui/core/InputAdornment";
 //import { UserContext } from "../../UserContext";
 import axios from "axios";
-import ValidatorForm from 'react-material-ui-form-validator';
-import TextValidator from 'react-material-ui-form-validator';
 import red from '@material-ui/core/colors/red';
 //import { useHistory } from "react-router-dom";
 import { cdRefresh, encrypt} from "views/functions.js";
@@ -59,8 +55,6 @@ export default function ResetPassword() {
   const classes = useStyles();
 	const gClasses = globalStyles();
 	const alert = useAlert();
-//  const history = useHistory();
-  // const [userName, setUserName] = useState("");
 
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
