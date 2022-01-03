@@ -201,6 +201,7 @@ export default function ResetPassword() {
 					errorMessages={['Minimum 6 chars required','Special characters not permitted']}
 				/>
 			}
+			<br />
 			{(showRepeatPassword) &&
 				<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
 					label="Repeat Password" type={"text"}
@@ -233,6 +234,7 @@ export default function ResetPassword() {
           errorMessages={['password mismatch']}
 				/>
 			}
+			<br />
       <Button type="submit" fullWidth variant="contained" color="primary" disabled={disableButton} >
         Update
 			</Button>
