@@ -205,7 +205,7 @@ const useStyles = makeStyles((theme) => ({
 */
 
 const DrawerWidth={drawerStyle: {width: 500, },};
-const MAXDISPLAYTEXTROWS=15;
+const MAXDISPLAYTEXTROWS=12;
 const MAXEDITTEXTROWS=25;
 
 var userCid;
