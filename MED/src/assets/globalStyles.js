@@ -23,8 +23,13 @@ const globalStyles = makeStyles((theme) => ({
 		align: 'center',
 		//width: (isMobile()) ? '60%' : '20%',
 	},
-  drawer: {
+  drawer40: {
 		width: '40%',
+		flexShrink: 0
+		//backgroundColor: "rgba(0,0,0,0.6)" Don't target here
+	},
+  drawer90: {
+		width: '90%',
 		flexShrink: 0
 		//backgroundColor: "rgba(0,0,0,0.6)" Don't target here
 	},

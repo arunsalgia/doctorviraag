@@ -807,7 +807,12 @@ export default function DentalTreatment(props) {
 				<ArunNotes />
 			}
 		</Box>
-		<Drawer anchor="right" variant="temporary" open={isDrawerOpened !== ""}>
+		<Drawer 
+			classes={{
+				paper: gClasses.drawer90
+			}}
+			anchor="right" variant="temporary" open={isDrawerOpened !== ""}
+		>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 		<VsCancel align="right" onClick={() => {setIsDrawerOpened("")}} />
 		{((isDrawerOpened === "ADDTREAT") || (isDrawerOpened === "EDITTREAT")) &&
@@ -857,7 +862,7 @@ export default function DentalTreatment(props) {
 					placeholder="Treatment Plan..."
 					value={emurName}
 					onChange={(event) => setEmurName(event.target.value)}
-					className={gClasses.textArea}
+					className={gClasses.textAreaFixed}
 				/>
 				<br />
 				<VsButton name="Update" onClick={handlEditPlan} />
@@ -873,7 +878,7 @@ export default function DentalTreatment(props) {
 					placeholder="Treatment Notes..."
 					value={emurName}
 					onChange={(event) => setEmurName(event.target.value)}
-					className={gClasses.textArea}
+					className={gClasses.textAreaFixed}
 				/>
 				<br />
 				<VsButton name="Update" onClick={handlEditNotes} />
