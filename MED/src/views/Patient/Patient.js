@@ -288,15 +288,15 @@ export default function Patient() {
 		const us = async () => {
 			
 			try {
-				console.log("starting");
-				console.log(sessionStorage.getItem("userType"));
+				//console.log("starting");
+				//	console.log(sessionStorage.getItem("userType"));
 				if (sessionStorage.getItem("userType") !== "Developer") {
-					console.log("starting JSON");
+					//console.log("starting JSON");
 					customerData = JSON.parse(sessionStorage.getItem("customerData"));
-					console.log("starting axios");
+					//console.log("starting axios");
 					console.log(userCid);
 					let rrr =  await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/patient/checkexpiry/${userCid}`);
-					console.log("over axios");
+					//console.log("over axios");
 					if (rrr.data.status) return alert.error('Plan has expired');
 				} else {
 					customerData = {type: "Developer"};
@@ -316,8 +316,18 @@ export default function Patient() {
 				setPatientFilter(ppp, searchText);				
 			}
 		}
+
+		// do not get data if current user is patient
 		userCid = sessionStorage.getItem("cid");
-		us();
+		customerData = JSON.parse(sessionStorage.getItem("customerData"));
+		if (sessionStorage.getItem("userType") !== "Patient") {
+			us();	
+		} else {
+			let myPatients = JSON.parse(sessionStorage.getItem("patients"));
+			myPatients = myPatients.filter(x => x.cid === userCid);
+			setPatientMasterArray(myPatients)
+			setPatientFilter(myPatients, "");		
+		}
   }, [])
 
 
@@ -582,23 +592,30 @@ export default function Patient() {
 	<Grid className={gClasses.noPadding} key="AllPatients" container alignItems="center" >
 	{patientArray.map( (m, index) => 
 		<Grid key={"PAT"+m.pid} item xs={12} sm={6} md={3} lg={3} >
+		{(sessionStorage.getItem("userType") !== "Patient") &&
 		<DisplayPatientBox patient={m}
-		button1={
-			<IconButton className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  >
-				<VisibilityIcon  />
-			</IconButton>
-		}
-		button2={
-			<IconButton className={gClasses.blue} size="small" onClick={() => {handleEdit(m)}}  >
-				<EditIcon  />
-			</IconButton>
-		}
-		button3={
-			<IconButton color="secondary" size="small" onClick={() => {handleDelete(m)}}  >
-				<CancelIcon />
-			</IconButton>
-		}
+			button1={
+				<IconButton className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  >
+					<VisibilityIcon  />
+				</IconButton>
+			}
+			button2={
+				<IconButton className={gClasses.blue} size="small" onClick={() => {handleEdit(m)}}  >
+					<EditIcon  />
+				</IconButton>
+			}
+			button3={
+				<IconButton color="secondary" size="small" onClick={() => {handleDelete(m)}}  >
+					<CancelIcon />
+				</IconButton>
+			}
 		/>
+		}
+		{(sessionStorage.getItem("userType") === "Patient") &&
+		<DisplayPatientBox patient={m}
+			button1={<VisibilityIcon className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) } />}
+		/>
+		}
 		</Grid>
 	)}
 	</Grid>	
@@ -649,34 +666,36 @@ export default function Patient() {
 			<div>
 			<DisplayPageHeader headerName="Patient Directory" groupName="" tournament=""/>
 			<BlankArea />
-			<Grid className={gClasses.vgSpacing} key="PatientFilter" container alignItems="center" >
-				<Grid key={"F1"} item xs={false} sm={false} md={2} lg={2} />
-				<Grid key={"F2"} item xs={12} sm={12} md={4} lg={4} >
-					{/*<TextField id="filter"  padding={5} fullWidth label="Search Patient by name or Id" 
-					value={searchText}
-					onChange={(event) => filterPatients(event.target.value)}
-					InputProps={
-						{
-							endAdornment: (
-								<div>
-								<InputAdornment position="end"><SearchIcon /></InputAdornment>
-								</div>
-								)
+			{(window.sessionStorage.getItem("userType") !== "Patient") &&
+				<Grid className={gClasses.vgSpacing} key="PatientFilter" container alignItems="center" >
+					<Grid key={"F1"} item xs={false} sm={false} md={2} lg={2} />
+					<Grid key={"F2"} item xs={12} sm={12} md={4} lg={4} >
+						{/*<TextField id="filter"  padding={5} fullWidth label="Search Patient by name or Id" 
+						value={searchText}
+						onChange={(event) => filterPatients(event.target.value)}
+						InputProps={
+							{
+								endAdornment: (
+									<div>
+									<InputAdornment position="end"><SearchIcon /></InputAdornment>
+									</div>
+									)
+							}
 						}
-					}
-					/>*/}
-				<VsTextSearch label="Search Patient by name or Id" value={searchText}
-					onChange={(event) => filterPatients(event.target.value)}
-					onClear={(event) => filterPatients("")}
-				/>
+						/>*/}
+					<VsTextSearch label="Search Patient by name or Id" value={searchText}
+						onChange={(event) => filterPatients(event.target.value)}
+						onClear={(event) => filterPatients("")}
+					/>
+					</Grid>
+					<Grid key={"F4"} item xs={8} sm={8} md={3} lg={3} >
+					</Grid>
+					<Grid key={"F5"} item xs={4} sm={4} md={1} lg={1} >
+						<VsButton name="New Patient" onClick={handleAdd} />
+					</Grid>
+					<Grid key={"F6"} item xs={false} sm={false} md={2} lg={2} />
 				</Grid>
-				<Grid key={"F4"} item xs={8} sm={8} md={3} lg={3} >
-				</Grid>
-				<Grid key={"F5"} item xs={4} sm={4} md={1} lg={1} >
-					<VsButton name="New Patient" onClick={handleAdd} />
-				</Grid>
-				<Grid key={"F6"} item xs={false} sm={false} md={2} lg={2} />
-			</Grid>
+			}
 			<DisplayAllPatients />
 			</div>
 		}

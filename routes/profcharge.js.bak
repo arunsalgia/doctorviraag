@@ -37,7 +37,7 @@ router.get('/fromtolist/:cid/:myFrom/:myTo', async function(req, res, next) {
 	
 	//console.log(cid, pid)
 	let startDate = new Date(Number(myFrom.substr(0, 4)), Number(myFrom.substr(4,2))-1, Number(myFrom.substr(6,2)), 0, 0, 0);
-	let endDate = new Date(Number(myTo.substr(0, 4)), Number(myTo.substr(4,2))-1, Number(myTo.substr(6,2))+1, 0, 0, 0);
+	let endDate = new Date(Number(myFrom.substr(0, 4)), Number(myTo.substr(4,2))-1, Number(myTo.substr(6,2))+1, 0, 0, 0);
 	//console.log(startDate, endDate);
 
 	let allRecs = await M_ProfCharge.find({cid: cid, date: {$gte: startDate, $lte: endDate} }).sort({tid: -1});

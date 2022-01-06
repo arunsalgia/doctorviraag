@@ -48,14 +48,13 @@ import Holiday from "views/Settings/Holiday";
 import Assistant from "views/Settings/Assistant";
 import Inventory from "views/Inventory/Inventory";
 import PanelDoctor from "views/PanelDoctor/PanelDoctor";
+import Clinic from "views/Clinic/Clinic"
 
-import Modal from 'react-modal';
 // import download from 'js-file-downloader';
 import { BlankArea } from './CustomComponents';
 import {cdRefresh, specialSetPos, upGradeRequired, isMobile,
   downloadApk, clearBackupData,
-  checkIdle, setIdle,
-  internalToText, textToInternal,
+  setIdle,
 	handleLogout,
 } from "views/functions.js"
 import { LocalSee } from '@material-ui/icons';
@@ -171,6 +170,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function setTab(num) {
+  //console.log("Tab is ", num);
   localStorage.setItem("menuValue", num);
   cdRefresh();
 }
@@ -253,15 +253,7 @@ export function CricDreamTabs() {
   const handleAppointment = () => { setMenuValue(2);  }
 	const handleInventory = () => { setMenuValue(4);  }
 	const handlePanelDoctor = () => { setMenuValue(5);  }
-	
-/*
-  //const handleVisit = () => { setMenuValue(3);  }
-	const handleNextVisit = () => { handleClose(); setMenuValue(904);}
-	const handleReport = () => { handleClose(); setMenuValue(905);}
-	const handleSample = () => { handleClose(); setMenuValue(801);}
-	const handleCustomer = () => { handleClose(); setMenuValue(802);}
-	//const handleMedicine = () => { handleClose(); setMenuValue(704);}
-*/
+	const handleClinic = () => { setMenuValue(6);  }
 
   const handlePatient = () => { handleClose(); setMenuValue(901);}
 	
@@ -289,6 +281,7 @@ export function CricDreamTabs() {
       case 3: return <Visit/>; 	
 			case 4: return <Inventory />; 
 			case 5: return <PanelDoctor />; 
+      case 6: return <Clinic />
       case 101: 
         if (window.sessionStorage.getItem("userType") === "Developer")
           return <Customer />
@@ -352,14 +345,14 @@ export function CricDreamTabs() {
 	</div>
 	)}
     
-  let mylogo = `${process.env.PUBLIC_URL}/favicon.ico`;
-  let groupCharacter="G";
-  let currencyChar = '₹';
-  let myName = localStorage.getItem("userName");
-	
+  //let mylogo = `${process.env.PUBLIC_URL}/favicon.ico`;
+  //let groupCharacter="G";
+  //let currencyChar = '₹';
+  
 	//console.log("menuValue", localStorage.getItem("menuValue"));
 	//console.log("value", value);
 	//console.log("Is it Mobile", isMobile());
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -401,26 +394,41 @@ export function CricDreamTabs() {
 									<Typography className={classes.menuStyle}>Change Password</Typography>
 								</MenuItem>
                 <Divider className={classes.divider}/>
-								{(itIsMobile) &&
-									<div>
-									<MenuItem onClick={handleAppointment}>
-									<Typography className={classes.menuStyle}>Appointment</Typography>
-									</MenuItem>
-									<MenuItem onClick={handlePatient}>
-									<Typography className={classes.menuStyle}>Patient</Typography>
-									</MenuItem>
-									<MenuItem onClick={handleSummary}>
-									<Typography className={classes.menuStyle}>Summary</Typography>
-									</MenuItem>
-									<MenuItem onClick={handleInventory}>
-									<Typography className={classes.menuStyle}>Inventory</Typography>
-									</MenuItem>
-									<MenuItem onClick={handlePanelDoctor}>
-									<Typography className={classes.menuStyle}>PanelDoctor</Typography>
-									</MenuItem>
+								{((itIsMobile) && (window.sessionStorage.getItem("userType") !== "Patient")) &&
+                  <div>
+                  <MenuItem onClick={handleAppointment}>
+                  <Typography className={classes.menuStyle}>Appointment</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handlePatient}>
+                  <Typography className={classes.menuStyle}>Patient</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleSummary}>
+                  <Typography className={classes.menuStyle}>Summary</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleInventory}>
+                  <Typography className={classes.menuStyle}>Inventory</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handlePanelDoctor}>
+                  <Typography className={classes.menuStyle}>PanelDoctor</Typography>
+                  </MenuItem>
 									<Divider className={classes.divider} />
-									</div>
-								} 
+                  </div>
+                }
+                {((itIsMobile) && (window.sessionStorage.getItem("userType") === "Patient")) &&
+                  <div>
+                  <MenuItem onClick={handleClinic}>
+                    <Typography className={classes.menuStyle}>Clinic</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleAppointment}>
+                  <Typography className={classes.menuStyle}>Appointment</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handlePatient}>
+                  <Typography className={classes.menuStyle}>Patient</Typography>
+                  </MenuItem>
+                  <Divider className={classes.divider} />
+                  </div>
+                }
+                {(window.sessionStorage.getItem("userType") !== "Patient") &&
 								<div align="center">
 								<Typography className={classes.title}>Settings</Typography>
 								<MenuItem onClick={handleWorkingHours}>
@@ -433,7 +441,8 @@ export function CricDreamTabs() {
 								<Typography className={classes.menuStyle}>User</Typography>
 								</MenuItem>
 								</div>
-								{((false) && (window.sessionStorage.getItem("userType") === "Developer")) &&
+                }
+                {((false) && (window.sessionStorage.getItem("userType") === "Developer")) &&
 									<div>
 									<Divider className={classes.divider}/>
 									<MenuItem onClick={handleSample}>
@@ -452,9 +461,6 @@ export function CricDreamTabs() {
               </Menu>
             </div>
           )}
-          {/* <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton> */}
 					<Typography onClick={handleHome}>
 						<span className={classes.doctor}>+</span>
 						<span className={classes.ankit}> Doctor Viraag</span>
@@ -468,14 +474,21 @@ export function CricDreamTabs() {
           >
             <HomeIcon className={classes.icon}/>
           </IconButton>*/}
-					{(itIsMobile === false) &&
+					{((itIsMobile === false) && (window.sessionStorage.getItem("userType") === "Patient")) &&
+          <div>
+            <Button color="inherit" className={classes.statButton} onClick={handleClinic}>Clinic</Button>
+            <Button color="inherit" className={classes.statButton} onClick={handleAppointment}>Appt</Button>
+            <Button color="inherit" className={classes.visitButton} onClick={handlePatient}>Patient</Button>
+          </div>
+          }
+					{((itIsMobile === false) && (window.sessionStorage.getItem("userType") !== "Patient")) &&
 						<div>
-						<Button color="inherit" className={classes.statButton} onClick={handleAppointment}>Appt</Button>
-						<Button color="inherit" className={classes.visitButton} onClick={handlePatient}>Patient</Button>
-						<Button color="inherit" className={classes.visitButton} onClick={handleSummary}>Summary</Button>
-						<Button color="inherit" className={classes.visitButton} onClick={handleInventory}>Inventory</Button>
-						<Button color="inherit" className={classes.visitButton} onClick={handlePanelDoctor}>PanelDoctor</Button>
-						</div>
+              <Button color="inherit" className={classes.statButton} onClick={handleAppointment}>Appt</Button>
+              <Button color="inherit" className={classes.visitButton} onClick={handlePatient}>Patient</Button>
+              <Button color="inherit" className={classes.visitButton} onClick={handleSummary}>Summary</Button>
+              <Button color="inherit" className={classes.visitButton} onClick={handleInventory}>Inventory</Button>
+              <Button color="inherit" className={classes.visitButton} onClick={handlePanelDoctor}>PanelDoctor</Button>
+            </div>
 					}
 					{(false) &&
 					<div align="right">

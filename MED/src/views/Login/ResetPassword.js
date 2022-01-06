@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function ResetPassword() {
+export default function ResetPassword(props) {
   const classes = useStyles();
 	const gClasses = globalStyles();
 	const alert = useAlert();
@@ -68,7 +68,7 @@ export default function ResetPassword() {
 
     const verifyCode = async () => {
 			try {
-				let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/user/cricverifycode/${sessionStorage.getItem("currentUserCode")}`
+				let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/user/cricverifycode/${props.param1}`
 				// console.log(myUrl);
 				let  response = await axios.get(myUrl);
 				// console.log(response.data);

@@ -1227,7 +1227,6 @@ export function DisplayProfCharge(props) {
 		let isBilling = (p.treatment !== "");
 		let myInfo = "";
 		let tmp = props.patientArray.find(x => x.pid === p.pid);
-		if (!tmp) return null;
 		let myName = tmp.displayName;
 		for(let i=0; i<p.treatmentDetails.length; ++i) {
 			myInfo += p.treatmentDetails[i].name + ": "+p.treatmentDetails[i].amount + "<br />";

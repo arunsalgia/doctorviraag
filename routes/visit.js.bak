@@ -638,7 +638,7 @@ router.get('/fromtolist/:cid/:myFrom/:myTo', async function(req, res, next) {
 	//	{visitDate: {$gte: startDate}}
 	//	{visitDate: {$lte: endDate  }}
 	//]}).sort({visitDate: -1});
-	//console.log(allRecs);
+	console.log(allRecs);
 	sendok(res, allRecs);
 });
 

@@ -466,6 +466,27 @@ router.get('/jaijinendra/:uName/:uPassword', async function (req, res, next) {
 		senderr(res, 602, "Invalid User name or password");
 });
 
+router.get('/jaijinendrabypatient/:uMobile', async function (req, res, next) {
+  setHeader(res);
+  var { uMobile } = req.params;   // mobile number of patient
+  
+  let patientRecs = await M_Patient.find({mobile: uMobile});
+  if (patientRecs.length === 0) return senderr(res, 601, "Invalid mobile number");
+
+  for(i=0; i<patientRecs.length; ++i) {
+    patientRecs[i].email = dbToSvrText(patientRecs[i].email );
+  }
+
+  let allCids = _.map(patientRecs, 'cid');
+  allCids = _.uniqBy(allCids);
+  customerRecs = [];
+  for(let c=0; c<allCids.length; ++c) {
+    let myCustomer = await akshuGetCustomer(allCids[c]);
+    customerRecs.push(myCustomer)
+  }
+  console.log("Done");    
+  sendok(res, {patient: patientRecs, clinic: customerRecs});
+});
 
 router.get('/cricchangepassword/:userId/:oldPwd/:newPwd', async function (req, res, next) {
   // CricRes = res;

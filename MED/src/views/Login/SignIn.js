@@ -27,6 +27,8 @@ import { BlankArea } from 'CustomComponents/CustomComponents';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
+import VsCheckBox from "CustomComponents/VsCheckBox.js"
+
 /*
 let welcomeMESSAGE = `${process.env.REACT_APP_WELCOME}`;
 
@@ -86,6 +88,8 @@ export default function SignIn() {
   const history = useHistory();
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
+  const [isPatient, setIsPatient] = useState(false);
+
   // const [showPage, setShowPage] = useState(true);
   // const [open, setOpen] = useState(true)
   // const { setUser } = useContext(UserContext);
@@ -112,26 +116,42 @@ export default function SignIn() {
 
 	async function handleSubmit(e) {
   e.preventDefault();
+  if (isPatient) {
+    try {
+      let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendrabypatient/${userName}`); 
+      window.sessionStorage.setItem("uid", userName);
+      window.sessionStorage.setItem("userName", userName);
+      window.sessionStorage.setItem("userType", "Patient");
+      window.sessionStorage.setItem("cid", "");
+      
+      window.sessionStorage.setItem("patients", JSON.stringify(response.data.patient));
+      window.sessionStorage.setItem("clinics", JSON.stringify(response.data.clinic));
+      
+      setTab("6");
+    } catch (e) {
+      setError("Mobile number not registered with any clinic", true);
+    }
+  } else {
+    try { 
+      let enPassword = encrypt(password);
+      let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendra/${userName}/${enPassword}`); 
+      setError("", false);
+      let userData = response.data.user;
+      window.sessionStorage.setItem("uid", userData.uid)
+      window.sessionStorage.setItem("userName", userData.displayName);
+      window.sessionStorage.setItem("userType", userData.userType);
+      window.sessionStorage.setItem("cid", userData.cid);
 
-	try { 
-		let enPassword = encrypt(password);
-		let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendra/${userName}/${enPassword}`); 
-		setError("", false);
-		let userData = response.data.user;
-		window.sessionStorage.setItem("uid", userData.uid)
-		window.sessionStorage.setItem("userName", userData.displayName);
-		window.sessionStorage.setItem("userType", userData.userType);
-		window.sessionStorage.setItem("cid", userData.cid);
-
-		window.sessionStorage.setItem("customerData", JSON.stringify(response.data.customer));
-		
-		//window.sessionStorage.setItem("doctorData", JSON.stringify(response.data.doctor));
-		 
-		//window.sessionStorage.setItem("admin", true)
-		setTab(process.env.REACT_APP_HOME);
-	} catch (err) {
-		setError("Invalid User name / Password", true);
-	}
+      window.sessionStorage.setItem("customerData", JSON.stringify(response.data.customer));
+      
+      //window.sessionStorage.setItem("doctorData", JSON.stringify(response.data.doctor));
+      
+      //window.sessionStorage.setItem("admin", true)
+      setTab(process.env.REACT_APP_HOME);
+    } catch (err) {
+      setError("Invalid User name / Password", true);
+    }
+  }
 };
 
 function handleForgot() {
@@ -271,7 +291,21 @@ function handleForgot() {
 	<CricDreamLogo />
 	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
 		<Typography component="h1" variant="h5" align="center">Sign in</Typography>
-		<BlankArea />
+    <VsCheckBox align="left" 
+      label="Patient Login" 
+      checked={isPatient}  
+      onClick={() => setIsPatient(!isPatient) }
+    />
+    {(isPatient) &&
+		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
+			id="newPatientName" label="Mobile Number" type="number"
+			value={userName} 
+			onChange={() => { setUserName(event.target.value) }}
+			validators={['minNumber:1000000000', 'maxNumber:9999999999']}
+			errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
+		/>
+    }
+    {(!isPatient) &&
 		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
 			id="newPatientName" label="Name" type="text"
 			value={userName} 
@@ -279,8 +313,9 @@ function handleForgot() {
 			validators={['noSpecialCharacters']}
 			errorMessages={['Special characters not permitted']}
 		/>
+    }
     <br/>
-		{(showPassword) &&
+		{((!isPatient) &&  (showPassword)) &&
 			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
 				id="password" label="Password" type={"text"}
 				value={password} 
@@ -296,7 +331,7 @@ function handleForgot() {
 				errorMessages={['Special characters not permitted']}
 			/>
 		}
-		{(!showPassword) &&
+		{((!isPatient) &&  (!showPassword)) &&
 			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
 				id="password" label="Password" type={"password"}
 				value={password} 

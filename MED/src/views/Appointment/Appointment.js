@@ -495,14 +495,14 @@ export default function Appointment() {
 		//customerData = JSON.parse(sessionStorage.getItem("customerData"));
 		const getCustomerDetails  = async () => {
 			if (sessionStorage.getItem("userType") !== "Developer") {
-				console.log("starting JSON");
+				//console.log("starting JSON");
 				customerData = JSON.parse(sessionStorage.getItem("customerData"));
 				setDoctorList([customerData.doctorName].concat(customerData.doctorPanel));
 				setMobileList([customerData.mobile].concat(customerData.doctorMobile));
-				console.log("starting axios");
+				//console.log("starting axios");
 				console.log(userCid);
 				let rrr =  await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/patient/checkexpiry/${userCid}`);
-				console.log("over axios");
+				//console.log("over axios");
 				if (rrr.data.status) return alert.error('Plan has expired');
 			} else {
 				customerData = {type: "Developer"};
@@ -533,9 +533,18 @@ export default function Appointment() {
 				return [];
 			}
 	
-			let ppp = await getAllPatients(userCid);
+			
+			let ppp;
+			if (window.sessionStorage.getItem("userType") !== "Patient")  {
+				ppp = await getAllPatients(userCid)
+			} else {
+				ppp = JSON.parse(sessionStorage.getItem("patients"));
+				ppp = ppp.filter(x => x.cid === userCid);
+			}
 			return ppp;				
 		}
+
+
 		const makeSlots  = async () => {
 			//let allHolidays = await PgetAllHolidays;
 			let allPendingAppt = await PgetAllPendingAppointment;
@@ -1567,7 +1576,7 @@ export default function Appointment() {
 		<DisplayPageHeader headerName="Appointment Directory" groupName="" tournament=""/>
 		<Container component="main" maxWidth="lg">
 		<CssBaseline />
-		{(currentPatient === "") && 
+		{((currentPatient === "") && (sessionStorage.getItem("userType") !== "Patient")) && 
 			<div>
 			<Grid className={gClasses.vgSpacing} key="PatientFilter" container alignItems="center" >
 			<Grid key={"F1"} item xs={false} sm={false} md={2} lg={2} />
@@ -1592,8 +1601,10 @@ export default function Appointment() {
 				<VsButton name="My Appointments" onClick={handleMyAppt}/> 
 			</Grid>
 			</Grid>
-			<DisplayAllPatients />
 			</div>
+			}
+		{(currentPatient === "") && 
+			<DisplayAllPatients />
 		}
 		{(currentPatient !== "") &&
 			<VsButton align="right" name="Select Patient" onClick={() => { setCurrentPatient("")}} />	

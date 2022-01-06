@@ -367,8 +367,7 @@ export default function Summary() {
 		</Grid>
 		{dueArray.map( (v, index) => {
 			let myPat = patientMasterArray.find(x => x.pid === v._id);
-			if (!myPat) return null;
-			let myName = myPat.displayName;
+			let myName = (myPat) ? myPat.displayName : "";
 			return (
 			<Grid className={gClasses.noPadding} key={"DUES"+index} container justify="center" alignItems="center" >
 			<Grid item xs={4} sm={4} md={4} lg={4} >

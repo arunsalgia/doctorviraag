@@ -12,10 +12,11 @@ import SignIn from "views/Login/SignIn"
 import Welcome from "views/MED/Welcome";
 //import SignUp from "views/Login/SignUp.js";
 //import Doctor from "views/MED/Doctor";
-import ResetPassword from "views/Login/ResetPassword";
 //import Session from "views/Session/Session"
 //import JoinGroup from "views/Group/JoinGroup.js"
+import ResetPassword from "views/Login/ResetPassword";
 import ForgotPassword from "views/Login/ForgotPassword.js";
+import DisplayDocument from "views/DisplayDocument/DisplayDocument";
 import IdleTimer from 'react-idle-timer'
 
 import { PinDropSharp } from "@material-ui/icons";
@@ -90,6 +91,20 @@ function checkResetPasswordRequest() {
 }
 
 
+function checkExternalConnectRequest() {
+	let resetLink = {cmd: 'none', param1: '', param2: ''};
+  //console.log("-",location.pathname,"-" );
+	let x = location.pathname.split("/");
+  //console.log(x);
+	if (x.length >= 3)
+	if (x[1].toLowerCase() === "doctorviraag") {
+    resetLink.cmd = x[2].toLowerCase();
+    resetLink.param1 = (x.length >= 4) ? x[3] : '';
+    resetLink.param2 = (x.length >= 5) ? x[4] : '';
+  }
+	return resetLink;
+}
+
 function AppRouter() {
   //let history={hist}
 
@@ -141,14 +156,20 @@ function AppRouter() {
 		} 
 */
 		else  {
-			let myLink = checkResetPasswordRequest();
-			//console.log("Link", myLink);
-			if (myLink !== "") {
-				sessionStorage.setItem("currentUserCode", myLink);
-				hist.push("/");
+			let myLink = checkExternalConnectRequest();
+      if  (myLink.cmd !== 'none') {
+      hist.push("/");
+        switch (myLink.cmd) {
+          case 'resetpassword':
+            return (<ResetPassword param1={myLink.param1} />);
+          case 'prescription':
+          case 'receipt':
+            return (<DisplayDocument cmd={myLink.cmd} param1={myLink.param1} />);
+        }
+				//sessionStorage.setItem("currentUserCode", myLink);
 				//console.log(history, hist);
-				return (<ResetPassword />);
-			} else {
+				
+      } else {
 				//console.log("About to call Welcome");
 				if (process.env.REACT_APP_SHOWWELCOMEPAGE === 'true')
 					return (<Welcome/>)
