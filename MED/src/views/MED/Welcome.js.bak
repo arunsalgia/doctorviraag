@@ -43,6 +43,7 @@ const cardStyles = {
   }
 };
 
+const theme = createTheme();
 const useStyles = makeStyles((theme) => ({
 	boxColor: {
 		backgroundColor: grey[100],

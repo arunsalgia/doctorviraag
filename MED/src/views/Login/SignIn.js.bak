@@ -291,11 +291,11 @@ function handleForgot() {
 	<CricDreamLogo />
 	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
 		<Typography component="h1" variant="h5" align="center">Sign in</Typography>
-	{/*<VsCheckBox align="left" 
+    <VsCheckBox align="left" 
       label="Patient Login" 
       checked={isPatient}  
       onClick={() => setIsPatient(!isPatient) }
-		/>*/}
+    />
     {(isPatient) &&
 		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
 			id="newPatientName" label="Mobile Number" type="number"
