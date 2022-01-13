@@ -600,7 +600,7 @@ export default function DentalTreatment(props) {
 			<Grid item align="right" xs={9} sm={9} md={10} lg={10} >
 			<Typography className={gClasses.patientInfo2}>{"Total Professional Charges: "}</Typography>
 			</Grid>
-			<Grid item xs={3} sm={3} md={2} lg={2} >
+			<Grid item align="right" xs={3} sm={3} md={2} lg={2} >
 			<Typography className={gClasses.patientInfo2}>{INR+" "+lodashSumBy(x.treatment, 'amount')}</Typography>
 			</Grid>
 			</Grid>

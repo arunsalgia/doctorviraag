@@ -281,7 +281,6 @@ NextVisitSchema = mongoose.Schema({
 	pid: Number,
 	cid: String,
 	status: String,
-	order: String,
 	nextVisitDate: Date,
 	enabled: Boolean,
 });

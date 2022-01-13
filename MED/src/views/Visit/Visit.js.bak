@@ -364,7 +364,7 @@ export default function Visit(props) {
 		}
 		</Grid>
 		<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
-			<Typography className={gClasses.dateSelection} >
+			<Typography className={gClasses.indexSelection} >
 				{myDate}
 			</Typography>
 		</Grid>

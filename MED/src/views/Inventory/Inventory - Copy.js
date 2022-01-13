@@ -73,7 +73,6 @@ import {
 
 // import { UserContext } from "../../UserContext";
 import { 
-	isMobile,
 	vsDialog,
 	disablePastDt,
 	disableFutureDt,
@@ -218,7 +217,6 @@ export default function Inventory() {
 
 
 	function DisplayInventoryToolTips(props) {
-	if (isMobile()) return null;
 	return(
 		<div>
 		{props.list.map( t => {
@@ -231,8 +229,7 @@ export default function Inventory() {
 	)}	
 		
 	function DisplayInventoryPurchases(props) {
-		//console.log(props.list.length);
-		if (props.list.length === 0) return null;
+		//console.log(props.list);
 		let myShopping = props.list;		//.filter( x => x.subId === 0);
 	return (
 		<div className={gClasses.fullWidth} >
@@ -267,13 +264,7 @@ export default function Inventory() {
 		<Accordion className={gClasses.fullWidth} key={"INVAC"+myStr2} expanded={expandedPanel2 === myStr2} onChange={handleAccordionChange2(myStr2)}>
 				<AccordionSummary  className={(expandedPanel2 === myStr2) ? gClasses.selectedAccordian : gClasses.normalAccordian} key={"INVAS"+myStr2} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
 				<Grid className={gClasses.noPadding} container align="center">
-				<Grid align="left" key={"INVITEM1"+myStr2} item xs={8} sm={8} md={4} lg={4} >
-					{(isMobile()) &&
-					<Typography >
-						<span className={gClasses.patientInfo2}>{"Vendor: "+i.vendor}</span>
-					</Typography>
-					}
-					{(!isMobile()) &&
+				<Grid align="left" key={"INVITEM1"+myStr2} item xs={6} sm={6} md={4} lg={4} >
 					<Typography >
 						<span className={gClasses.patientInfo2}>{"Vendor: "+i.vendor}</span>
 						<span align="left"
@@ -284,19 +275,17 @@ export default function Inventory() {
 						<InfoIcon color="primary" size="small"/>
 						</span>
 					</Typography>
-					}
 				</Grid>	
 				{(!i.expired) &&
-					<Grid align="right" key={"INVITEM2"+myStr2} item xs={4} sm={4} md={3} lg={3} >
+					<Grid align="left" key={"INVITEM2"+myStr2} item xs={6} sm={6} md={3} lg={3} >
 						<Typography className={gClasses.patientInfo2}>{expiryStr}</Typography>
 					</Grid>	
 				}
 				{(i.expired) &&
-					<Grid align="right" key={"INVITEM2"+myStr2} item xs={4} sm={4} md={3} lg={3} >
+					<Grid align="left" key={"INVITEM2"+myStr2} item xs={6} sm={6} md={3} lg={3} >
 						<Typography className={gClasses.patientInfo2Red}>{"Expired"}</Typography>
 					</Grid>	
-				}				
-				<Grid align="left" key={"INVITEM3"+myStr2} item xs={6} sm={6} md={3} lg={3} >
+				}				<Grid align="left" key={"INVITEM3"+myStr2} item xs={6} sm={6} md={3} lg={3} >
 					<Typography className={gClasses.patientInfo2}>{"Balance: " + balance }</Typography>
 				</Grid>	
 				<Grid align="right" key={"INVITEM4"+myStr2} item xs={6} sm={6} md={2} lg={2} >
@@ -353,16 +342,16 @@ export default function Inventory() {
 			<Accordion key={"AC"+i.name} expanded={expandedPanel === i.name} onChange={handleAccordionChange(i.name)}>
           <AccordionSummary className={(expandedPanel === i.name) ? gClasses.selectedAccordian : gClasses.normalAccordian} key={"AS"+i.name} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
 					<Grid className={gClasses.noPadding} container align="center">
-					<Grid key={"ITEM1"+index} align="left" item xs={6} sm={6} md={4} lg={4} >
+					<Grid key={"ITEM1"+index} item xs={6} sm={6} md={4} lg={4} >
 						<Typography className={gClasses.patientInfo2}>{i.name}</Typography>
 					</Grid>	
 					<Grid align="left" key={"ITEM2"+index} item xs={6} sm={6} md={3} lg={3} >
 						<Typography className={gClasses.patientInfo2}>{"Balance Qty: " + balance }</Typography>
 					</Grid>	
-					<Grid align="left" key={"ITEM3"+index} item xs={9} sm={9} md={3} lg={3} >
+					<Grid align="left" key={"ITEM3"+index} item xs={8} sm={8} md={3} lg={3} >
 						<Typography className={gClasses.patientInfo2}>{"Inventory Value: " + totalAmount + "/-"}</Typography>
 					</Grid>	
-					<Grid align="right" key={"ITEM4"+index} item xs={3} sm={3} md={2} lg={2} >
+					<Grid align="right" key={"ITEM4"+index} item xs={4} sm={4} md={2} lg={2} >
 						<EditIcon color="primary" size="small" onClick={() => { handleEditItem(i)}} />
 						<AddIcon color="primary" size="small" onClick={() => { handleAddToInventory(i)}} />
 						<CancelIcon color="secondary" size="small" onClick={() => { handleDeleteTransaction(i.id, 0, 0)}} />

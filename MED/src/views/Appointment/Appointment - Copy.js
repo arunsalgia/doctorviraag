@@ -409,11 +409,19 @@ function setAptDate(d) { aptDate = d; }
 
 //var workingHours;
 var timeSlots;
-
+function NumDays() {
+var retval = 5;
+	if (isMobile())
+	if(window.innerHeight > window.innerWidth)
+    retval=2;
+	else
+		retval = 3;
+	
+	return retval;
+}
+const NUMBEROFDAYS = NumDays();
 var userCid;
 var customerData;
-
-const NUMBEROFDAYS = (isMobile()) ? 2: 5;
 
 export default function Appointment() {
   const classes = useStyles();
@@ -487,9 +495,8 @@ export default function Appointment() {
 
 	const [currentDoctor, setCurrentDoctor] = useState("");
 
- 
-	
-	useEffect(() => {			
+  useEffect(() => {	
+
 		userCid = sessionStorage.getItem("cid");
 		let PgetAllHolidays;
 		let PgetAllPendingAppointment;
@@ -594,10 +601,7 @@ export default function Appointment() {
 		makeSlots();
 		PcheckFromPatient = checkFromPatient();
 		//handleMyAppt();
-
   }, []);
-
-
 
 	async function reloadAppointmentDetails() {
 		// get all pending apt
@@ -619,7 +623,6 @@ export default function Appointment() {
 	async function generateSlots(allPendingAppt) {
 		let d;
 		let slotData = [];
-		
 		for(let i=0; i<NUMBEROFDAYS; ++i) {
 			d = (i === 0) ? getFirstDate() : getNextDate(d);
 			//console.log(d);
@@ -1164,7 +1167,7 @@ export default function Appointment() {
   
 	function DisplayAvailableAppointments() {
 	if (allTimeSlots.length === 0) return null;
-
+	
 	//console.log(currentIndex);
 	//console.log(allTimeSlots[currentIndex]);
 	let tStr = DATESTR[allTimeSlots[currentIndex].date];
@@ -1180,7 +1183,7 @@ export default function Appointment() {
 		<Grid item xs={12} sm={12} md={12} lg={12} >
 		<Typography className={classes.slotTitle} >{"Appointment Date"}</Typography>
 		</Grid>
-		<Grid key="LEFT" align="left" item xs={1} sm={1} md={1} lg={1} >
+		<Grid key="LEFT" align="left" item xs={1} sm={2} md={1} lg={1} >
 			<IconButton color={'primary'} onClick={prevDate}  >
 					<LeftIcon />
 				</IconButton>
@@ -1194,7 +1197,7 @@ export default function Appointment() {
 				t.eveningSlots.filter(x => x.visit === "available").length;
 			let myClass = (index === currentIndex) ? classes.selIndex : classes.unselIndex;
 		return (
-		<Grid key={"TIME"+index} item xs={5} sm={5} md={2} lg={2} >
+		<Grid key={"TIME"+index} item xs={5} sm={3} md={2} lg={2} >
 			<Box onClick={() => {setNewCurrentIndex(index)}} 
 			className={(t.holiday) ? gClasses.greenboxStyle : gClasses.boxStyle} 
 			borderRadius={7} border={1} >

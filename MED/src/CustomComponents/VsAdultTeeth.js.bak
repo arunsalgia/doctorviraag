@@ -89,6 +89,7 @@ return (
 			)}
 		</TableCell>
 	</TableRow>
+	</TableBody> 
 	</div>
 	}
 	{(isMobile()) &&
@@ -158,9 +159,9 @@ return (
 			)}
 		</TableCell>
 	</TableRow>
+	</TableBody> 
 	</div>
 	}
-	</TableBody> 
 	</Table>
 	</TableContainer>
 </Box>

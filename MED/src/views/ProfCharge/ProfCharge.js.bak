@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { InputAdornment, Container, CssBaseline } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
 import SwitchBtn from '@material-ui/core/Switch';
 import { usePromiseTracker, trackPromise } from "react-promise-tracker";
@@ -47,7 +47,7 @@ import globalStyles from "assets/globalStyles";
 
 
 import {ValidComp, BlankArea, 
-	DisplayProfChargeBalance, DisplayProfCharge,
+	DisplayProfCharge_WO_Name, DisplayProfCharge, DisplayProfChargeBalance
 } from "CustomComponents/CustomComponents.js"
 
 import {
@@ -465,7 +465,7 @@ export default function ProfCharge(props) {
 		<DisplayProfChargeBalance balance={balance}/>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 			<DisplayNewBtn />
-			<DisplayProfCharge profChargeArray={profChargeArray} 
+			<DisplayProfCharge_WO_Name profChargeArray={profChargeArray} 
 				patientArray={[currentPatientData]}
 				handleReceipt={handleReceipt}
 				handleEdit={handleEditPayment} 

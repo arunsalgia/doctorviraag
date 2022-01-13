@@ -250,7 +250,7 @@ export default function Visit(props) {
 			let d = new Date(v.investigationDate);
 			myDate = `Investigation dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
 			if (v.investigationNumber === MAGICNUMBER) {
-					myDate += " ( New )";
+					myDate += " (New)";
 			}
 		}
 	return (
@@ -264,7 +264,7 @@ export default function Visit(props) {
 		}
 		</Grid>
 		<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
-			<Typography className={gClasses.indexSelection} >
+			<Typography className={gClasses.dateSelection} >
 				{myDate}
 			</Typography>
 		</Grid>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { InputAdornment, Container, CssBaseline } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
 import Checkbox from '@material-ui/core//Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -87,7 +87,9 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import { red, blue 
 } from '@material-ui/core/colors';
 
-import { callYesNo, 
+import { 
+	isMobile,
+	callYesNo, 
 	downloadVisit,
 	encrypt, decrypt, 
 	validateInteger,
@@ -412,17 +414,18 @@ export default function WorkingHours() {
 	let startNum = currentIndex*100 + BLOCKNUMBER.morningBlockStart;
 	let endNum = currentIndex*100 + BLOCKNUMBER.morningBlockEnd + 1;
 	//console.log(startNum, endNum);
+	let dayoftheweek = isMobile() ? SHORTWEEKSTR[currentIndex] + "." : WEEKSTR[currentIndex];
 	return (
 	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={classes.noPadding} key={"MED"+currentIndex} container alignItems="center"  >
 	<Grid item xs={12} sm={6} md={6} lg={6} >
 		<div align="center">
-		<Typography className={classes.slotTitle}>{WEEKSTR[currentIndex]+" Morning slots"}</Typography>
+		<Typography className={classes.slotTitle}>{dayoftheweek+" Morning slots"}</Typography>
 		</div>
 	</Grid>
 	<Grid item xs={6} sm={3} md={3} lg={3} >
 		{(sessionStorage.getItem("userType") === "Doctor") &&
-			<VsButton name="Set default Morning Slots" onClick={() => {setDefaultSlots("MORNING", startNum, endNum)}} />
+			<VsButton name="Set default" onClick={() => {setDefaultSlots("MORNING", startNum, endNum)}} />
 		}
 	</Grid>
 	<Grid item xs={6} sm={3} md={3} lg={3} >
@@ -438,7 +441,7 @@ export default function WorkingHours() {
 		} 
 		 label={
 			 <Typography className={classes.blueCheckBoxLabel}>
-			 {"Select all morning slots"} 
+			 {"Select all"} 
 			 </Typography>
 		 }
 		/>
@@ -449,7 +452,7 @@ export default function WorkingHours() {
 		let hour = Math.floor(tmp / 4);
 		let minute = MINUTEBLOCK[tmp % 4];
 		return (
-			<Grid key={"gr"+HOURSTR[hour]+":"+MINUTESTR[minute]} item xs={3} sm={2} md={1} lg={1} >	
+			<Grid key={"gr"+HOURSTR[hour]+":"+MINUTESTR[minute]} item xs={4} sm={2} md={1} lg={1} >	
 			<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 				{(sessionStorage.getItem("userType") === "Doctor") &&
 					<FormControlLabel 
@@ -495,17 +498,18 @@ export default function WorkingHours() {
 	function DisplayAfterNoonSlots() {
 	let startNum = currentIndex*100 + BLOCKNUMBER.afternoonBlockStart;
 	let endNum = currentIndex*100 + BLOCKNUMBER.afternoonBlockEnd + 1;
+	let dayoftheweek = isMobile() ? SHORTWEEKSTR[currentIndex] + "." : WEEKSTR[currentIndex];
 	return (
 	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={classes.noPadding} key={"MED"+currentIndex} container alignItems="center"  >
 	<Grid item xs={12} sm={6} md={6} lg={6} >
 		<div align="center">
-		<Typography className={classes.slotTitle}>{WEEKSTR[currentIndex]+" afternoon slots"}</Typography>
+		<Typography className={classes.slotTitle}>{dayoftheweek+" afternoon slots"}</Typography>
 		</div>
 	</Grid>
 	<Grid item xs={6} sm={3} md={3} lg={3} >
 		{(sessionStorage.getItem("userType") === "Doctor") &&
-			<VsButton name="Set default Afternoon Slots" onClick={() => {setDefaultSlots("AFTERNOON", startNum, endNum)}} />
+			<VsButton name="Set default" onClick={() => {setDefaultSlots("AFTERNOON", startNum, endNum)}} />
 		}
 	</Grid>
 	<Grid item xs={6} sm={3} md={3} lg={3} >
@@ -521,7 +525,7 @@ export default function WorkingHours() {
 			} 
 			 label={
 				 <Typography className={classes.blueCheckBoxLabel}>
-				 {"Select all afternoon slots"} 
+				 {"Select all"} 
 				 </Typography>
 			 }
 		/>
@@ -532,7 +536,7 @@ export default function WorkingHours() {
 		let hour = Math.floor(tmp / 4);
 		let minute = MINUTEBLOCK[tmp % 4];
 		return (
-			<Grid item xs={3} sm={2} md={1} lg={1} >	
+			<Grid item xs={4} sm={2} md={1} lg={1} >	
 			<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 				{(sessionStorage.getItem("userType") === "Doctor") &&
 					<FormControlLabel 
@@ -578,18 +582,19 @@ export default function WorkingHours() {
 	function DisplayEveningSlots() {
 	let startNum = currentIndex*100 + BLOCKNUMBER.eveningBlockStart;
 	let endNum = currentIndex*100 + BLOCKNUMBER.eveningBlockEnd + 1;
+	let dayoftheweek = isMobile() ? SHORTWEEKSTR[currentIndex] + "." : WEEKSTR[currentIndex];
 	//console.log(startNum, endNum);
 	return (
 	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={classes.noPadding} key={"MED"+currentIndex} container alignItems="center"  >
 	<Grid item xs={12} sm={6} md={6} lg={6} >
 		<div align="center">
-		<Typography className={classes.slotTitle}>{WEEKSTR[currentIndex]+" evening slots"}</Typography>
+		<Typography className={classes.slotTitle}>{dayoftheweek+" evening slots"}</Typography>
 		</div>
 	</Grid>
 	<Grid item xs={6} sm={3} md={3} lg={3} >
 		{(sessionStorage.getItem("userType") === "Doctor") &&
-			<VsButton name="Set default Evening Slots" onClick={() => {setDefaultSlots("EVENING", startNum, endNum)}} />
+			<VsButton name="Set default" onClick={() => {setDefaultSlots("EVENING", startNum, endNum)}} />
 		}
 	</Grid>
 	<Grid item xs={6} sm={3} md={3} lg={3} >
@@ -605,7 +610,7 @@ export default function WorkingHours() {
 		} 
 		 label={
 			 <Typography className={classes.blueCheckBoxLabel}>
-			 {"Select all evening slots"} 
+			 {"Select all"} 
 			 </Typography>
 		 }
 	/>
@@ -616,7 +621,7 @@ export default function WorkingHours() {
 		let hour = Math.floor(tmp / 4);
 		let minute = MINUTEBLOCK[tmp % 4];
 		return (
-			<Grid item xs={3} sm={2} md={1} lg={1} >	
+			<Grid item xs={4} sm={2} md={1} lg={1} >	
 			<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 				{(sessionStorage.getItem("userType") === "Doctor") &&
 					<FormControlLabel 
@@ -687,14 +692,14 @@ export default function WorkingHours() {
 	<Grid className={gClasses.noPadding} key="DOCTYPE" container alignItems="center" >
 		<Grid key="DOCTYPETITLE" item xs={12} sm={12} md={12} lg={12} >
 			<div align="center">
-			<Typography className={classes.slotTitle} >{"Working Slots of Week day"}</Typography>
+			<Typography className={classes.slotTitle} >{"Working Slots"}</Typography>
 			</div>
 		</Grid>		
 		<Grid key={"LEFT"} item xs={false} sm={false} md={2} lg={2} />
 		{[0,1,2,3,4,5,6].map( (index) => {
 			let myClass = (index === currentIndex) ? classes.selIndex : classes.unselIndex;
 			return (
-				<Grid key={"DOC"+index} item xs={4} sm={3} md={1} lg={1} >
+				<Grid key={"DOC"+index} item xs={3} sm={3} md={1} lg={1} >
 					<Typography className={myClass} 
 						onClick={() => {handleCategoryClick(index)}}
 					>

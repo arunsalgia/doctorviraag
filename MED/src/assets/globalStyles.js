@@ -48,6 +48,13 @@ const globalStyles = makeStyles((theme) => ({
 		padding: "2px 2px", 
 		margin: "2px 2px", 
 	},
+	dateSelection: {
+		color: 'green',
+		fontSize: theme.typography.pxToRem(24),
+		fontWeight: theme.typography.fontWeightBold,
+		padding: "2px 2px", 
+		margin: "2px 2px", 
+	},
 	filterRadio: {
 		fontSize: theme.typography.pxToRem(14),
 		fontWeight: theme.typography.fontWeightBold,

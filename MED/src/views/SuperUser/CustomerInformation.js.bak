@@ -936,7 +936,7 @@ export default function CustomerInformations(props) {
 	{(currentCustomer !== "") &&
 	<div>
 		<DisplayCustomerHeader customer={currentCustomerData} />
-			{/*<DisplayWalletBalance balance={balance} />*/}
+		<DisplayWalletBalance balance={balance} />
 		<DisplayCustomerFunctionHeader />
 		{(currentCustomerSelection == "Profile") &&
 			<DisplayCustomerDetails />

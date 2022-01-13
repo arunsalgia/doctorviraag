@@ -231,7 +231,7 @@ export default function Inventory() {
 	)}	
 		
 	function DisplayInventoryPurchases(props) {
-		//console.log(props.list.length);
+		console.log(props.list.length);
 		if (props.list.length === 0) return null;
 		let myShopping = props.list;		//.filter( x => x.subId === 0);
 	return (
