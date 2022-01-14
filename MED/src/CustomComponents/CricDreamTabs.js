@@ -39,6 +39,9 @@ import Summary from "views/Summary/Summary.js"
 import Customer from "views/SuperUser/Customer";
 import CustomerInformation from 'views/SuperUser/CustomerInformation';
 
+import Report from "views/Report/Report.js" 
+
+
 import ChangePassword from "views/Login/ChangePassword.js"
 import Home from "views/MED/Home.js";
 //import ContactUs from "views/MED/ContactUs.js";
@@ -49,6 +52,7 @@ import Assistant from "views/Settings/Assistant";
 import Inventory from "views/Inventory/Inventory";
 import PanelDoctor from "views/PanelDoctor/PanelDoctor";
 import Clinic from "views/Clinic/Clinic"
+import PatientHome from "views/Patient/PatientHome";
 
 // import download from 'js-file-downloader';
 import { BlankArea } from './CustomComponents';
@@ -282,6 +286,8 @@ export function CricDreamTabs() {
 			case 4: return <Inventory />; 
 			case 5: return <PanelDoctor />; 
       case 6: return <Clinic />
+			case 7: return <PatientHome />
+			
       case 101: 
         if (window.sessionStorage.getItem("userType") === "Developer")
           return <Customer />
@@ -299,6 +305,8 @@ export function CricDreamTabs() {
 			case 702: return <Holiday />
 			case 703: return <Assistant />
       //case 704: return <Medicine />;
+			
+			case 905: return <Report />
 
       default: return  null;
     }

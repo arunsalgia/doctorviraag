@@ -22,7 +22,7 @@ import {red, green, blue } from '@material-ui/core/colors';
 import { DesktopWindows } from '@material-ui/icons';
 import { isMobile, cdRefresh, specialSetPos, encrypt, clearBackupData, downloadApk } from "views/functions.js"
 import {setTab} from "CustomComponents/CricDreamTabs.js"
-import { DisplayLogo, CricDreamLogo, ValidComp } from 'CustomComponents/CustomComponents.js';
+import { CricDreamLogo, ValidComp } from 'CustomComponents/CustomComponents.js';
 import { BlankArea } from 'CustomComponents/CustomComponents';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
@@ -89,9 +89,7 @@ export default function SignIn() {
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
   const [isPatient, setIsPatient] = useState(false);
-	const [selectionDone, setSelectionDone] = useState(false);
-	const [currentSelection, setCurrentSelection] = useState("");
-	
+
   // const [showPage, setShowPage] = useState(true);
   // const [open, setOpen] = useState(true)
   // const { setUser } = useContext(UserContext);
@@ -284,12 +282,7 @@ function handleForgot() {
     )
   }
 
-	function selectCategory(category) {
-		console.log(category);
-		setIsPatient((category.toLowerCase() === "patient"));
-		setSelectionDone(true);
-		setCurrentSelection((category.toLowerCase() === "patient") ? " Patient" : " Doctor");
-	}
+
 	//console.log("In sign in");
   return (
 	<Container component="main" maxWidth="xs">
@@ -297,31 +290,13 @@ function handleForgot() {
 	<div className={gClasses.paper}>
 	<CricDreamLogo />
 	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
-		<Typography component="h1" variant="h5" align="center">{"Sign in as "+((selectionDone) ? ((isPatient) ? " Patient" : " Doctor") :  "")}</Typography>
+		<Typography component="h1" variant="h5" align="center">Sign in</Typography>
 	{/*<VsCheckBox align="left" 
       label="Patient Login" 
       checked={isPatient}  
       onClick={() => setIsPatient(!isPatient) }
 		/>*/}
-		{(!selectionDone) &&
-		<div>
-		<br />
-		<br />
-		<Grid className={gClasses.fullWidth} key="LOGO" container align="center">
-		<Grid item xs={12} sm={12} md={12} lg={12} >
-		</Grid>
-		<Grid item xs={false} sm={false} md={1} lg={1} />
-		<Grid item xs={6} sm={6} md={5} lg={5} >
-      <DisplayLogo onClick={() => selectCategory("Patient")} label="Patient" image="SI_PATIENT.JPG" />;
-		</Grid>
-		<Grid item xs={6} sm={6} md={5} lg={5} >
-      <DisplayLogo onClick={() => selectCategory("Doctor")} label="Doctor" image="SI_DOCTOR.JPG" />;
-		</Grid>
-		<Grid item xs={false} sm={false} md={1} lg={1} />
-		</Grid>
-		</div>
-		}
-    {((isPatient) && (selectionDone)) &&
+    {(isPatient) &&
 		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
 			id="newPatientName" label="Mobile Number" type="number"
 			value={userName} 
@@ -330,7 +305,7 @@ function handleForgot() {
 			errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
 		/>
     }
-    {((!isPatient) && (selectionDone)) &&
+    {(!isPatient) &&
 		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
 			id="newPatientName" label="Name" type="text"
 			value={userName} 
@@ -340,7 +315,7 @@ function handleForgot() {
 		/>
     }
     <br/>
-		{((!isPatient) &&  (showPassword) && (selectionDone)) &&
+		{((!isPatient) &&  (showPassword)) &&
 			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
 				id="password" label="Password" type={"text"}
 				value={password} 
@@ -356,7 +331,7 @@ function handleForgot() {
 				errorMessages={['Special characters not permitted']}
 			/>
 		}
-		{((!isPatient) &&  (!showPassword)  && (selectionDone)) &&
+		{((!isPatient) &&  (!showPassword)) &&
 			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
 				id="password" label="Password" type={"password"}
 				value={password} 
@@ -374,28 +349,13 @@ function handleForgot() {
 		}
 		<Typography className={(errorMessage.isError) ? gClasses.error : gClasses.nonerror} align="left">{errorMessage.msg}</Typography>
 		<ValidComp />
-		{(selectionDone) &&
-		<Grid className={gClasses.fullWidth} key="LOGO" container align="center" alignItems="center" >
-		<Grid item xs={1} sm={1} md={1} lg={1} />
-		<Grid item xs={4} sm={4} md={4} lg={4} >
-			<Button type="submit" fullWidth variant="contained" color="primary" className={gClasses.submit}>
-				Sign In
-			</Button>
-		</Grid>
-		<Grid item xs={1} sm={1} md={1} lg={1} />
-		<Grid item xs={4} sm={4} md={4} lg={4} >
-			<Button fullWidth variant="contained" color="primary" className={gClasses.submit} onClick={() => setSelectionDone(false)}>
-				Back
-			</Button>
-		</Grid>
-		</Grid>
-		}
+		<Button type="submit" fullWidth variant="contained" color="primary" className={gClasses.submit}>
+			Sign In
+		</Button>
 		</ValidatorForm>	
-		{(selectionDone) &&
 		<div align="left">
 			<Link href="#" onClick={handleForgot} variant="body2">Forgot password</Link>
 		</div>
-		}
 	</div>
 	</Container>
   );

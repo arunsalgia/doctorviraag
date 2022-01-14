@@ -153,6 +153,13 @@ const globalStyles = makeStyles((theme) => ({
 		fontWeight: theme.typography.fontWeightBold,	
 		color: 'blue',
 	},
+	titleBlack: {
+		fontSize: theme.typography.pxToRem(18),
+		fontWeight: theme.typography.fontWeightBold,	
+		color: 'black',
+		marginTop: 'none',
+		marginBottom: "20px",
+	},
 	vgSpacing: {
 		padding: "10px 10px", 
 		margin: "10px 10px", 
@@ -276,7 +283,9 @@ const globalStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    marginLeft: 3,
+		marginRight: 3,
+
   },
   page: {
   },

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 //import { useParams } from 'react-router-dom'
 import axios from "axios";
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -49,6 +49,7 @@ import Assistant from "views/Settings/Assistant";
 import Inventory from "views/Inventory/Inventory";
 import PanelDoctor from "views/PanelDoctor/PanelDoctor";
 import Clinic from "views/Clinic/Clinic"
+import PatientHome from "views/Patient/PatientHome";
 
 // import download from 'js-file-downloader';
 import { BlankArea } from './CustomComponents';
@@ -282,6 +283,8 @@ export function CricDreamTabs() {
 			case 4: return <Inventory />; 
 			case 5: return <PanelDoctor />; 
       case 6: return <Clinic />
+			case 7: return <PatientHome />
+			
       case 101: 
         if (window.sessionStorage.getItem("userType") === "Developer")
           return <Customer />

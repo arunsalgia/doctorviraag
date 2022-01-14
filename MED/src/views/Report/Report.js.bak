@@ -719,10 +719,9 @@ export default function Document(props) {
 	};
   
 	function DisplayAllReports() {
-		let useris = sessionStorage.getItem("userType")
 	return (
 	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-		{(useris !== "Patient") &&
+		{(sessionStorage.getItem("userType") !== "Patient") &&
 		<VsButton align="right" name="Add new Medical Report" onClick={addDoc} />
 		}
 		{(documentArray.length === 0) &&
@@ -741,7 +740,6 @@ export default function Document(props) {
 			<Grid className={gClasses.noPadding} key="AllDOCS" container alignItems="center" >
 			{documentArray.map( (d, index) => 
 				<Grid key={"DOC"+index} item xs={12} sm={6} md={3} lg={3} >
-				{(useris !== "Patient") &&
 				<DisplayDocumentDetails
 					document={d} 
 					button1={
@@ -760,37 +758,6 @@ export default function Document(props) {
 						</IconButton>
 					}
 				/>
-				}
-				{(useris !== "Patient") &&
-				<DisplayDocumentDetails
-					document={d} 
-					button1={
-						<IconButton color="primary" size="small" onClick={() => {handleFileView(d)}} >
-							<VisibilityIcon	 />
-						</IconButton>	
-					}
-					button2={
-						<IconButton color="primary" size="small" onClick={() => {editDoc(d)}}  >
-							<EditIcon  />
-						</IconButton>
-					}
-					button3={
-						<IconButton color="secondary" size="small" onClick={() => {deleteDoc(d)}}  >
-							<CancelIcon  />
-						</IconButton>
-					}
-				/>
-				}
-				{(useris === "Patient") &&
-				<DisplayDocumentDetails
-					document={d} 
-					button1={
-						<IconButton color="primary" size="small" onClick={() => {handleFileView(d)}} >
-							<VisibilityIcon	 />
-						</IconButton>	
-					}
-				/>
-				}
 				</Grid>
 			)}
 			</Grid>

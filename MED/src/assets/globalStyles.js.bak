@@ -48,6 +48,13 @@ const globalStyles = makeStyles((theme) => ({
 		padding: "2px 2px", 
 		margin: "2px 2px", 
 	},
+	dateSelection: {
+		color: 'green',
+		fontSize: theme.typography.pxToRem(24),
+		fontWeight: theme.typography.fontWeightBold,
+		padding: "2px 2px", 
+		margin: "2px 2px", 
+	},
 	filterRadio: {
 		fontSize: theme.typography.pxToRem(14),
 		fontWeight: theme.typography.fontWeightBold,
@@ -145,6 +152,12 @@ const globalStyles = makeStyles((theme) => ({
 		fontSize: theme.typography.pxToRem(18),
 		fontWeight: theme.typography.fontWeightBold,	
 		color: 'blue',
+	},
+	titleBlack: {
+		fontSize: theme.typography.pxToRem(18),
+		fontWeight: theme.typography.fontWeightBold,	
+		color: 'black',
+		marginBottom: "20px",
 	},
 	vgSpacing: {
 		padding: "10px 10px", 
@@ -269,7 +282,9 @@ const globalStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    marginLeft: 3,
+		marginRight: 3,
+
   },
   page: {
   },

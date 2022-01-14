@@ -29,7 +29,6 @@ export default function Clinic() {
 	function setCurrentClinic(myClinic, startDisplay) {
 		window.sessionStorage.setItem("cid", myClinic._id);
 		window.sessionStorage.setItem("customerData", JSON.stringify(myClinic));
-		
 		if (startDisplay) {
 			setTab(process.env.REACT_APP_PATIENTHOME);
 		} else {

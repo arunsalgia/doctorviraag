@@ -63,6 +63,16 @@ const useStyles = makeStyles((theme) => ({
     width: theme.spacing(10),
     height: theme.spacing(10),
   },
+	logo: {
+    //margin: theme.spacing(1),
+    //backgroundColor: theme.palette.secondary.main,
+    width: theme.spacing(10),
+    height: theme.spacing(10),
+		//backgroundColor: deepOrange[200],
+		borderWidth: 4,
+		borderStyle: 'solid',
+		margin: 'none',
+  },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
@@ -716,6 +726,20 @@ export class Copyright extends React.Component {
   }
 }
 
+export function DisplayLogo(props) {
+	let mylogo = `${process.env.PUBLIC_URL}/image/${props.image}`;
+  const classes = useStyles();
+	const gClasses = globalStyles();
+	var _label = (props.label !== null) ? props.label : "";
+  return (
+		<div>
+    <Avatar variant="square" onClick={props.onClick} className={classes.logo}  src={mylogo}/>
+		{(_label != "") &&
+			<Typography className={gClasses.title} align="center">{_label}</Typography>
+		}
+		</div>
+);
+}
 
 export function CricDreamLogo () {
   let mylogo = `${process.env.PUBLIC_URL}/DV.ICO`;
@@ -1168,7 +1192,7 @@ export function DisplayProfChargeBalance(props) {
 			</Grid>
 			<Grid key={"BAL2"} align="center" item xs={4} sm={4} md={4} lg={4} >
 				<Typography className={gClasses.dateSelection} >
-					{"Collection: "+INR+props.balance.payment}
+					{"Payment: "+INR+props.balance.payment}
 				</Typography>
 			</Grid>
 			<Grid key={"BAL3"} align="center" item xs={4} sm={4} md={4} lg={4} >
