@@ -91,13 +91,9 @@ export default function SignIn() {
   const [isPatient, setIsPatient] = useState(false);
 	const [selectionDone, setSelectionDone] = useState(false);
 	const [currentSelection, setCurrentSelection] = useState("");
-	
-  // const [showPage, setShowPage] = useState(true);
-  // const [open, setOpen] = useState(true)
-  // const { setUser } = useContext(UserContext);
+
   const [ errorMessage, setErrorMessage ] = useState({msg: "", isError: false });
   const [ downloadMessage, setDownloadMessage ] = useState("");
-  // const [errorFound, setErrorFound] = useState(false);
 
   useEffect(() => {
     if (window.localStorage.getItem("logout")) {
@@ -156,7 +152,7 @@ export default function SignIn() {
   }
 };
 
-function handleForgot() {
+	function handleForgot() {
   console.log("Call forgot password here")
   // history.push('/admin/emailpassword');
   sessionStorage.setItem("currentLogin", "FORGOT");
@@ -298,14 +294,9 @@ function handleForgot() {
 	<CricDreamLogo />
 	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
 		<Typography component="h1" variant="h5" align="center">{"Sign in as "+((selectionDone) ? ((isPatient) ? " Patient" : " Doctor") :  "")}</Typography>
-	{/*<VsCheckBox align="left" 
-      label="Patient Login" 
-      checked={isPatient}  
-      onClick={() => setIsPatient(!isPatient) }
-		/>*/}
+		<br />
 		{(!selectionDone) &&
 		<div>
-		<br />
 		<br />
 		<Grid className={gClasses.fullWidth} key="LOGO" container align="center">
 		<Grid item xs={12} sm={12} md={12} lg={12} >
@@ -393,6 +384,7 @@ function handleForgot() {
 		</ValidatorForm>	
 		{(selectionDone) &&
 		<div align="left">
+			<br />
 			<Link href="#" onClick={handleForgot} variant="body2">Forgot password</Link>
 		</div>
 		}

@@ -165,6 +165,32 @@ router.post('/delete/:cid/:pid/:tid', async function(req, res, next) {
 	sendok(res, "done");
 });
 
+router.get('/test', async function(req, res, next) {
+  setHeader(res);
+	
+	let allTreatment = await M_DentalTreatment.find({});
+	console.log("Treat Count: ", allTreatment.length);
+	
+	//let treatmentIds = _.map(allTreatment, '_id');
+	//let allPC = await M_ProfCharge.find({treatment: {$in: treatmentIds}});
+	//console.log("PC Count: ",allPC.length);
+	
+	let count = 0;
+	for(let i=0; i<allTreatment.length; ++i) {
+		iRec = allTreatment[i];
+		myPC = await M_ProfCharge.findOne({treatment: iRec._id});
+		if (!myPC) continue; 
+		let tmp = "";
+		for(let t=0; t<iRec.treatment.length; ++t) {
+			tmp += ((tmp !== "") ? " / " : "") + iRec.treatment[t].name;
+		}
+		console.log(tmp);
+		myPC.description = tmp;
+		await myPC.save();
+	}
+	sendok(res, "done");
+});
+
 function sendok(res, usrmsg) { res.send(usrmsg); }
 function senderr(res, errcode, errmsg) { res.status(errcode).send(errmsg); }
 function setHeader(res) {

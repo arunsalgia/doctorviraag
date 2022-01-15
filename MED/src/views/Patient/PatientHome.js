@@ -1,200 +1,54 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Container, CssBaseline } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-
-import VsButton from "CustomComponents/VsButton";
-import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
-
 import Grid from "@material-ui/core/Grid";
 import Typography from '@material-ui/core/Typography';
 import Avatar from "@material-ui/core/Avatar"
-import { useHistory } from "react-router-dom";
-import { useAlert } from 'react-alert';
 
-
+import VsButton from "CustomComponents/VsButton";
 
 import Report from 'views/Report/Report';
 import ProfCharge from 'views/ProfCharge/PatientProfCharge';
 import Visit from 'views/Visit/PatientVisit';
+import PatientAppointment from 'views/Appointment/PatientAppointment';
 
-import { isMobile, encrypt,
-	dispOnlyAge, dispAge, dispEmail, dispMobile, checkIfBirthday,
-	validateInteger,
-	getAllPatients,
-	vsDialog,
-	disableFutureDt,
- } from "views/functions.js"
+import VisibilityIcon from '@material-ui/icons/Visibility';
+
 import {
 	DisplayLogo,
 	DisplayPageHeader, 
+	DisplayPatientBox,
 } from "CustomComponents/CustomComponents.js"
 
 // styles
 import globalStyles from "assets/globalStyles";
 
-
-import {red, blue, yellow, orange, green, pink } from '@material-ui/core/colors';
-import {setTab} from "CustomComponents/CricDreamTabs.js"
-
-/*
-const useStyles = makeStyles((theme) => ({
-	dateTime: {
-		color: 'blue',
-		fontSize: theme.typography.pxToRem(28),
-		fontWeight: theme.typography.fontWeightBold,
-		backgroundColor: pink[100],
-		align: 'center',
-		width: (isMobile()) ? '60%' : '20%',
-	}, 
-	dateTimeNormal: {
-		color: 'blue',
-		fontSize: theme.typography.pxToRem(14),
-		fontWeight: theme.typography.fontWeightBold,
-		//backgroundColor: pink[100],
-		align: 'center',
-		//width: (isMobile()) ? '60%' : '20%',
-	}, 
-	dateTimeBlock: {
-		color: 'blue',
-		//fontSize: theme.typography.pxToRem(28),
-		fontWeight: theme.typography.fontWeightBold,
-		//backgroundColor: pink[100],
-		width: '40%'
-	},
-	drawer: {
-		width: '40%',
-		flexShrink: 0
-		//backgroundColor: "rgba(0,0,0,0.6)" Don't target here
-	},
-	boxStyle: {padding: "5px 10px", margin: "4px 2px", backgroundColor: blue[300] },
-	radio: {
-		fontSize: theme.typography.pxToRem(20),
-		fontWeight: theme.typography.fontWeightBold,
-		color: "blue",
-	},
-    root: {
-      width: '100%',
-    }, 
-		link: {
-			backgroundColor: 'transparent',
-		},
-		switchText: {
-			fontSize: theme.typography.pxToRem(14),
-			fontWeight: theme.typography.fontWeightBold,
-    }, 
-    info: {
-			backgroundColor: yellow[500],	
-			color: blue[700],
-			height: theme.spacing(AVATARHEIGHT),
-			width: theme.spacing(AVATARHEIGHT),
-			fontSize: '12px',
-			fontWeight: theme.typography.fontWeightBold,
-			borderWidth: 1,
-			borderColor: 'black',
-			borderStyle: 'solid',
-    }, 
-		noinfo: {
-			backgroundColor: '#FFFFFF',	
-			color: '#000000',
-			height: theme.spacing(AVATARHEIGHT),
-			width: theme.spacing(AVATARHEIGHT),
-			fontSize: '12px',
-			fontWeight: theme.typography.fontWeightBold,
-			borderWidth: 1,
-			borderColor: 'black',
-			borderStyle: 'solid',
-		},       
-    td : {
-			border: 5,
-			align: "center",
-			padding: "none",
-			borderWidth: 1,
-			borderColor: 'black',
-			borderStyle: 'solid',
-			backgroundColor: '#00E5FF',
-		},
-		th : {
-			border: 5,
-			align: "center",
-			padding: "none",
-			borderWidth: 1,
-			borderColor: 'black',
-			borderStyle: 'solid',
-			backgroundColor: '#FF7043',
-		},
-		header: {
-			fontSize: theme.typography.pxToRem(20),
-			fontWeight: theme.typography.fontWeightBold,
-    }, 
-    error:  {
-      // right: 0,
-      fontSize: '12px',
-      color: red[700],
-      // position: 'absolute',
-      alignItems: 'center',
-      marginTop: '0px',
-		},
-		editdelete: {
-			marginLeft:  '50px',
-			marginRight: '50px',
-			paddings: '20px',
-		},
-		NoPatients: {
-			fontSize: theme.typography.pxToRem(20),
-			fontWeight: theme.typography.fontWeightBold,
-			color: blue[700]
-		},  
-		radio: {
-			fontSize: theme.typography.pxToRem(20),
-			fontWeight: theme.typography.fontWeightBold,
-			color: "blue",
-		},
-		messageText: {
-			color: '#4CC417',
-			fontSize: 12,
-			// backgroundColor: green[700],
-    },
-    symbolText: {
-        color: '#4CC417',
-        // backgroundColor: green[700],
-    },
-    button: {
-			margin: theme.spacing(0, 1, 0),
-    },
-    heading: {
-      fontSize: theme.typography.pxToRem(15),
-      flexBasis: '33.33%',
-      flexShrink: 0,
-    },
-    secondaryHeading: {
-      fontSize: theme.typography.pxToRem(15),
-      color: theme.palette.text.secondary,
-    },
-  }));
-
-*/
-
 var userCid;
 var customerData;
+var clinicName = "";
 
 export default function PatientHome() {
-	//const history = useHistory();	
-  //const classes = useStyles();
 	const gClasses = globalStyles();
-	const alert = useAlert();
+	const [patientArray, setPatientArray] = useState([]);
 
+	const [currentPatientName, setCurrentPatientName] = useState("");
 	const [currentPatientData, setCurrentPatientData] = useState({});
 	const [currentSelection, setCurrentSelection] = useState("");
-
-	
   useEffect(() => {
 		
 		const us = async () => {
 			try {
 				let userCid = sessionStorage.getItem("cid");
-				let allPatient = JSON.parse(sessionStorage.getItem("patients"));
-				setCurrentPatientData(allPatient.find(x => x.cid === userCid));
+				//console.log(userCid);
+				customerData = JSON.parse(sessionStorage.getItem("customerData"));
+				//console.log(customerData);
+				clinicName = customerData.clinicName;
+				let tmp = JSON.parse(sessionStorage.getItem("patients"));
+				tmp = tmp.filter(x => x.cid === userCid);
+				setPatientArray(tmp);
+				//console.log(tmp);
+				if (tmp.length === 1) {
+					handleSelectPatient(tmp[0]);
+				} 				
 			} catch {
 				console.log("in patient catch");
 			}	
@@ -202,51 +56,89 @@ export default function PatientHome() {
 		us();	
   }, [])
 
-	function selectCategory(category) {
 
-
-		
+	function handleSelectPatient(patRec) {
+		setCurrentPatientData(patRec);
+		setCurrentPatientName(patRec.displayName);
 	}
+	
+	function DisplayAllPatients() {
+	//console.log(patientArray);
+	//console.log(patientMasterArray);
+	return (
+	<Grid className={gClasses.noPadding} key="AllPatients" container alignItems="center" >
+	{patientArray.map( (m, index) => 
+		<Grid key={"PAT"+m.pid} item xs={12} sm={6} md={4} lg={3} >
+			<DisplayPatientBox patient={m}
+				button1={<VisibilityIcon className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  />}
+			/>
+		</Grid>
+	)}
+	</Grid>	
+	)}
 	
   return (
   <div className={gClasses.webPage} align="center" key="main">
 	<CssBaseline />
-	{(currentSelection !== "") &&
-		<div>
-		<DisplayPageHeader headerName={currentSelection} groupName="" tournament=""/>
-		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
-		</div>
+	<Typography className={gClasses.patientInfo2Orange}>{"Clinic: "+clinicName}</Typography>
+	<br />
+	{(currentPatientName === "") &&
+		<DisplayAllPatients />
 	}
-	{(currentSelection === "") &&
+	{((currentPatientName !== "") && (currentSelection === "")) &&
 	<Container component="main" maxWidth="xs">
 	<DisplayPageHeader headerName={"Welcome "+currentPatientData.displayName} groupName="" tournament=""/>
+	<br />
 	<br />
 	<Grid className={gClasses.fullWidth} key="LOGO" container align="center">
 		<Grid item xs={12} sm={12} md={12} lg={12} >
 		</Grid>
-		<Grid item xs={6} sm={4} md={3} lg={3} >
-      <DisplayLogo onClick={() => selectCategory("Appointment")} label="Appointment" image="SAMPLE.JPG" />;
+		<Grid item xs={6} sm={4} md={4} lg={4} >
+      <DisplayLogo onClick={() => setCurrentSelection("Appointment")} label="Appointment" image="SAMPLE.JPG" />;
 		</Grid>
-		<Grid item xs={6} sm={4} md={3} lg={3} >
+		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Visit")} label="Prescription" image="SAMPLE.JPG" />;
 		</Grid>
-		<Grid item xs={6} sm={4} md={3} lg={3} >
+		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Report")} label="Report" image="SAMPLE.JPG" />;
 		</Grid>
-		<Grid item xs={6} sm={4} md={3} lg={3} >
+		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Payment")} label="Payment" image="SAMPLE.JPG" />;
 		</Grid>
 	</Grid>
 	</ Container>
 	}
+	{(currentSelection === "Appointment") &&
+		<div>
+		<DisplayPageHeader headerName={"Appointment Details"} groupName="" tournament=""/>
+		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
+		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
+		<PatientAppointment patient={currentPatientData} />
+		</div>
+	}
 	{(currentSelection === "Report") &&
+		<div>
+		<DisplayPageHeader headerName={"Report Details"} groupName="" tournament=""/>
+		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
+		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
 		<Report patient={currentPatientData} />
+		</div>
 	}
 	{(currentSelection === "Payment") &&
+		<div>
+		<DisplayPageHeader headerName={"Payment Details"} groupName="" tournament=""/>
+		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
+		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
 		<ProfCharge patient={currentPatientData} />
+		</div>
 	}
 	{(currentSelection === "Visit") &&
+		<div>
+		<DisplayPageHeader headerName={"Visit Details"} groupName="" tournament=""/>
+		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
+		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
 		<Visit patient={currentPatientData} />
+		</div>
 	}
   </div>
   );    

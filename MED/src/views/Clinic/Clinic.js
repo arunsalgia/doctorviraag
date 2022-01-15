@@ -12,9 +12,7 @@ import {
 } from "CustomComponents/CustomComponents.js"
 
 export default function Clinic() {
-  //const classes = useStyles();
 	const gClasses = globalStyles();
-	
 	
 	const [clinicArray, setClinicArray] = useState([]);
 	const [patientArray, setPatientArray] = useState([]);
@@ -22,6 +20,10 @@ export default function Clinic() {
   useEffect(() => {
 		let tmpArray = 	JSON.parse(sessionStorage.getItem("clinics"));
 		setClinicArray(tmpArray);
+		if (tmpArray.length === 1) {
+			setCurrentClinic(tmpArray[0], true);
+		}
+		
 		setCurrentClinic(tmpArray[0], false)
 		
   }, []);
@@ -42,6 +44,8 @@ export default function Clinic() {
 	}
 
 	function DisplayClinicList() {
+	if (clinicArray.length <= 1) return null;
+	
 	return (	
 		<Grid className={gClasses.noPadding} key="AllPatients" container alignItems="center" >
 		{clinicArray.map( (m, index) => 

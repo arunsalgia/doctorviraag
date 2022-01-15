@@ -49,6 +49,11 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 			let tmp = await M_ProfCharge.find({}).limit(1).sort({tid: -1});
 			myProfChargeRec.tid = (tmp.length > 0) ? tmp[0].tid + 1 : "1";
 		}
+		
+		let tmp = "";
+		for(let t=0; t<iRec.treatment.length; ++t) {
+			tmp += ((tmp !== "") ? " / " : "") + iRec.treatment[t].name;
+		}
 		myProfChargeRec.description = "Professional charges dated " +
 			DATESTR[iRec.treatmentDate.getDate()] + "/" +
 			MONTHNUMBERSTR[iRec.treatmentDate.getMonth()] + "/" +

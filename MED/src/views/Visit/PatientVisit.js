@@ -313,22 +313,20 @@ export default function PatientVisit(props) {
 
 
 	return (
-		<div align="center" key="main">
+	<div align="center" key="main">
 	<CssBaseline />
-	<Box align="left" >
-		<DisplayVisitDates />
-		<DisplayFunctionHeader />
-		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >`
-			{(currentSelection === "Medicine") &&
-				<ArunMedicines />
-			}
-			{(currentSelection === "User Note") &&
-				<ArunNotes />
-			}
-			{(currentSelection === "Lab Test") &&
-				<ArunRemarks  />
-			}
-		</Box>
+	<DisplayVisitDates />
+	<DisplayFunctionHeader />
+	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >`
+		{(currentSelection === "Medicine") &&
+			<ArunMedicines />
+		}
+		{(currentSelection === "User Note") &&
+			<ArunNotes />
+		}
+		{(currentSelection === "Lab Test") &&
+			<ArunRemarks  />
+		}
 	</Box>
 	</div>
   );    

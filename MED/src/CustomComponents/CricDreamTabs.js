@@ -26,6 +26,7 @@ import Wallet from "views/Wallet/Wallet.js"
 import Sample from "views/SuperUser/Sample.js"
 import Profile from "views/Profile/UserProfile"
 */
+
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu'; 
@@ -422,7 +423,7 @@ export function CricDreamTabs() {
 									<Divider className={classes.divider} />
                   </div>
                 }
-                {((itIsMobile) && (window.sessionStorage.getItem("userType") === "Patient")) &&
+                {((false) && (itIsMobile) && (window.sessionStorage.getItem("userType") === "Patient")) &&
                   <div>
                   <MenuItem onClick={handleClinic}>
                     <Typography className={classes.menuStyle}>Clinic</Typography>
@@ -469,10 +470,18 @@ export function CricDreamTabs() {
               </Menu>
             </div>
           )}
+					{(sessionStorage.getItem("userType") !== "Patient") &&
 					<Typography onClick={handleHome}>
 						<span className={classes.doctor}>+</span>
 						<span className={classes.ankit}> Doctor Viraag</span>
 					</Typography>
+					}
+					{(sessionStorage.getItem("userType") === "Patient") &&
+					<Typography onClick={handleClinic}>
+						<span className={classes.doctor}>+</span>
+						<span className={classes.ankit}> Doctor Viraag</span>
+					</Typography>
+					}
           {/*<IconButton
             aria-label="account of current user"
             aria-controls="menu-appbar"

@@ -164,7 +164,8 @@ router.get('/list/pid/:cid/:pid', async function (req, res) {
 router.get('/pendinglist/pid/:cid/:pid', async function (req, res) {
   setHeader(res);
   var { cid, pid } = req.params;
-	//console.log(cid, pid);
+	console.log(cid, pid);
+	
 	if (await checkCustomerExpiry(cid)) return senderr(res, PLANEXIREDERR, "Expiry");
 	
 	publishAppointments(res, { cid: cid, pid: Number(pid), visit: VISITTYPE.pending})
