@@ -1353,7 +1353,6 @@ export default function Appointment() {
 		}
 		return (
 			<Grid key={props.slotName+index} item xs={4} sm={4} md={2} lg={2} >
-				{/*}
 				{(t.visit === "expired") &&
 					<Box className={gClasses.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
@@ -1376,17 +1375,6 @@ export default function Appointment() {
 				}
 				{((t.visit === "available") && (currentPatient !== "INFO")) &&
 					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
-					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
-					</Box>
-				}
-			*/}
-				{(!clickRequired) &&
-					<Box className={myClass} borderColor="blue" borderRadius={7} border={1} >
-					<Typography>{t.name}</Typography>
-					</Box>
-				}
-				{(clickRequired) &&
-					<Box className={myClass} borderColor="blue" borderRadius={7} border={1} >
 					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
 					</Box>
 				}
