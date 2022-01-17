@@ -1,76 +1,50 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from "axios";
-import TextField from '@material-ui/core/TextField';
-import { InputAdornment, makeStyles, Container, CssBaseline } from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
+import { InputAdornment, Container, CssBaseline } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import SwitchBtn from '@material-ui/core/Switch';
-import { usePromiseTracker, trackPromise } from "react-promise-tracker";
 import Grid from "@material-ui/core/Grid";
-import GridItem from "components/Grid/GridItem.js";
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Select from "@material-ui/core/Select";
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
+
 import Typography from '@material-ui/core/Typography';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
+
 import Box from '@material-ui/core/Box';
-import Modal from 'react-modal';
+
 
 import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel"
 import VsTextSearch from "CustomComponents/VsTextSearch";
-import VsImageButton from "CustomComponents/VsImageButton";
+import VsRadio from "CustomComponents/VsRadio";
 
-import { borders } from '@material-ui/system';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormLabel from '@material-ui/core/FormLabel';
+
 import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import Datetime from "react-datetime";
 import "react-datetime/css/react-datetime.css";
 import moment from "moment";
-import {setTab} from "CustomComponents/CricDreamTabs.js"
 import { useAlert } from 'react-alert'
 import Drawer from '@material-ui/core/Drawer';
-import _ from 'lodash'
-
+import lodashSortBy from "lodash/sortBy"
 
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
-import Avatar from "@material-ui/core/Avatar"
-//import validator from 'validator'
+
+
 
 // styles
 import globalStyles from "assets/globalStyles";
-import modalStyles from "assets/modalStyles";
 import {dynamicModal } from "assets/dynamicModal";
 
-
-import Switch from "@material-ui/core/Switch";
-import Link from '@material-ui/core/Link';
-
-import {DisplayPageHeader, ValidComp, BlankArea, DisplayYesNo,
-DisplayPatientDetails,
+import {DisplayPageHeader, ValidComp, BlankArea,
 DisplayPatientBox,
 DisplayAppointmentDetails, DisplayAppointmentBox,
+DisplayPatientHeader,
 } from "CustomComponents/CustomComponents.js"
 
-import { LeakRemoveTwoTone, LensTwoTone } from '@material-ui/icons';
+
 
 import {
-WEEKSTR, SHORTMONTHSTR, 
+WEEKSTR, SHORTMONTHSTR, SHORTWEEKSTR,
 HOURSTR, MINUTESTR,
 MONTHSTR, DATESTR, MONTHNUMBERSTR,
 VISITTYPE,
@@ -79,6 +53,8 @@ BLOCKNUMBER,
 } from 'views/globals';
 
 // icons
+
+/*
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 //import DeleteIcon from '@material-ui/icons/Delete';
@@ -86,8 +62,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Cancel';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
-import EventNoteIcon from '@material-ui/icons/EventNote';
 import AddIcon from '@material-ui/icons/AddCircleOutline';
+*/
+import EventNoteIcon from '@material-ui/icons/EventNote';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -98,16 +75,11 @@ red, blue, grey, yellow, orange, pink, green, brown, deepOrange, lightGreen, blu
 } from '@material-ui/core/colors';
 
 import { 
-	isMobile, callYesNo,
-	disablePastDt, disableFutureDt, disableAllDt,
+	isMobile, 
+	disablePastDt, disableFutureDt,
 	validateInteger,
 	encrypt, decrypt, 
-	left, right,
-	intString,
-	updatePatientByFilter,
-	dispAge, dispEmail, dispMobile,
-	ordinalSuffix,
-	compareDate, makeTimeString,
+	compareDate,
 	getAllPatients,
 	vsDialog,
 	generateOrder, generateOrderByDate,
@@ -119,6 +91,12 @@ const useStyles = makeStyles((theme) => ({
 	root: {
 		width: '100%',
 	}, 
+	greenBox: {
+		backgroundColor: 'green',
+	},
+	whiteBox: {
+		backgroundColor: 'white',
+	},
 	selIndex: {
 		color: 'blue',
 		fontSize: theme.typography.pxToRem(14),
@@ -416,8 +394,8 @@ let dense = false;
 
 let test=[];
 let medQty=[];
-const timeArray=[1,2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-const unitArray=["Day(s)", "Weeks(s)", "Month(s)"];
+//const timeArray=[1,2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+//const unitArray=["Day(s)", "Weeks(s)", "Month(s)"];
 
 const MINUTEBLOCK = [0, 15, 30, 45];
 
@@ -429,11 +407,13 @@ let defaultDirectoryMode=true;
 let aptDate = new Date();
 function setAptDate(d) { aptDate = d; }
 
-var workingHours;
+//var workingHours;
 var timeSlots;
-const NUMBEROFDAYS = (isMobile()) ? 3 : 5;
+
 var userCid;
 var customerData;
+
+const NUMBEROFDAYS = (isMobile()) ? 2: 5;
 
 export default function Appointment() {
   const classes = useStyles();
@@ -442,10 +422,6 @@ export default function Appointment() {
 	
 	const [searchText, setSearchText] = useState("");
 	
-	const [currSlotMessage, setCurrSlotMessage] = useState("");
-	const [currSlotData, setCurrSlotData] = useState([]);
-	const [currSlotDate, setCurrSlotDate] = useState("");
-	
 	const [registerStatus, setRegisterStatus] = useState(0);
 	
   const [patientArray, setPatientArray] = useState([])
@@ -453,7 +429,7 @@ export default function Appointment() {
 	const [currentPatient, setCurrentPatient] = useState("");
 	const [currentPatientData, setCurrentPatientData] = useState({});
 	const [allPendingAppt, setAllPendingAppt] = useState([])
-	const [emurName, setEmurName] = useState("");
+	//const [emurName, setEmurName] = useState("");
 	const [modalRegister, setModalRegister] = useState(0)
 	const [radioValue, setRadioValue] = useState("Male");
 	const [isDrawerOpened, setIsDrawerOpened] = useState(false);
@@ -503,18 +479,44 @@ export default function Appointment() {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [allTimeSlots, setAllTimeSlots] = useState([]);
 	
-  useEffect(() => {	
+	const [doctorList, setDoctorList] = useState([]);
+	const [mobileList, setMobileList] = useState([]);
+
+	const [currApptInfo, setCurrApptInfo] = useState({});
+	const [currSlot, setCurrSlot] = useState({});
+
+	const [currentDoctor, setCurrentDoctor] = useState("");
+
+ 
+	
+	useEffect(() => {			
+		userCid = sessionStorage.getItem("cid");
 		let PgetAllHolidays;
 		let PgetAllPendingAppointment;
 		let PgetAllMyPatients;
 		let PcheckFromPatient;
 		
-		customerData = JSON.parse(sessionStorage.getItem("customerData"));
-		userCid = sessionStorage.getItem("cid");
-		
+		//customerData = JSON.parse(sessionStorage.getItem("customerData"));
+		const getCustomerDetails  = async () => {
+			if (sessionStorage.getItem("userType") !== "Developer") {
+				//console.log("starting JSON");
+				customerData = JSON.parse(sessionStorage.getItem("customerData"));
+				setDoctorList([customerData.doctorName].concat(customerData.doctorPanel));
+				setMobileList([customerData.mobile].concat(customerData.doctorMobile));
+				//console.log("starting axios");
+				console.log(userCid);
+				let rrr =  await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/patient/checkexpiry/${userCid}`);
+				//console.log("over axios");
+				if (rrr.data.status) return alert.error('Plan has expired');
+			} else {
+				customerData = {type: "Developer"};
+			}			
+		}
+
 		const getAllPendingAppointment  = async () => {
 			allPending = await reloadAppointmentDetails();
 		}
+		
 		const getAllHolidays  = async () => {
 			let allHolidays;
 			try {
@@ -529,15 +531,33 @@ export default function Appointment() {
 				return allHolidays;
 			}
 		}
+		
 		const getAllMyPatients  = async () => {
-			let ppp = await getAllPatients(userCid);
+			let rrr =  await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/patient/checkexpiry/${userCid}`);
+			if (rrr.data.status) {
+				alert.error('Plan has expired');
+				return [];
+			}
+	
+			
+			let ppp;
+			if (window.sessionStorage.getItem("userType") !== "Patient")  {
+				ppp = await getAllPatients(userCid)
+			} else {
+				ppp = JSON.parse(sessionStorage.getItem("patients"));
+				ppp = ppp.filter(x => x.cid === userCid);
+			}
 			return ppp;				
 		}
+
+
 		const makeSlots  = async () => {
-			let allHolidays = await PgetAllHolidays;
+			//let allHolidays = await PgetAllHolidays;
 			let allPendingAppt = await PgetAllPendingAppointment;
-			generateSlots(allPendingAppt, allHolidays);			
+			await generateSlots(allPendingAppt);			
 		}
+		
+		
 		const checkFromPatient = async () => {
 			let ppp = await PgetAllMyPatients;	
 			setPatientMasterArray(ppp);
@@ -567,13 +587,17 @@ export default function Appointment() {
 		}	
 		
 		// fetch data 1 by 1 
+		getCustomerDetails();
 		PgetAllMyPatients = getAllMyPatients();
 		PgetAllHolidays = getAllHolidays();
 		PgetAllPendingAppointment = reloadAppointmentDetails();
 		makeSlots();
 		PcheckFromPatient = checkFromPatient();
 		//handleMyAppt();
+
   }, []);
+
+
 
 	async function reloadAppointmentDetails() {
 		// get all pending apt
@@ -592,20 +616,20 @@ export default function Appointment() {
 		}		
 	}
 	
-	function generateSlots(allPendingAppt, allHolidays) {
+	async function generateSlots(allPendingAppt) {
 		let d;
 		let slotData = [];
+		
 		for(let i=0; i<NUMBEROFDAYS; ++i) {
-			d = (i === 0) ? getFirstDate(allHolidays) : getNextDate(d, allHolidays);
+			d = (i === 0) ? getFirstDate() : getNextDate(d);
 			//console.log(d);
-			slotData.push(prepareData(d, allPendingAppt));
+			slotData.push(await prepareData(d, allPendingAppt));
 		}
 		setAllTimeSlots(slotData);
 		setCurrentIndex(0);
 	}
 	
 	function setNewCurrentIndex(idx) {
-		let currentSlot = [].concat(allTimeSlots);
 		let itIsToday = false;
 		let today = new Date();
 		if (idx === 0) {
@@ -670,7 +694,6 @@ export default function Appointment() {
 			// now all done. Update all time slots
 			setAllTimeSlots(currentSlot);
 		}
-		handleSlotSelection("MORNING", currentSlot[idx]);
 		setCurrentIndex(idx);
 	}
 	
@@ -697,7 +720,12 @@ export default function Appointment() {
 		return (retStr);
 	}
 	
-	function prepareData(d, allAppt) {
+	async function checkHoliday(year, month, date) {
+		let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/holiday/isholiday/${userCid}/${year}/${month}/${date}`)
+		return resp.data.status;
+	}
+
+	async function prepareData(d, allAppt) {
 		let morningSlots = [];
 		let afternoonSlots = [];
 		let eveningSlots = [];
@@ -708,6 +736,9 @@ export default function Appointment() {
 		let myDate = d.getDate();
 		let myDay = d.getDay();
 		// for morning slots
+		let todayHoiliday = await checkHoliday(myYear, myMonth, myDate );
+		//console.log("HChk",todayHoiliday);
+
 		for(let blk=BLOCKNUMBER.morningBlockStart; blk<=BLOCKNUMBER.morningBlockEnd; ++blk) {
 			if (workingHours.includes(myDay*100+blk)) {
 				let hour = Math.floor(blk / 4);
@@ -759,38 +790,12 @@ export default function Appointment() {
 			}
 		}
 	
-		let retValue = {dateTime: d, year: myYear, month: myMonth, date: myDate,
+		let retValue = {dateTime: d, year: myYear, month: myMonth, date: myDate, holiday: todayHoiliday,
 			day: myDay, morningSlots: morningSlots, afternoonSlots: afternoonSlots,
 			eveningSlots: eveningSlots
 		};
 		//console.log(retValue);
 		return retValue;
-	}
-	
-	function clinicOff(d, myHoildays) {
-		let tmp = myHoildays.filter(x => x.date === d.getDate() &&
-				x.month === d.getMonth() && x.year === d.getFullYear());
-		if (tmp.length > 0) return true;
-			
-		// check if doctor's weekend on this date
-		tmp = customerData.workingHours.filter(x => 
-			x >= (d.getDay()*100 + BLOCKNUMBER.allBlockStart) &&
-			x <= (d.getDay()*100 + BLOCKNUMBER.allBlockEnd)
-		);
-		let isClosed = (tmp.length === 0);
-		return isClosed;
-	}
-	
-	function getNextDate(d, myHoildays) {
-		let done = false
-		//console.log("I",d)
-		while (!done) {
-			d = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1, 0 , 0);
-			if (clinicOff(d, myHoildays)) { continue; }
-			break;
-		}
-		//console.log("O",d)
-		return d;
 	}
 
 
@@ -818,26 +823,54 @@ export default function Appointment() {
     )
   }
 
+	
+	function clinicOff(d, myHoildays) {
+		let tmp = myHoildays.filter(x => x.date === d.getDate() &&
+				x.month === d.getMonth() && x.year === d.getFullYear());
+		if (tmp.length > 0) return true;
+			
+		// check if doctor's weekend on this date
+		tmp = customerData.workingHours.filter(x => 
+			x >= (d.getDay()*100 + BLOCKNUMBER.allBlockStart) &&
+			x <= (d.getDay()*100 + BLOCKNUMBER.allBlockEnd)
+		);
+		let isClosed = (tmp.length === 0);
+		return isClosed;
+	}
+	
+	function getNextDate(d) {
+		let done = false
+		//console.log("I",d)
+		while (!done) {
+			d = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1, 0 , 0);
+			//if (clinicOff(d, myHoildays)) { continue; }
+			break;
+		}
+		//console.log("O",d)
+		return d;
+	}
 
-	function getPrevDate(d, myHoildays) {
+	function getPrevDate(d) {
 		let today = new Date();
 		let done = false
 		while (!done) {
 			d = new Date(d.getFullYear(), d.getMonth(), d.getDate()-1, 0 , 0);
 			if (compareDate(d, today) < 0) return null;
-			if (clinicOff(d, myHoildays)) continue;
+			//if (clinicOff(d, myHoildays)) continue;
 			break;
 		}
 		return d;
 	}
 	
-	function getFirstDate(myHoildays) {
+	function getFirstDate() {
 		//console.log(myHoildays);
 		let d = new Date();
 		let firstDate = new Date(d.getFullYear(), d.getMonth(), d.getDate()-1);
-		return getNextDate(firstDate, myHoildays);
+		return getNextDate(firstDate);
 	}
-		
+	
+/*
+	
 	function ModalResisterStatus() {
     // console.log(`Status is ${modalRegister}`);
 		let regerr = true;
@@ -891,7 +924,6 @@ export default function Appointment() {
     )
   }
 
-/*
 	async function selectFilter() {
 		//console.log("Filter:", searchText);
 		getPatientList(searchText);
@@ -926,16 +958,6 @@ export default function Appointment() {
 */
 	
 	
-	
-	async function junkandleSelectPatient_junk(rec) {
-		let tmpArray = await reloadAppointmentDetails();
-		generateSlots(tmpArray, holidayArray);
-		setSelectPatient(false);
-		setCurrentPatient(rec.displayName);
-		setCurrentPatientData(rec);
-		await getPatientAppt(rec);
-	}
-	
 	async function getPatientAppt(rec) {
 		try {
 			var resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/pendinglist/pid/${userCid}/${rec.pid}`);
@@ -949,9 +971,9 @@ export default function Appointment() {
 
 	
 	async function prevDate() {
-		let d = getPrevDate(allTimeSlots[0].dateTime, holidayArray);
+		let d = getPrevDate(allTimeSlots[0].dateTime);
 		if (d !== null) {
-			let x = [prepareData(d, allPendingAppt)];
+			let x = [await prepareData(d, allPendingAppt)];
 			for (let i=0; i<(NUMBEROFDAYS-1); ++i) {
 				x.push(allTimeSlots[i]);
 			}
@@ -967,8 +989,8 @@ export default function Appointment() {
 		for (let i=1; i<NUMBEROFDAYS; ++i) {
 			x.push(allTimeSlots[i]);
 		}
-		let d = getNextDate(allTimeSlots[NUMBEROFDAYS-1].dateTime, holidayArray);
-		let newData = prepareData(d, allPendingAppt);
+		let d = getNextDate(allTimeSlots[NUMBEROFDAYS-1].dateTime);
+		let newData = await prepareData(d, allPendingAppt);
 		x.push(newData);
 		//console.log(x);
 		setAllTimeSlots(x);
@@ -979,6 +1001,82 @@ export default function Appointment() {
 	}
 	
 
+	function selectPanelDoctor(slot, apptInfo) {
+		setCurrSlot(slot);
+		setCurrApptInfo(apptInfo);
+		setCurrentDoctor(doctorList[0]);
+		setIsDrawerOpened("PANELDOCTOR");
+	}
+
+	async function handlePanelDoctorAppointmentSubmit() {
+		var myIndex = doctorList.indexOf(currentDoctor);
+		var myMobile = mobileList[myIndex];
+		console.log(currentDoctor, myMobile);
+		setIsDrawerOpened("");
+		sendAppointmentRequest(currSlot, currApptInfo, currentDoctor, myMobile)
+	}
+
+
+	async function sendAppointmentRequest(slot, apptInfo, doctorName, doctorMobile) {
+		apptInfo["doctorName"] = doctorName;
+		apptInfo["doctorMobile"] = doctorMobile;
+		
+		let jTmp = JSON.stringify(apptInfo);
+		// add this to database
+		try {
+			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/appointment/add/${userCid}/${jTmp}`;
+			let resp = await axios.get(myUrl);
+			alert.success("Appointment set of "+currentPatientData.displayName);
+			// update patient appointment
+			let tmpArray=[resp.data].concat(apptArray);
+			tmpArray = lodashSortBy(tmpArray, ['order']);
+			setApptArray(tmpArray);
+			
+			// now update all pending appointment
+			tmpArray=[resp.data].concat(allPendingAppt);
+			tmpArray = lodashSortBy(tmpArray, ['order']);
+			setAllPendingAppt(tmpArray);
+
+			// update slot as pending
+			if (true) {
+				//console.log(currentIndex);
+				
+				let myTmpSlots = [].concat(allTimeSlots);
+				// check if add apt is in morning
+				let ttt = myTmpSlots[currentIndex].morningSlots.find(x => x.hour === slot.hour &&
+					x.minute === slot.minute);
+				//console.log("morning",ttt);
+				if (ttt) {
+					ttt.name = currentPatientData.displayName
+					ttt.visit = 'pending';
+				}
+
+				ttt = myTmpSlots[currentIndex].afternoonSlots.find(x => x.hour === slot.hour &&
+					x.minute === slot.minute);
+				//console.log("afternoon",ttt);
+				if (ttt) {
+					ttt.name = currentPatientData.displayName
+					ttt.visit = 'pending';
+				}
+				
+				ttt = myTmpSlots[currentIndex].eveningSlots.find(x => x.hour === slot.hour &&
+					x.minute === slot.minute);
+				//console.log("evening",ttt);
+				if (ttt) {
+					ttt.name = currentPatientData.displayName
+					ttt.visit = 'pending';
+				}	
+				setAllTimeSlots(myTmpSlots);
+			}	
+		} catch (e) {
+			console.log(e);
+			alert.error("Error setting appointment of "+currentPatientData.displayName);
+			return;
+		}
+
+	}
+
+
 	async function handleAddAppointment(slot) {	
 		// check if appoint time before current time. If yes then do not allow.
 		let myOrder = generateOrder(slot.year, slot.month, slot.date, slot.hour, slot.minute)
@@ -986,7 +1084,8 @@ export default function Appointment() {
 		if (myOrder < currentValidOrder) {
 			return alert.error("Appointment of past date/time is not permitted");
 		}
-			
+		console.log(`Panel Count: ${doctorList.length} ${mobileList.length}`);
+
 		let tmp = {
 			cid: userCid,
 			//data: currentPatientData,
@@ -1003,6 +1102,12 @@ export default function Appointment() {
 								slot.hour, slot.minute, 0),
 		};
 		
+		if (doctorList.length > 1) {
+			selectPanelDoctor(slot, tmp)
+		} else {
+			sendAppointmentRequest(slot, tmp, doctorList[0], mobileList[0]);
+		}
+		return;
 		let jTmp = JSON.stringify(tmp);
 		// add this to database
 		try {
@@ -1011,12 +1116,12 @@ export default function Appointment() {
 			alert.success("Appointment set of "+currentPatientData.displayName);
 			// update patient appointment
 			let tmpArray=[resp.data].concat(apptArray);
-			tmpArray = _.sortBy(tmpArray, ['order']);
+			tmpArray = lodashSortBy(tmpArray, ['order']);
 			setApptArray(tmpArray);
 			
 			// now update all pending appointment
 			tmpArray=[resp.data].concat(allPendingAppt);
-			tmpArray = _.sortBy(tmpArray, ['order']);
+			tmpArray = lodashSortBy(tmpArray, ['order']);
 			setAllPendingAppt(tmpArray);
 
 			// update slot as pending
@@ -1059,10 +1164,12 @@ export default function Appointment() {
   
 	function DisplayAvailableAppointments() {
 	if (allTimeSlots.length === 0) return null;
-	
-	let tStr = ((allTimeSlots[currentIndex].date < 10) ? "0" : "") + allTimeSlots[currentIndex].date;
+
+	//console.log(currentIndex);
+	//console.log(allTimeSlots[currentIndex]);
+	let tStr = DATESTR[allTimeSlots[currentIndex].date];
 	tStr += "/";
-	tStr += (((allTimeSlots[currentIndex].month + 1) < 10) ? "0" : "") + (allTimeSlots[currentIndex].month+1);
+	tStr += MONTHNUMBERSTR[allTimeSlots[currentIndex].month];
 	tStr += "/";
 	tStr += allTimeSlots[currentIndex].year;
 
@@ -1073,7 +1180,7 @@ export default function Appointment() {
 		<Grid item xs={12} sm={12} md={12} lg={12} >
 		<Typography className={classes.slotTitle} >{"Appointment Date"}</Typography>
 		</Grid>
-		<Grid key="LEFT" item xs={1} sm={1} md={1} lg={1} >
+		<Grid key="LEFT" align="left" item xs={1} sm={1} md={1} lg={1} >
 			<IconButton color={'primary'} onClick={prevDate}  >
 					<LeftIcon />
 				</IconButton>
@@ -1087,16 +1194,18 @@ export default function Appointment() {
 				t.eveningSlots.filter(x => x.visit === "available").length;
 			let myClass = (index === currentIndex) ? classes.selIndex : classes.unselIndex;
 		return (
-		<Grid key={"TIME"+index} item xs={3} sm={3} md={2} lg={2} >
-			<div>
-			<Typography className={myClass} onClick={() => {setNewCurrentIndex(index)}}>{dStr}</Typography>
-			<Typography className={myClass} onClick={() => {setNewCurrentIndex(index)}}>{WEEKSTR[t.day]}</Typography>
-			<Typography className={myClass} onClick={() => {setNewCurrentIndex(index)}}>{freeSlots+" free Slots"}</Typography>
-			</div>
+		<Grid key={"TIME"+index} item xs={5} sm={5} md={2} lg={2} >
+			<Box onClick={() => {setNewCurrentIndex(index)}} 
+			className={(t.holiday) ? gClasses.greenboxStyle : gClasses.boxStyle} 
+			borderRadius={7} border={1} >
+			<Typography className={myClass}>{dStr+"( "+SHORTWEEKSTR[t.day]+")"}</Typography>
+			{/*<Typography className={myClass}>{WEEKSTR[t.day]}</Typography>*/}
+			<Typography className={myClass}>{freeSlots+" free Slots"}</Typography>
+			</Box>
 		</Grid>
 		)}
 		)}
-		<Grid key="RIGHT" item xs={1} sm={1} md={1} lg={1} >
+		<Grid key="RIGHT" align="right" item xs={1} sm={1} md={1} lg={1} >
 			<IconButton color={'primary'} onClick={nextDate}  >
 			<RightIcon />
 			</IconButton>
@@ -1109,7 +1218,7 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="MORNING" container alignItems="center" >
 	<Grid key="MORNINGITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{"Morning (till 12PM) Slots of "+tStr}</Typography>
+	<Typography className={classes.slotTitle} >{"Morning Slots of "+tStr}</Typography>
 	</Grid>
 	{allTimeSlots[currentIndex].morningSlots.map( (t, index) => {
 		return (
@@ -1150,7 +1259,7 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid key="AFTERNOON" container alignItems="center" >
 	<Grid key="AFTERNOONITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{"Afternoon (12PM to 4PM) Slots of "+tStr}</Typography>
+	<Typography className={classes.slotTitle} >{"Afternoon Slots of "+tStr}</Typography>
 	</Grid>
 	{allTimeSlots[currentIndex].afternoonSlots.map( (t, index) => {
 		//console.log("Afternoon slots---------------");
@@ -1193,102 +1302,11 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="EVENING" container alignItems="center" >
 	<Grid key="EVENINGITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{"Evening (from 4PM) Slots of "+tStr}</Typography>
+	<Typography className={classes.slotTitle} >{"Evening Slots of "+tStr}</Typography>
 	</Grid>
 	{allTimeSlots[currentIndex].eveningSlots.map( (t, index) => {
 		return (
 			<Grid key={"EVE"+index} item xs={4} sm={4} md={2} lg={2} >
-				{(t.visit === "expired") &&
-					<Box className={classes.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
-					<Typography id={t.slot}>{t.name}</Typography>
-					</Box>
-				}
-				{(t.visit === "pending") &&
-					<Box className={classes.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
-					<Typography id={t.slot}>{t.name}</Typography>
-					</Box>
-				}
-				{(t.visit === "visit") &&
-					<Box className={classes.visitSlot} borderColor="blue" borderRadius={7} border={1} >
-					<Typography id={t.slot}>{t.name}</Typography>
-					</Box>
-				}
-				{((t.visit === "available") && (currentPatient === "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
-					<Typography>{t.slot}</Typography>
-					</Box>
-				}
-				{((t.visit === "available") && (currentPatient !== "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
-					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
-					</Box>
-				}
-			</Grid>
-		)}
-	)}
-	</Grid>
-	</Box>
-	}
-	</div>
-	)}
-	
-	function DisplayAvailableSlotAppointments() {
-	if (allTimeSlots.length === 0) return null;
-	
-	let tStr = DATESTR[currSlotData.date];
-	tStr += "/";
-	tStr += MONTHNUMBERSTR[currSlotData.month];
-	tStr += "/";
-	tStr += currSlotData.year;
-
-	return (
-	<div>
-	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
-	<Grid className={gClasses.noPadding} key="ALLDATE" container alignItems="center" >
-		<Grid item xs={12} sm={12} md={12} lg={12} >
-		<Typography className={classes.slotTitle} >{"Appointment Date"}</Typography>
-		</Grid>
-		<Grid key="LEFT" item xs={1} sm={1} md={1} lg={1} >
-			<IconButton color={'primary'} onClick={prevDate}  >
-					<LeftIcon />
-				</IconButton>
-		</Grid>
-		{allTimeSlots.map( (t, index) => {
-			let dStr = (compareDate(t.dateTime, new Date()) !== 0) 
-				? DATESTR[t.date] + "/" + MONTHNUMBERSTR[t.month] + "/" + t.year
-				: "Today";
-			let freeSlots = t.morningSlots.filter(x => x.visit === "available").length + 
-				t.afternoonSlots.filter(x => x.visit === "available").length +
-				t.eveningSlots.filter(x => x.visit === "available").length;
-			let myClass = (index === currentIndex) ? classes.selIndex : classes.unselIndex;
-		return (
-		<Grid key={"TIME"+index} item xs={3} sm={3} md={2} lg={2} >
-			<div>
-			<Typography className={myClass} onClick={() => {setNewCurrentIndex(index)}}>{dStr}</Typography>
-			<Typography className={myClass} onClick={() => {setNewCurrentIndex(index)}}>{WEEKSTR[t.day]}</Typography>
-			<Typography className={myClass} onClick={() => {setNewCurrentIndex(index)}}>{freeSlots+" free Slots"}</Typography>
-			</div>
-		</Grid>
-		)}
-		)}
-		<Grid key="RIGHT" item xs={1} sm={1} md={1} lg={1} >
-			<IconButton color={'primary'} onClick={nextDate}  >
-			<RightIcon />
-			</IconButton>
-		</Grid>
-	</Grid>	
-	</Box>
-	<BlankArea />
-	{/*  Show morningSlots slots */}
-	{(currSlotData.length > 0) &&
-	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
-	<Grid className={gClasses.noPadding} key="MORNING" container alignItems="center" >
-	<Grid key="MORNINGITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{currSlotMessage+" Slots of "+currSlotDate}</Typography>
-	</Grid>
-	{currSlotData.map( (t, index) => {
-		return (
-			<Grid key={"MOR"+index} item xs={4} sm={4} md={2} lg={2} >
 				{(t.visit === "expired") &&
 					<Box className={classes.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
@@ -1365,7 +1383,7 @@ export default function Appointment() {
 				);
 			setAllPendingAppt(tmpAppt);
 			//let tmpArray = await reloadAppointmentDetails();
-			//generateSlots(tmpArray, holidayArray);
+			//generateSlots(tmpArray);
 						
 			let slotIndex = getSlotIndex(cancelAppt.year, cancelAppt.month, cancelAppt.date);
 			if (slotIndex >= 0) {
@@ -1499,7 +1517,7 @@ export default function Appointment() {
 		setSelectPatient(false);
 		await getAppointmentsByPid(rec.pid);
 		let tmpArray = await reloadAppointmentDetails();	
-		generateSlots(tmpArray, holidayArray); // ARS. This is okay and confirmed
+		await generateSlots(tmpArray); // ARS. This is okay and confirmed
 	}
 	
 	function handleAdd() {
@@ -1513,7 +1531,7 @@ export default function Appointment() {
 		setPatientDob(moment(new Date(2000, 1, 1)));
 		
 		//setIsAdd(true);
-		setIsDrawerOpened(true);
+		setIsDrawerOpened("ADDPATIENT");
 	}
 	
 	async function handleAddEditSubmit() {
@@ -1542,12 +1560,12 @@ export default function Appointment() {
 			setRegisterStatus(error.response.status);
 			return;
 		}
-		setIsDrawerOpened(false);
+		setIsDrawerOpened("");
 
 		let ppp = await getAllPatients(userCid);
 		setPatientMasterArray(ppp);
 		setPatientFilter(ppp, searchText);
-		setIsDrawerOpened(false);
+		setIsDrawerOpened("");
 		return; 
 	}
 	
@@ -1555,7 +1573,7 @@ export default function Appointment() {
 
 	async function handleMyAppt() {
 		let tmpArray = await reloadAppointmentDetails();
-		generateSlots(tmpArray, holidayArray);		// ARS This is required and confirmed
+		await generateSlots(tmpArray);		// ARS This is required and confirmed
 		setCurrentPatient("INFO")
 		setApptArray([]);
 	}
@@ -1565,63 +1583,12 @@ export default function Appointment() {
 		setPatientDob(d);
 	}
 	
-	function handleSlotSelection(txt, mySlotDate) {
-		//alert.info(txt);
-	setCurrSlotDate(`${DATESTR[mySlotDate.date]}/${MONTHNUMBERSTR[mySlotDate.month]}/${mySlotDate.year}`);
-		switch (txt) {
-			case "MORNING":
-				setCurrSlotMessage("Morning (till 12PM)");
-				setCurrSlotData(mySlotDate.morningSlots);
-				break;
-			case "AFTERNOON":
-				setCurrSlotMessage("Afternoon (12PM to 4PM)");
-				setCurrSlotData(mySlotDate.afternoonSlots);
-				break;
-			case "EVENING":
-				setCurrSlotMessage("Evening (from 4PM)");
-				setCurrSlotData(mySlotDate.eveningSlots);
-				break;
-		}
-	}
-	
-	function DisplaySlotButton() {
-	return (
-	<div>
-		<Grid className={gClasses.vgSpacing} key="ImageButton" container alignItems="center" >
-		<Grid key={"F1"} item xs={false} sm={false} md={3} lg={3} />
-		<Grid key={"F2"} item xs={2} sm={2} md={2} lg={2} >
-			<VsImageButton image={"MORNING"} onClick={() => handleSlotSelection("MORNING", allTimeSlots[currentIndex])}/>
-		</Grid>
-		<Grid key={"F3"} item xs={2} sm={2} md={2} lg={2} >
-			<VsImageButton image={"AFTERNOON"} onClick={() => handleSlotSelection("AFTERNOON", allTimeSlots[currentIndex])}/>
-		</Grid>
-		<Grid key={"F4"} item xs={2} sm={2} md={2} lg={2} >
-			<VsImageButton image={"EVENING"} onClick={() => handleSlotSelection("EVENING", allTimeSlots[currentIndex])}/>
-		</Grid>
-		<Grid key={"F5"} item xs={false} sm={false} md={3} lg={3} />
-		<Grid key={"F11"} item xs={false} sm={false} md={3} lg={3} />
-		<Grid key={"F12"} item xs={2} sm={2} md={2} lg={2} >
-			<Typography className={classes.selIndex}>till 12PM</Typography>
-		</Grid>
-		<Grid key={"F13"} item xs={2} sm={2} md={2} lg={2} >
-			<Typography className={classes.selIndex}>12PM to 4PM</Typography>
-		</Grid>
-		<Grid key={"F14"} item xs={2} sm={2} md={2} lg={2} >
-			<Typography className={classes.selIndex}>from 4PM</Typography>
-		</Grid>
-		<Grid key={"F15"} item xs={false} sm={false} md={3} lg={3} />
-		</Grid>
-	</div>
-	)}
-	
-	
-	
 	return (
 		<div className={gClasses.webPage} align="center" key="main">
 		<DisplayPageHeader headerName="Appointment Directory" groupName="" tournament=""/>
 		<Container component="main" maxWidth="lg">
 		<CssBaseline />
-		{(currentPatient === "") && 
+		{((currentPatient === "") && (sessionStorage.getItem("userType") !== "Patient")) && 
 			<div>
 			<Grid className={gClasses.vgSpacing} key="PatientFilter" container alignItems="center" >
 			<Grid key={"F1"} item xs={false} sm={false} md={2} lg={2} />
@@ -1646,30 +1613,30 @@ export default function Appointment() {
 				<VsButton name="My Appointments" onClick={handleMyAppt}/> 
 			</Grid>
 			</Grid>
-			<DisplayAllPatients />
 			</div>
+			}
+		{(currentPatient === "") && 
+			<DisplayAllPatients />
 		}
 		{(currentPatient !== "") &&
 			<VsButton align="right" name="Select Patient" onClick={() => { setCurrentPatient("")}} />	
 		}
 		{(currentPatient !== "") &&
 			<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-			<Typography align="center" className={classes.modalHeader}>
-			{(currentPatient === "INFO") ?
-				"Appointment Information" :
-				currentPatientData.displayName+" ( Id: "+currentPatientData.pid+" ) "
+			{(currentPatient === "INFO") &&
+				<Typography align="center" className={classes.modalHeader}>
+					Appointment Information
+				</Typography>	
 			}
-			</Typography>	
 			<BlankArea />
 			{(currentPatient !== "INFO") &&
+				<div>
+				<DisplayPatientHeader patient={currentPatientData} />
 				<DisplayPatientAppointments />
+				</div>
 			}
 			{(true) &&
-				<div>
-				<DisplaySlotButton />
-				{/*<DisplayAvailableAppointments />*/}
-				<DisplayAvailableSlotAppointments />
-				</div>
+				<DisplayAvailableAppointments />
 			}
 			</Box>
 		}
@@ -1678,10 +1645,10 @@ export default function Appointment() {
 			variant="temporary"
 			open={isDrawerOpened}
 		>
-		{(true) &&
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-		<VsCancel align="right" onClick={() => { setIsDrawerOpened(false)}} />
-		<ValidatorForm align="center" className={classes.form} onSubmit={handleAddEditSubmit}>
+		<VsCancel align="right" onClick={() => { setIsDrawerOpened("")}} />
+		{(isDrawerOpened == "ADDPATIENT") &&
+		<ValidatorForm align="center" className={gClasses.form} onSubmit={handleAddEditSubmit}>
 			<Typography className={gClasses.title}>{"Add Patient"}</Typography>
 			<TextValidator fullWidth  className={gClasses.vgSpacing}
 				id="newPatientName" label="Name" type="text"
@@ -1733,9 +1700,19 @@ export default function Appointment() {
 			<ShowResisterStatus />
 			<BlankArea />
 			<VsButton name={"Add"} />
-			</ValidatorForm>    		
-			</Box>
+		</ValidatorForm>    		
 		}
+		{(isDrawerOpened == "PANELDOCTOR") &&
+		<ValidatorForm align="center" className={gClasses.form} onSubmit={handlePanelDoctorAppointmentSubmit}>
+			<Typography className={gClasses.title}>{"Select Doctor from the Panel List"}</Typography>
+			<br />
+			{doctorList.map( (d, index) =>
+				<VsRadio label={d} checked={currentDoctor === d} align="left" onClick={() => setCurrentDoctor(d)} />
+			)}
+			<VsButton type="submit" name={"Select Panel Doctor"} /> 
+		</ValidatorForm>    		
+		}
+		</Box>
 		</Drawer>		
 		</Container>				
   </div>

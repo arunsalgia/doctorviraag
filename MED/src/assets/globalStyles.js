@@ -4,11 +4,20 @@ import {
   grayColor,
   hexToRgb
 } from "assets/jss/material-dashboard-react.js";
-import { red, blue, green, deepOrange, deepPurple, yellow, lightGreen } from '@material-ui/core/colors';
+import { red, blue, grey, green, deepOrange, deepPurple, yellow, lightGreen } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 
 
 const globalStyles = makeStyles((theme) => ({
+  blue14: {
+		color: 'blue',
+		fontSize: theme.typography.pxToRem(14),
+		fontWeight: theme.typography.fontWeightBold,
+	},
+  normal14: {
+		fontSize: theme.typography.pxToRem(14),
+    fontSize: theme.typography.pxToRem(14),
+	},
 	new: {
     fontSize: theme.typography.pxToRem(20),
     fontWeight: theme.typography.fontWeightBold,
@@ -77,6 +86,30 @@ const globalStyles = makeStyles((theme) => ({
 		fontWeight: theme.typography.fontWeightBold,
 		padding: "10px 10px", 
 		margin: "10px 10px", 
+	},
+  pendingSlot: {
+		padding: "5px 10px", 
+		margin: "4px 2px", 
+		borderColor: 'blue',
+		//backgroundColor: blue[300] 
+	},
+	expiredSlot: {
+		padding: "5px 10px", 
+		margin: "4px 2px", 
+		borderColor: 'blue',
+		backgroundColor: grey[500],
+	},
+  visitSlot: {
+		padding: "5px 10px", 
+		margin: "4px 2px", 
+		borderColor: 'blue',
+		backgroundColor: lightGreen["A400"],
+	},
+  availableSlot: {
+		padding: "5px 10px", 
+		margin: "4px 2px", 
+		borderColor: 'blue',
+		//backgroundColor: blue[300] 
 	},
 	selectedTooth: {
 		backgroundColor: green[900],

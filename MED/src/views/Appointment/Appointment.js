@@ -1,13 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from "axios";
-import { InputAdornment, Container, CssBaseline } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { Container, CssBaseline } from '@material-ui/core';
 import Grid from "@material-ui/core/Grid";
-
 import Typography from '@material-ui/core/Typography';
-
 import Box from '@material-ui/core/Box';
 
 
@@ -15,11 +10,8 @@ import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel"
 import VsTextSearch from "CustomComponents/VsTextSearch";
 import VsRadio from "CustomComponents/VsRadio";
+import VsRadioGroup from 'CustomComponents/VsRadioGroup';
 
-
-import FormControl from '@material-ui/core/FormControl';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Radio from '@material-ui/core/Radio';
 import Datetime from "react-datetime";
 import "react-datetime/css/react-datetime.css";
 import moment from "moment";
@@ -33,7 +25,6 @@ import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 
 // styles
 import globalStyles from "assets/globalStyles";
-import {dynamicModal } from "assets/dynamicModal";
 
 import {DisplayPageHeader, ValidComp, BlankArea,
 DisplayPatientBox,
@@ -44,11 +35,11 @@ DisplayPatientHeader,
 
 
 import {
-WEEKSTR, SHORTMONTHSTR, SHORTWEEKSTR,
+GENDER,
+WEEKSTR, SHORTWEEKSTR,
 HOURSTR, MINUTESTR,
 MONTHSTR, DATESTR, MONTHNUMBERSTR,
 VISITTYPE,
-str1by4, str1by2,  str3by4,
 BLOCKNUMBER,
 } from 'views/globals';
 
@@ -69,10 +60,6 @@ import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-//colours 
-import { 
-red, blue, grey, yellow, orange, pink, green, brown, deepOrange, lightGreen, blueGrey, lime,
-} from '@material-ui/core/colors';
 
 import { 
 	isMobile, 
@@ -86,6 +73,12 @@ import {
 } from "views/functions.js";
 
 
+/*
+
+//colours 
+import { 
+red, blue, grey, yellow, orange, pink, green, brown, deepOrange, lightGreen, blueGrey, lime,
+} from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -221,7 +214,7 @@ const useStyles = makeStyles((theme) => ({
 			fontWeight: theme.typography.fontWeightBold,
 			color: blue[700]
 		},  
-		modalHeader: {
+		functionSelected: {
 			fontSize: theme.typography.pxToRem(20),
 			fontWeight: theme.typography.fontWeightBold,
 			color: 'blue',
@@ -386,10 +379,10 @@ const useStyles = makeStyles((theme) => ({
 		borderStyle: 'solid',
 	},
 }));
+*/
 
-
-const ROWSPERPAGE = 10;
-let dense = false;
+//const ROWSPERPAGE = 10;
+//let dense = false;
 
 
 let test=[];
@@ -399,13 +392,13 @@ let medQty=[];
 
 const MINUTEBLOCK = [0, 15, 30, 45];
 
-const menuModal = (isMobile()) ? dynamicModal('50%') : dynamicModal('20%');
-const yesNoModal = dynamicModal('60%');
+//const menuModal = (isMobile()) ? dynamicModal('50%') : dynamicModal('20%');
+//const yesNoModal = dynamicModal('60%');
 
 let defaultDirectoryMode=true;
 
-let aptDate = new Date();
-function setAptDate(d) { aptDate = d; }
+//let aptDate = new Date();
+//function setAptDate(d) { aptDate = d; }
 
 //var workingHours;
 var timeSlots;
@@ -416,7 +409,7 @@ var customerData;
 const NUMBEROFDAYS = (isMobile()) ? 2: 5;
 
 export default function Appointment() {
-  const classes = useStyles();
+  //const classes = useStyles();
 	const gClasses = globalStyles();
 	const alert = useAlert();
 	
@@ -504,7 +497,7 @@ export default function Appointment() {
 				setDoctorList([customerData.doctorName].concat(customerData.doctorPanel));
 				setMobileList([customerData.mobile].concat(customerData.doctorMobile));
 				//console.log("starting axios");
-				console.log(userCid);
+				//console.log(userCid);
 				let rrr =  await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/patient/checkexpiry/${userCid}`);
 				//console.log("over axios");
 				if (rrr.data.status) return alert.error('Plan has expired');
@@ -1162,7 +1155,7 @@ export default function Appointment() {
 		}
 	}
   
-	function DisplayAvailableAppointments() {
+	function org_DisplayAvailableAppointments() {
 	if (allTimeSlots.length === 0) return null;
 
 	//console.log(currentIndex);
@@ -1178,27 +1171,25 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="ALLDATE" container alignItems="center" >
 		<Grid item xs={12} sm={12} md={12} lg={12} >
-		<Typography className={classes.slotTitle} >{"Appointment Date"}</Typography>
+		<Typography className={gClasses.slotTitle} >{"Appointment Date"}</Typography>
 		</Grid>
 		<Grid key="LEFT" align="left" item xs={1} sm={1} md={1} lg={1} >
-			<IconButton color={'primary'} onClick={prevDate}  >
-					<LeftIcon />
-				</IconButton>
+			<LeftIcon color={'primary'} onClick={prevDate}  />
 		</Grid>
 		{allTimeSlots.map( (t, index) => {
 			let dStr = (compareDate(t.dateTime, new Date()) !== 0) 
-				? DATESTR[t.date] + "/" + MONTHNUMBERSTR[t.month] + "/" + t.year
+				? DATESTR[t.date] + "/" + MONTHNUMBERSTR[t.month] + "/" + (t.year % 100)
 				: "Today";
 			let freeSlots = t.morningSlots.filter(x => x.visit === "available").length + 
 				t.afternoonSlots.filter(x => x.visit === "available").length +
 				t.eveningSlots.filter(x => x.visit === "available").length;
-			let myClass = (index === currentIndex) ? classes.selIndex : classes.unselIndex;
+			let myClass = (index === currentIndex) ? gClasses.blue14 : gClasses.normal14;
 		return (
 		<Grid key={"TIME"+index} item xs={5} sm={5} md={2} lg={2} >
 			<Box onClick={() => {setNewCurrentIndex(index)}} 
 			className={(t.holiday) ? gClasses.greenboxStyle : gClasses.boxStyle} 
 			borderRadius={7} border={1} >
-			<Typography className={myClass}>{dStr+"( "+SHORTWEEKSTR[t.day]+")"}</Typography>
+			<Typography className={myClass}>{dStr+" ("+SHORTWEEKSTR[t.day]+")"}</Typography>
 			{/*<Typography className={myClass}>{WEEKSTR[t.day]}</Typography>*/}
 			<Typography className={myClass}>{freeSlots+" free Slots"}</Typography>
 			</Box>
@@ -1206,9 +1197,7 @@ export default function Appointment() {
 		)}
 		)}
 		<Grid key="RIGHT" align="right" item xs={1} sm={1} md={1} lg={1} >
-			<IconButton color={'primary'} onClick={nextDate}  >
-			<RightIcon />
-			</IconButton>
+			<RightIcon color={'primary'} onClick={nextDate}  />
 		</Grid>
 	</Grid>	
 	</Box>
@@ -1218,33 +1207,33 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="MORNING" container alignItems="center" >
 	<Grid key="MORNINGITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{"Morning Slots of "+tStr}</Typography>
+	<Typography className={gClasses.slotTitle} >{"Morning Slots of "+tStr}</Typography>
 	</Grid>
 	{allTimeSlots[currentIndex].morningSlots.map( (t, index) => {
 		return (
 			<Grid key={"MOR"+index} item xs={4} sm={4} md={2} lg={2} >
 				{(t.visit === "expired") &&
-					<Box className={classes.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{(t.visit === "pending") &&
-					<Box className={classes.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{(t.visit === "visit") &&
-					<Box className={classes.visitSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.visitSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{((t.visit === "available") && (currentPatient === "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography>{t.slot}</Typography>
 					</Box>
 				}
 				{((t.visit === "available") && (currentPatient !== "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
 					</Box>
 				}
@@ -1259,7 +1248,7 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid key="AFTERNOON" container alignItems="center" >
 	<Grid key="AFTERNOONITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{"Afternoon Slots of "+tStr}</Typography>
+	<Typography className={gClasses.slotTitle} >{"Afternoon Slots of "+tStr}</Typography>
 	</Grid>
 	{allTimeSlots[currentIndex].afternoonSlots.map( (t, index) => {
 		//console.log("Afternoon slots---------------");
@@ -1267,27 +1256,27 @@ export default function Appointment() {
 		return (
 			<Grid key={"AFETR"+index} item xs={4} sm={4} md={2} lg={2} >
 				{(t.visit === "expired") &&
-					<Box className={classes.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{(t.visit === "pending") &&
-					<Box className={classes.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{(t.visit === "visit") &&
-					<Box className={classes.visitSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.visitSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{((t.visit === "available") && (currentPatient === "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography>{t.slot}</Typography>
 					</Box>
 				}
 				{((t.visit === "available") && (currentPatient !== "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
 					</Box>
 				}
@@ -1302,33 +1291,33 @@ export default function Appointment() {
 	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="EVENING" container alignItems="center" >
 	<Grid key="EVENINGITEM" item xs={12} sm={12} md={12} lg={12} >
-	<Typography className={classes.slotTitle} >{"Evening Slots of "+tStr}</Typography>
+	<Typography className={gClasses.slotTitle} >{"Evening Slots of "+tStr}</Typography>
 	</Grid>
 	{allTimeSlots[currentIndex].eveningSlots.map( (t, index) => {
 		return (
 			<Grid key={"EVE"+index} item xs={4} sm={4} md={2} lg={2} >
 				{(t.visit === "expired") &&
-					<Box className={classes.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{(t.visit === "pending") &&
-					<Box className={classes.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{(t.visit === "visit") &&
-					<Box className={classes.visitSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.visitSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography id={t.slot}>{t.name}</Typography>
 					</Box>
 				}
 				{((t.visit === "available") && (currentPatient === "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography>{t.slot}</Typography>
 					</Box>
 				}
 				{((t.visit === "available") && (currentPatient !== "INFO")) &&
-					<Box className={classes.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
 					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
 					</Box>
 				}
@@ -1340,6 +1329,126 @@ export default function Appointment() {
 	}
 	</div>
 	)}
+
+	function DisplaySlotAppointMent(props) {
+	if (props.timeSlots.length === 0) return null;
+	return(
+	<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
+	<Grid className={gClasses.noPadding} key={props.slotName} container alignItems="center" >
+	<Grid item xs={12} sm={12} md={12} lg={12} >
+	<Typography className={gClasses.slotTitle} >{props.slotName+" Slots"}</Typography>
+	</Grid>
+	{props.timeSlots.map( (t, index) => {
+		let myClass;
+		let clickRequired = false;
+		if (t.visit === "expired")
+			myClass = gClasses.expiredSlot;
+		else if (t.visit === "pending")
+			myClass = gClasses.pendingSlot;
+		else if (t.visit === "visit")
+			myClass = gClasses.visitSlot;
+		else if (t.visit === "available") {
+			myClass = gClasses.availableSlot
+			clickRequired = (currentPatient !== "INFO");
+		}
+		return (
+			<Grid key={props.slotName+index} item xs={4} sm={4} md={2} lg={2} >
+				{/*}
+				{(t.visit === "expired") &&
+					<Box className={gClasses.expiredSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Typography id={t.slot}>{t.name}</Typography>
+					</Box>
+				}
+				{(t.visit === "pending") &&
+					<Box className={gClasses.pendingSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Typography id={t.slot}>{t.name}</Typography>
+					</Box>
+				}
+				{(t.visit === "visit") &&
+					<Box className={gClasses.visitSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Typography id={t.slot}>{t.name}</Typography>
+					</Box>
+				}
+				{((t.visit === "available") && (currentPatient === "INFO")) &&
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Typography>{t.slot}</Typography>
+					</Box>
+				}
+				{((t.visit === "available") && (currentPatient !== "INFO")) &&
+					<Box className={gClasses.availableSlot} borderColor="blue" borderRadius={7} border={1} >
+					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
+					</Box>
+				}
+			*/}
+				{(!clickRequired) &&
+					<Box className={myClass} borderColor="blue" borderRadius={7} border={1} >
+					<Typography>{t.name}</Typography>
+					</Box>
+				}
+				{(clickRequired) &&
+					<Box className={myClass} borderColor="blue" borderRadius={7} border={1} >
+					<Typography onClick={() => {handleAddAppointment(t)}}>{t.slot}</Typography>
+					</Box>
+				}
+			</Grid>
+		)}
+	)}
+	</Grid>
+	</Box>
+	)}
+
+	function DisplayAvailableAppointments() {
+		if (allTimeSlots.length === 0) return null;
+	
+		//console.log(currentIndex);
+		//console.log(allTimeSlots[currentIndex]);
+		let tStr = DATESTR[allTimeSlots[currentIndex].date];
+		tStr += "/";
+		tStr += MONTHNUMBERSTR[allTimeSlots[currentIndex].month];
+		tStr += "/";
+		tStr += allTimeSlots[currentIndex].year;
+	
+		return (
+		<div>
+		<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
+		<Grid className={gClasses.noPadding} key="ALLDATE" container alignItems="center" >
+			<Grid item xs={12} sm={12} md={12} lg={12} >
+			<Typography className={gClasses.slotTitle} >{"Appointment Date"}</Typography>
+			</Grid>
+			<Grid key="LEFT" align="left" item xs={1} sm={1} md={1} lg={1} >
+				<LeftIcon color={'primary'} onClick={prevDate}  />
+			</Grid>
+			{allTimeSlots.map( (t, index) => {
+				let dStr = (compareDate(t.dateTime, new Date()) !== 0) 
+					? DATESTR[t.date] + "/" + MONTHNUMBERSTR[t.month] + "/" + (t.year % 100)
+					: "Today";
+				let freeSlots = t.morningSlots.filter(x => x.visit === "available").length + 
+					t.afternoonSlots.filter(x => x.visit === "available").length +
+					t.eveningSlots.filter(x => x.visit === "available").length;
+				let myClass = (index === currentIndex) ? gClasses.blue14 : gClasses.normal14;
+			return (
+			<Grid key={"TIME"+index} item xs={5} sm={5} md={2} lg={2} >
+				<Box onClick={() => {setNewCurrentIndex(index)}} 
+				className={(t.holiday) ? gClasses.greenboxStyle : gClasses.boxStyle} 
+				borderRadius={7} border={1} >
+				<Typography className={myClass}>{dStr+" ("+SHORTWEEKSTR[t.day]+")"}</Typography>
+				{/*<Typography className={myClass}>{WEEKSTR[t.day]}</Typography>*/}
+				<Typography className={myClass}>{freeSlots+" free Slots"}</Typography>
+				</Box>
+			</Grid>
+			)}
+			)}
+			<Grid key="RIGHT" align="right" item xs={1} sm={1} md={1} lg={1} >
+				<RightIcon color={'primary'} onClick={nextDate}  />
+			</Grid>
+		</Grid>	
+		</Box>
+		<BlankArea />
+		<DisplaySlotAppointMent date={tStr} slotName="Morning" timeSlots={allTimeSlots[currentIndex].morningSlots} />
+		<DisplaySlotAppointMent date={tStr} slotName="Afternoon" timeSlots={allTimeSlots[currentIndex].afternoonSlots} />
+		<DisplaySlotAppointMent date={tStr} slotName="Evening" timeSlots={allTimeSlots[currentIndex].eveningSlots} />
+		</div>
+		)}
 	
 	async function handleCancelAppt(cancelAppt) {
 		
@@ -1448,9 +1557,7 @@ export default function Appointment() {
 			<DisplayAppointmentBox 
 				appointment={a} 
 				button1={
-					<IconButton color={'secondary'} size="small" onClick={() => { handleCancelAppt(a)}}  >
-						<CancelIcon />
-					</IconButton>
+					<CancelIcon color={'secondary'} size="small" onClick={() => { handleCancelAppt(a)}}  />
 				}
 			/>
 			</Grid>
@@ -1468,9 +1575,7 @@ export default function Appointment() {
 		<DisplayPatientBox 
 			patient={m} 
 			button1={
-				<IconButton className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  >
-					<EventNoteIcon  />
-				</IconButton>
+				<EventNoteIcon className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  />
 			}
 		/>
 		</Grid>
@@ -1624,7 +1729,7 @@ export default function Appointment() {
 		{(currentPatient !== "") &&
 			<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 			{(currentPatient === "INFO") &&
-				<Typography align="center" className={classes.modalHeader}>
+				<Typography align="center" className={gClasses.functionSelected}>
 					Appointment Information
 				</Typography>	
 			}
@@ -1640,10 +1745,7 @@ export default function Appointment() {
 			}
 			</Box>
 		}
-		<Drawer className={classes.drawer}
-			anchor="right"
-			variant="temporary"
-			open={isDrawerOpened}
+		<Drawer anchor="right" variant="temporary" open={isDrawerOpened}
 		>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 		<VsCancel align="right" onClick={() => { setIsDrawerOpened("")}} />
@@ -1666,8 +1768,8 @@ export default function Appointment() {
 			<Typography className={gClasses.vgSpacing}>Date of Birth</Typography>
 			</div>
 			<Datetime 
-				className={classes.dateTimeBlock}
-				inputProps={{className: classes.dateTimeNormal}}
+				className={gClasses.dateTimeBlock}
+				inputProps={{className: gClasses.dateTimeNormal}}
 				timeFormat={false} 
 				initialValue={patientDob}
 				dateFormat="DD/MM/yyyy"
@@ -1676,7 +1778,7 @@ export default function Appointment() {
 				closeOnSelect={true}
 			/>
 			<BlankArea />
-			<FormControl component="fieldset">
+			{/*<FormControl component="fieldset">
 				<RadioGroup row aria-label="radioselection" name="radioselection" value={radioValue} 
 					onChange={() => {setRadioValue(event.target.value); setPatientGender(event.target.value); }}
 				>
@@ -1684,7 +1786,11 @@ export default function Appointment() {
 				<FormControlLabel className={classes.filterRadio} value="Female" 	control={<Radio color="primary"/>} label="Female" />
 				<FormControlLabel className={classes.filterRadio} value="Other"   control={<Radio color="primary"/>} label="Other" />
 			</RadioGroup>
-			</FormControl>
+			</FormControl>*/}
+			<VsRadioGroup value={radioValue}
+				onChange={() => {setRadioValue(event.target.value); setPatientGender(event.target.value); }}
+				radioList={GENDER}
+			/>
 			<TextValidator   fullWidth   className={gClasses.vgSpacing} 
 				id="newPatientEmail" label="Email" type="email"
 				value={patientEmail} 
