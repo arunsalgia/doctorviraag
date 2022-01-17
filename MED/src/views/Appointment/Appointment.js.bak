@@ -1400,9 +1400,9 @@ export default function Appointment() {
 		<div>
 		<Box className={gClasses.boxStyle} borderRadius={7} border={1} >
 		<Grid className={gClasses.noPadding} key="ALLDATE" container alignItems="center" >
-			{/*<Grid item xs={12} sm={12} md={12} lg={12} >
+			<Grid item xs={12} sm={12} md={12} lg={12} >
 			<Typography className={gClasses.slotTitle} >{"Appointment Date"}</Typography>
-			</Grid>*/}
+			</Grid>
 			<Grid key="LEFT" align="left" item xs={1} sm={1} md={1} lg={1} >
 				<LeftIcon color={'primary'} onClick={prevDate}  />
 			</Grid>
