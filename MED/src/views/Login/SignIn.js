@@ -1,91 +1,54 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
+import Modal from 'react-modal';
 import Avatar from '@material-ui/core/Avatar';
+//import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-// import TextField from '@material-ui/core/TextField';
 import { TextField, InputAdornment } from "@material-ui/core";
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import { Switch, Route } from 'react-router-dom';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+//import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+//import { makeStyles } from '@material-ui/core/styles';
 import globalStyles from "assets/globalStyles";
 import Container from '@material-ui/core/Container';
-// import SignUp from "../Login/SignUp.js";
-// import ForgotPassword from "./ForgotPassword.js";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import axios from "axios";
-import {red, green, blue } from '@material-ui/core/colors';
-import { DesktopWindows } from '@material-ui/icons';
-import { isMobile, cdRefresh, specialSetPos, encrypt, clearBackupData, downloadApk } from "views/functions.js"
+//import {red, green, blue } from '@material-ui/core/colors';
+//import { DesktopWindows } from '@material-ui/icons';
+import { isMobile, cdRefresh, specialSetPos, encrypt, upGradeRequired, clearBackupData, downloadApk } from "views/functions.js"
 import {setTab} from "CustomComponents/CricDreamTabs.js"
 import { DisplayLogo, CricDreamLogo, ValidComp } from 'CustomComponents/CustomComponents.js';
-import { BlankArea } from 'CustomComponents/CustomComponents';
+//import { BlankArea } from 'CustomComponents/CustomComponents';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
-import VsCheckBox from "CustomComponents/VsCheckBox.js"
+import VsButton from "CustomComponents/VsButton";
+//import VsCheckBox from "CustomComponents/VsCheckBox.js"
 
-/*
-let welcomeMESSAGE = `${process.env.REACT_APP_WELCOME}`;
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  android: {
-    marginRight: theme.spacing(1),
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  download: {
-    fontSize: theme.typography.pxToRem(18),
-    fontWeight: theme.typography.fontWeightBold,
-    // color: yellow[900]
-  },
-  downloadButon: {
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  error:  {
-      // right: 0,
-      fontSize: '12px',
-      color: red[700],
-      // position: 'absolute',
-      alignItems: 'center',
-      marginTop: '0px',
-  },
-  error:  {
-    // right: 0,
-    fontSize: '12px',
-    color: blue[700],
-    // position: 'absolute',
-    alignItems: 'center',
-    marginTop: '0px',
-},
-}));
-*/
-
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)',
+    backgroundColor       : '#B3E5FC',
+    //color                 : '#FFFFFF',
+  }
+};
 
 let deviceIsMobile=isMobile();
 
 export default function SignIn() {
-  //const classes = useStyles();
   const gClasses = globalStyles();
   const history = useHistory();
+	
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
   const [isPatient, setIsPatient] = useState(false);
@@ -94,7 +57,19 @@ export default function SignIn() {
 
   const [ errorMessage, setErrorMessage ] = useState({msg: "", isError: false });
   const [ downloadMessage, setDownloadMessage ] = useState("");
-
+	const [latestApk, setLatestApk] = React.useState(null);
+	const [upgrade, setUpgrade] = React.useState(false);
+  const [modalIsOpen,setIsOpen] = React.useState(true);
+	
+	function openModal() { setIsOpen(true); }
+ 
+  function afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    //subtitle.style.color = '#f00';
+  }
+ 
+  function closeModal(){ setIsOpen(false); }
+	
   useEffect(() => {
     if (window.localStorage.getItem("logout")) {
       localStorage.clear();
@@ -105,7 +80,75 @@ export default function SignIn() {
     } else {
       // setShowPage(true)
     }
-  });
+		
+    const checkVersion = async () => {
+      //console.log("about to call upgrade");
+      let upg = await upGradeRequired();
+      //console.log("Checkversion");
+      if (upg.latest) setLatestApk(upg.latest);
+
+      setUpgrade(upg.status);
+      if (upg.status) setIsOpen(true);
+    }
+    
+		checkVersion(); 
+	}, []);
+
+	async function handleUpgrade() {
+    //console.log("upgrade requested");
+		setUpgrade(false);
+    closeModal();
+    await downloadApk();
+    console.log("APK has to be downloaded");
+  }
+	
+	async function handleSkip() {
+		setUpgrade(false);
+    closeModal();
+  }
+	
+  function DisplayUpgrade() {
+    if (upgrade)
+      return(
+        <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+        ariaHideApp={false}
+				shouldCloseOnOverlayClick={false}
+				borderRadius={7} border={1} 
+				>
+					<Typography className={gClasses.new} align="center">
+						Upgrade to latest
+					</Typography>
+					<br />
+					<br />
+					<Typography className={gClasses.new} align="center">
+						What is new
+					</Typography>
+					<TextField variant="outlined" multiline fullWidth readonly
+						// label="What is new" 
+						className={gClasses.whatIsNew}
+						defaultValue={latestApk.text} 
+					/>
+					<br />
+					<br />
+					<Grid key="UPG" container align="center">
+					<Grid item xs={6} sm={6} md={6} lg={6} >
+						<VsButton type="button" align="center" name="Update" onClick={handleUpgrade} />
+					</Grid>
+					<Grid item xs={6} sm={6} md={6} lg={6} >
+						<VsButton type="button" align="center" name="Later" onClick={handleSkip} />
+					</Grid>
+					</Grid>
+					<br />
+      </Modal>
+      )
+    else
+      return(null);
+  }
 
   function setError(msg, isError) {
     setErrorMessage({msg: msg, isError: isError});
@@ -222,13 +265,13 @@ export default function SignIn() {
  
   async function handleAndroid() {
     try {
-      setDownloadMessage("APL Android app download started. Please wait...")
-      // console.log("Download Android app");
+      setDownloadMessage("DOCTORVIRAAG Android app. download started. Please wait...")
+      // console.log("Download Android app.");
       await downloadApk();
-      setDownloadMessage("APL Android app download complete.")
+      setDownloadMessage("DOCTORVIRAAG Android app. download complete.")
       // console.log("APK has to be downloaded");
     } catch (e) {
-      setDownloadMessage("Error encountred while downloading APL Android app", true)
+      setDownloadMessage("Error encountered while downloading DOCTORVIRAAG Android app", true)
     }
   }
 
@@ -239,13 +282,14 @@ export default function SignIn() {
 
   function DisplayDownload() {
     if (process.env.REACT_APP_DEVICE !== "WEB") return null;
-
+		if (!isMobile()) return null;
+		
     let androidImage = `${process.env.PUBLIC_URL}/image/ANDROID.JPG`;
     let iosImage = `${process.env.PUBLIC_URL}/image/IOS.JPG`;
     return (
       <div align="center">
       <Typography className={gClasses.message18}>Download the offical app</Typography>
-      <BlankArea />
+      <br />
       <Typography className={gClasses.nonerror} align="center">{downloadMessage}</Typography>
       <Grid key="jp1" container align="center">
         <Grid item xs={12} sm={12} md={12} lg={12} >
@@ -286,7 +330,7 @@ export default function SignIn() {
 		setSelectionDone(true);
 		setCurrentSelection((category.toLowerCase() === "patient") ? " Patient" : " Doctor");
 	}
-	//console.log("In sign in");
+
   return (
 	<Container component="main" maxWidth="xs">
 	<CssBaseline />
@@ -388,6 +432,8 @@ export default function SignIn() {
 			<Link href="#" onClick={handleForgot} variant="body2">Forgot password</Link>
 		</div>
 		}
+		<DisplayDownload />
+		<DisplayUpgrade/>
 	</div>
 	</Container>
   );

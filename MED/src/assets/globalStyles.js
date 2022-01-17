@@ -9,6 +9,17 @@ import { makeStyles } from '@material-ui/core/styles';
 
 
 const globalStyles = makeStyles((theme) => ({
+	new: {
+    fontSize: theme.typography.pxToRem(20),
+    fontWeight: theme.typography.fontWeightBold,
+    //color: '#FFFFFF'
+  },
+  whatIsNew: {
+    backgroundColor: '#FFFFFF',
+		fontSize: theme.typography.pxToRem(16),
+    //color: '#000000',
+    fontWeight: theme.typography.fontWeightBold,
+  },
   dateTimeBlock: {
 		color: 'blue',
 		//fontSize: theme.typography.pxToRem(28),

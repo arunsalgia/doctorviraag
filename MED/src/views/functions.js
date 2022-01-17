@@ -358,14 +358,14 @@ export async function upGradeRequired() {
   if (process.env.REACT_APP_DEVICE === "APK") {
     let myName = process.env.REACT_APP_NAME;
     let myVersion = process.env.REACT_APP_VERSION;
-    let myURL = `${process.env.REACT_APP_APLAXIOS}/apl/confirmlatest/${myName}/APK/${myVersion}`;
+    let myURL = `${process.env.REACT_APP_APLSERVER}/apl/confirmlatest/${myName}/APK/${myVersion}`;
     // console.log(myURL);
     let response = await axios.get(myURL);
     // console.log("After axios call", response.data);
     upGrade = (response.data.status) ? false : true;
     upGradeRecord = response.data.latest;
     upGradeRecord.text = internalToText(upGradeRecord.text);
-    // console.log(upGradeRecord);
+    //console.log(upGradeRecord);
   } else if (process.env.REACT_APP_DEVICE === "IOS") {
 		console.log("IOS currently not supported");
 	}
@@ -377,7 +377,7 @@ export async function upGradeRequired() {
 
 export async function org_downloadApk() {
   let myName = process.env.REACT_APP_NAME;
-  let myURL = `${process.env.REACT_APP_APLAXIOS}/apl/downloadlatestbinary/${myName}/APK/`;
+  let myURL = `${process.env.REACT_APP_APLSERVER}/apl/downloadlatestbinary/${myName}/APK/`;
   try {
     axios({
       method: 'get',
@@ -412,7 +412,7 @@ export async function org_downloadApk() {
 
 export async function downloadApk() {
   let myName = process.env.REACT_APP_NAME;
-  let myURL = `${process.env.REACT_APP_APLAXIOS}/apl/downloadlatestbinary/${myName}/APK/`;
+  let myURL = `${process.env.REACT_APP_APLSERVER}/apl/downloadlatestbinary/${myName}/APK/`;
   try {
     let response = await axios({
       method: 'get',

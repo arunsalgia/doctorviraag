@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 //import { createBrowserHistory } from "history";
 import { useHistory } from "react-router-dom";
 //import { useParams } from 'react-router-dom'
+import Modal from 'react-modal';
 import axios from "axios";
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -204,7 +205,7 @@ export function CricDreamTabs() {
   //console.log(location.pathname);
 
   useEffect(() => {       
-/*    
+    
     const checkVersion = async () => {
       //console.log("about to call upgrade");
       let upg = await upGradeRequired();
@@ -214,14 +215,54 @@ export function CricDreamTabs() {
       setUpgrade(upg.status);
       if (upg.status) setIsOpen(true);
     }
-*/    
+    
     function setMenuValue() {
       setValue(parseInt(localStorage.getItem("menuValue")));
       setIdle(false);
     }
+		//checkVersion(); 
     setMenuValue();
 }, []);
 
+
+  function DisplayUpgrade() {
+    //console.log(`Upgrate: ${upgrade} Menu Item:   ${value}`)
+    // console.log("Current",process.env.REACT_APP_VERSION);
+    if (upgrade)
+      return(
+        <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+        ariaHideApp={false}
+      >
+        {/* <Typography className={classes.new} align="center">
+          Current Version {process.env.REACT_APP_VERSION}
+        </Typography> */}
+        <Typography className={classes.new} align="center">
+          Latest Version {latestApk.version}
+        </Typography>
+        <BlankArea/>
+        <Typography className={classes.new} align="center">
+          What is new
+        </Typography>
+        <TextField variant="outlined" multiline fullWidth disabled
+          id="producttext"
+          // label="What is new" 
+          className={classes.whatIsNew}
+          defaultValue={latestApk.text} 
+        />
+        <BlankArea />
+        <Button align="center" key="upgrade" variant="contained" color="primary" size="medium"
+        className={classes.dashButton} onClick={handleUpgrade}>Update Now
+        </Button>
+      </Modal>
+      )
+    else
+      return(null);
+  }
 
   const handleChange = (event) => {
     setAuth(event.target.checked);
@@ -394,14 +435,16 @@ export function CricDreamTabs() {
               >
 								<Typography className={classes.title}>{sessionStorage.getItem("userName")}</Typography>
 								<Divider className={classes.divider} />
-                {(window.sessionStorage.getItem("userType") !== "Assistant") &&
-                <MenuItem onClick={handleProfile}>
-									<Typography className={classes.menuStyle}>Profile</Typography>
-								</MenuItem>
+                {((window.sessionStorage.getItem("userType") !== "Assistant") && (window.sessionStorage.getItem("userType") !== "Patient") )&&
+									<MenuItem onClick={handleProfile}>
+										<Typography className={classes.menuStyle}>Profile</Typography>
+									</MenuItem>
                 }
-								<MenuItem onClick={handleChangePassword}>
-									<Typography className={classes.menuStyle}>Change Password</Typography>
-								</MenuItem>
+								{(window.sessionStorage.getItem("userType") !== "Patient") &&
+									<MenuItem onClick={handleChangePassword}>
+										<Typography className={classes.menuStyle}>Change Password</Typography>
+									</MenuItem>
+								}
                 <Divider className={classes.divider}/>
 								{((itIsMobile) && (window.sessionStorage.getItem("userType") !== "Patient")) &&
                   <div>
@@ -491,7 +534,7 @@ export function CricDreamTabs() {
           >
             <HomeIcon className={classes.icon}/>
           </IconButton>*/}
-					{((itIsMobile === false) && (window.sessionStorage.getItem("userType") === "Patient")) &&
+					{((false) && (itIsMobile === false) && (window.sessionStorage.getItem("userType") === "Patient")) &&
           <div>
             <Button color="inherit" className={classes.statButton} onClick={handleClinic}>Clinic</Button>
             <Button color="inherit" className={classes.statButton} onClick={handleAppointment}>Appt</Button>
@@ -543,7 +586,7 @@ export function CricDreamTabs() {
 			 </Toolbar>
       </AppBar>
       <DisplayCdItems/>
-      {/* <DisplayUpgrade/> */}
+      <DisplayUpgrade/>
     </div>
   );
 }
