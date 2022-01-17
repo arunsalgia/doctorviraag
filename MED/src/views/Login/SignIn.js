@@ -26,6 +26,8 @@ import { DisplayLogo, CricDreamLogo, ValidComp } from 'CustomComponents/CustomCo
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
+import lodashSortby from "lodash/sortBy";
+
 import VsButton from "CustomComponents/VsButton";
 //import VsCheckBox from "CustomComponents/VsCheckBox.js"
 
@@ -164,8 +166,8 @@ export default function SignIn() {
       window.sessionStorage.setItem("userName", userName);
       window.sessionStorage.setItem("userType", "Patient");
       window.sessionStorage.setItem("cid", "");
-      
-      window.sessionStorage.setItem("patients", JSON.stringify(response.data.patient));
+      let myPatients =  lodashSortby(response.data.patient, 'pid');
+      window.sessionStorage.setItem("patients", JSON.stringify(myPatients));
       window.sessionStorage.setItem("clinics", JSON.stringify(response.data.clinic));
       
       setTab("6");
@@ -325,7 +327,7 @@ export default function SignIn() {
   }
 
 	function selectCategory(category) {
-		console.log(category);
+		//console.log(category);
 		setIsPatient((category.toLowerCase() === "patient"));
 		setSelectionDone(true);
 		setCurrentSelection((category.toLowerCase() === "patient") ? " Patient" : " Doctor");

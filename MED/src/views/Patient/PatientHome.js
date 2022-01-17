@@ -10,7 +10,8 @@ import Report from 'views/Report/Report';
 import ProfCharge from 'views/ProfCharge/PatientProfCharge';
 import Visit from 'views/Visit/PatientVisit';
 import PatientAppointment from 'views/Appointment/PatientAppointment';
-
+import Profile from 'views/Patient/PatientProfile';
+import DentalTreatment from 'views/Treatment/PatientDentalTreatment';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 
 import {
@@ -37,18 +38,12 @@ export default function PatientHome() {
 		
 		const us = async () => {
 			try {
-				let userCid = sessionStorage.getItem("cid");
+				userCid = sessionStorage.getItem("cid");
 				//console.log(userCid);
 				customerData = JSON.parse(sessionStorage.getItem("customerData"));
 				//console.log(customerData);
 				clinicName = customerData.clinicName;
-				let tmp = JSON.parse(sessionStorage.getItem("patients"));
-				tmp = tmp.filter(x => x.cid === userCid);
-				setPatientArray(tmp);
-				//console.log(tmp);
-				if (tmp.length === 1) {
-					handleSelectPatient(tmp[0]);
-				} 				
+				doHome();
 			} catch {
 				console.log("in patient catch");
 			}	
@@ -57,9 +52,31 @@ export default function PatientHome() {
   }, [])
 
 
+	function doHome() {
+		//console.log("in Home");
+		userCid = sessionStorage.getItem("cid");
+		let tmp = JSON.parse(sessionStorage.getItem("patients"));
+		//console.log(userCid);
+		//console.log(tmp);
+		tmp = tmp.filter(x => x.cid === userCid);
+		setPatientArray(tmp);
+		//console.log(tmp);
+		if (tmp.length === 1) {
+			handleSelectPatient(tmp[0]);
+		} else {
+			handleSelectPatient(null);
+		}			
+	}
+
 	function handleSelectPatient(patRec) {
-		setCurrentPatientData(patRec);
-		setCurrentPatientName(patRec.displayName);
+		if (patRec) {
+			setCurrentPatientData(patRec);
+			setCurrentPatientName(patRec.displayName);
+		} else {
+			setCurrentPatientData(null);
+			setCurrentPatientName("");
+		}
+		setCurrentSelection("")
 	}
 	
 	function DisplayAllPatients() {
@@ -77,6 +94,10 @@ export default function PatientHome() {
 	</Grid>	
 	)}
 	
+	function setHome() {
+
+	}
+
   return (
   <div className={gClasses.webPage} align="center" key="main">
 	<CssBaseline />
@@ -94,16 +115,29 @@ export default function PatientHome() {
 		<Grid item xs={12} sm={12} md={12} lg={12} >
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
-      <DisplayLogo onClick={() => setCurrentSelection("Appointment")} label="Appointment" image="SAMPLE.JPG" />;
+      <DisplayLogo onClick={() => setCurrentSelection("Profile")} label="Profile" image="PH_PROFILE.JPG" />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
-      <DisplayLogo onClick={() => setCurrentSelection("Visit")} label="Prescription" image="SAMPLE.JPG" />;
+      <DisplayLogo onClick={() => setCurrentSelection("Appointment")} label="Appointment" image="PH_APPOINTMENT.JPG" />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
-      <DisplayLogo onClick={() => setCurrentSelection("Report")} label="Report" image="SAMPLE.JPG" />;
+      <DisplayLogo onClick={() => setCurrentSelection("Visit")} label="Prescription" image="PH_VISIT.JPG" />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
-      <DisplayLogo onClick={() => setCurrentSelection("Payment")} label="Payment" image="SAMPLE.JPG" />;
+		<div>
+		{(customerData.type === "Dentist") &&
+			<DisplayLogo onClick={() => setCurrentSelection("DentalTreatment")} label="Treatment" image="PH_TREATMENT.JPG" />
+		}
+		{(customerData.type !== "Dentist") &&
+			<DisplayLogo onClick={() => setCurrentSelection("AlagTreatment")} label="Treatment" image="PH_TREATMENT.JPG" />
+		}
+    </div>
+		</Grid>
+		<Grid item xs={6} sm={4} md={4} lg={4} >
+      <DisplayLogo onClick={() => setCurrentSelection("Report")} label="Report" image="PH_REPORT.JPG" />
+		</Grid>
+		<Grid item xs={6} sm={4} md={4} lg={4} >
+      <DisplayLogo onClick={() => setCurrentSelection("Payment")} label="Payment" image="PH_PAYMENT.JPG" />
 		</Grid>
 	</Grid>
 	</ Container>
@@ -112,7 +146,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Appointment Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
+		<VsButton align="right" name="Home" onClick={doHome} />
 		<PatientAppointment patient={currentPatientData} />
 		</div>
 	}
@@ -120,7 +154,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Report Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
+		<VsButton align="right" name="Home" onClick={doHome} />
 		<Report patient={currentPatientData} />
 		</div>
 	}
@@ -128,7 +162,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Payment Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
+		<VsButton align="right" name="Home" onClick={doHome} />
 		<ProfCharge patient={currentPatientData} />
 		</div>
 	}
@@ -136,8 +170,24 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Visit Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={() => setCurrentSelection("")} />
+		<VsButton align="right" name="Home" onClick={doHome} />
 		<Visit patient={currentPatientData} />
+		</div>
+	}
+	{(currentSelection === "Profile") &&
+		<div>
+		<DisplayPageHeader headerName={"Patient Profile"} groupName="" tournament=""/>
+		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
+		<VsButton align="right" name="Home" onClick={doHome} />
+		<Profile patient={currentPatientData} />
+		</div>
+	}
+		{(currentSelection === "DentalTreatment") &&
+		<div>
+		<DisplayPageHeader headerName={"Patient Treatment"} groupName="" tournament=""/>
+		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
+		<VsButton align="right" name="Home" onClick={doHome} />
+		<DentalTreatment patient={currentPatientData} />
 		</div>
 	}
   </div>

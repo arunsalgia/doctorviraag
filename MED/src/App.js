@@ -57,7 +57,7 @@ function initCdParams() {
     if (ipos >= process.env.REACT_APP_BASEPOS) localStorage.setItem("tabpos", ipos-process.env.REACT_APP_BASEPOS);
   } else
     localStorage.setItem("tabpos", 0);
-  console.log(`ipos: ${ipos}   Tabpos ${localStorage.getItem("tabpos")}`)
+  //console.log(`ipos: ${ipos}   Tabpos ${localStorage.getItem("tabpos")}`)
 }
 
 

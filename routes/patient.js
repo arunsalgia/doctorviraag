@@ -247,7 +247,9 @@ patientRouter.get('/editwithdob/:cid/:oldName/:pName/:pDob/:pGender/:pEmail/:pMo
 	mRec.gender = pGender;
 	mRec.enabled = true;
 	console.log(mRec);
-	mRec.save();
+	await mRec.save();
+	
+	mRec.email = pEmail;
 	sendok(res, mRec);
 });
 

@@ -13,13 +13,13 @@ return (
 		<RadioGroup row aria-label="rgrp" name="rgrp" value={props.value} onChange={props.onChange}>
 	{(_field) &&
 		props.radioList.map ( r =>
-		<FormControlLabel className={gClasses.filterRadio} value={r} 
+		<FormControlLabel key={r} className={gClasses.filterRadio} value={r} 
 			control={<Radio color="primary"/>} label={r} />
 		)
 	}
 	{(!_field) &&
 		props.radioList.map ( r =>
-		<FormControlLabel className={gClasses.filterRadio} value={r[props.radioField]} 
+		<FormControlLabel key={r[props.radioField]} className={gClasses.filterRadio} value={r[props.radioField]} 
 			control={<Radio color="primary"/>} label={r[props.radioField]} />
 		)
 	}

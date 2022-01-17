@@ -12,6 +12,8 @@ export const INR = String.fromCharCode(8377)
 export const VISITTYPE = {pending: "pending", expired: "expired", cancelled: "cancelled", visit: ""};
 export const WALLETTYPE = {all: "all", wallet: "wallet", bonus: "bonus"};
 
+export const GENDER = ["Male", "Female", "Other"];
+
 export const WEEKSTR = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 export const SHORTWEEKSTR = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const MONTHSTR = ["January", "February", "March", "April", "May", "June",
