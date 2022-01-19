@@ -62,33 +62,6 @@ function initCdParams() {
 
 
 
-function checkSessionRequest() {
-	let resetLink = false;
-	let x = location.pathname.split("/");
-  console.log("Path is");
-  console.log(x);
-	if (x.length >= 3)
-	if (x[1].toLowerCase() === "medmaster")
-	if (x[2].toLowerCase() === "session") {
-		resetLink = true;
-	}
-	return resetLink;
-}
-
-
-function checkResetPasswordRequest() {
-	let resetLink = "";
-  //console.log("-",location.pathname,"-" );
-	let x = location.pathname.split("/");
-  //console.log(x);
-	if (x.length >= 4)
-	if (x[1] === "doctorviraag")
-	if (x[2] === "resetpassword") {
-		resetLink = x[3];
-	}
-  //console.log(resetLink);
-	return resetLink;
-}
 
 
 function checkExternalConnectRequest() {
@@ -115,22 +88,6 @@ function AppRouter() {
   var idleTimer = null;
   
   
-  async function handleOnActive (event) {
-    // console.log('user is active', event);
-  }
-
-  async function handleOnAction (event) {
-    // console.log(`Action from user ${sessionStorage.getItem("uid")}`);
-  }
-
-
-  async function handleOnIdle (event) {
-    // console.log('user is idle', event);
-    // console.log('last active', idleTimer.getLastActiveTime());
-    setIdle(true);
-  }
-
-
 
   function DispayTabs() {
     let isLogged = isUserLogged();
@@ -147,14 +104,6 @@ function AppRouter() {
 		else if (sessionStorage.getItem("currentLogin") ===  "FORGOT") {
 			return <ForgotPassword />
 		} 
-/*
-    else if (sessionStorage.getItem("currentLogin") ===  "SIGNUP") {
-			return <SignUp />
-		} 
-		else if (sessionStorage.getItem("currentLogin") ===  "DOCTOR") {
-			return <Doctor />
-		} 
-*/
 		else  {
 			let myLink = checkExternalConnectRequest();
       if  (myLink.cmd !== 'none') {

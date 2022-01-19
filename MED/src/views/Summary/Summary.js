@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 //import TextField from '@material-ui/core/TextField';
 import { CssBaseline } from '@material-ui/core';
+import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import axios from "axios";
 import Box from '@material-ui/core/Box';
@@ -9,7 +10,6 @@ import lodashSumBy from 'lodash/sumBy';
 import VsButton from "CustomComponents/VsButton";
 import VsTextSearch from "CustomComponents/VsTextSearch";
 
-//import  from '@material-ui/core/Container';
 //import  from '@material-ui/core/CssBaseline';
 //import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 
@@ -42,7 +42,7 @@ import { isMobile,
  } from "views/functions.js"
 import {
 	DisplayPageHeader, BlankArea, DisplayPatientBox, 
-	DisplayProfChargeBalance, DisplayProfCharge,
+	DisplayProfChargeBalance, DisplayProfCharge, DisplayProfCharge_WO_Name,
 	DisplayPatientHeader,
 } from "CustomComponents/CustomComponents.js"
 
@@ -296,21 +296,25 @@ export default function Summary() {
 	function DisplayPatientVisit() {
 	return (
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-	<Grid className={gClasses.noPadding} key="PATHDR" container justify="center" alignItems="center" >
-	<Grid item xs={4} sm={4} md={2} lg={2} >
-		<Typography className={gClasses.patientInfo2Blue}>Date</Typography>
+	<Grid className={gClasses.noPadding} key="PATHDR" container align="center" alignItems="center" >
+	<Grid align={(isMobile()) ? "left" : "center"} item xs={5} sm={5} md={2} lg={2} >
+		<Typography className={gClasses.patientInfo2Orange}>Date</Typography>
 	</Grid>
 	<Grid item xs={4} sm={4} md={4} lg={4} >
-		<Typography className={gClasses.patientInfo2Blue}>Name</Typography>
+		<Typography className={gClasses.patientInfo2Orange}>Name</Typography>
 	</Grid>
-	<Grid item xs={4} sm={4} md={1} lg={1} >
-		<Typography className={gClasses.patientInfo2Blue}>Age</Typography>
+	<Grid item xs={false} sm={false} md={1} lg={1} >
+	{(!isMobile()) &&
+		<Typography className={gClasses.patientInfo2Orange}>Age</Typography>
+	}
 	</Grid>
-	<Grid item xs={4} sm={4} md={3} lg={3} >
-		<Typography className={gClasses.patientInfo2Blue}>Email</Typography>
+	<Grid item xs={false} sm={false} md={3} lg={3} >
+	{(!isMobile()) &&
+		<Typography className={gClasses.patientInfo2Orange}>Email</Typography>
+	}
 	</Grid>
-	<Grid item xs={4} sm={4} md={2} lg={2} >
-		<Typography className={gClasses.patientInfo2Blue}>Mobile</Typography>
+	<Grid item xs={3} sm={3} md={2} lg={2} >
+		<Typography className={gClasses.patientInfo2Orange}>Mobile</Typography>
 	</Grid>
 	<Grid item xs={4} sm={4} md={false} lg={false} />
 	</Grid>
@@ -321,48 +325,69 @@ export default function Summary() {
 		let d = new Date(v.visitDate);
 		let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()} ${HOURSTR[d.getHours()]}:${MINUTESTR[d.getMinutes()]}`;
 		return (
-		<Grid className={gClasses.noPadding} key={"VISIT"+index} container justify="center" alignItems="center" >
-		<Grid item xs={4} sm={4} md={2} lg={2} >
+		<Grid className={gClasses.noPadding} key={"VISIT"+index} container align="center" alignItems="center" >
+		<Grid align={(isMobile()) ? "left" : "center"} item xs={5} sm={5} md={2} lg={2} >
 			<Typography className={gClasses.patientInfo2}>{myDate}</Typography>
 		</Grid>
 		<Grid item xs={4} sm={4} md={4} lg={4} >
 			<Typography className={gClasses.patientInfo2}>{myName}</Typography>
 		</Grid>
-		<Grid item xs={4} sm={4} md={1} lg={1} >
+		<Grid item xs={false} sm={false} md={1} lg={1} >
+		{(!isMobile()) &&
 			<Typography className={gClasses.patientInfo2}>{dispAge(myPat.age, myPat.gender)}</Typography>
+		}
 		</Grid>
-		<Grid item xs={4} sm={4} md={3} lg={3} >
+		<Grid item xs={false} sm={false} md={3} lg={3} >
+		{(!isMobile()) &&
 			<Typography className={gClasses.patientInfo2}>{dispEmail(myPat.email)}</Typography>
+		}
 		</Grid>
-		<Grid item xs={4} sm={4} md={2} lg={2} >
+		<Grid item xs={3} sm={3} md={2} lg={2} >
 			<Typography className={gClasses.patientInfo2}>{dispMobile(myPat.mobile)}</Typography>
 		</Grid>
-		<Grid item xs={4} sm={4} md={false} lg={false} />
 		</Grid>
 		)}
 	)}
 	</Box>
 	)}
 
+	function TotalDues() {
+	let totalDue = Math.abs(lodashSumBy(dueArray, 'due'));
+	return (
+		<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
+		<Grid className={gClasses.noPadding} key="DUESTTOAL"  container align="center" alignItems="center" >
+		<Grid item align="right" xs={9} sm={9} md={11} lg={11} >
+		<Typography className={gClasses.patientInfo2Green}>Total Dues</Typography>
+		</Grid>
+		<Grid item xs={3} sm={3} md={1} lg={1} >
+			<Typography align="right" className={gClasses.patientInfo2Green}>{INR+totalDue}</Typography>
+		</Grid>
+		</Grid>
+		</Box>
+	)}
+
 	function DisplayPatientDues() {
-		let totalDue = Math.abs(lodashSumBy(dueArray, 'due'));
 		return (
 		<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-		<Grid className={gClasses.noPadding} key="DUESHDR" container justify="center" alignItems="left" >
-			<Grid item xs={4} sm={4} md={4} lg={4} >
-				<Typography className={gClasses.patientInfo2Blue}>Name</Typography>
+		<Grid className={gClasses.noPadding} key="DUESHDR" container align="center" alignItems="left" >
+			<Grid align="left"  item xs={5} sm={5} md={4} lg={4} >
+				<Typography className={gClasses.patientInfo2Orange}>Name</Typography>
 			</Grid>
-			<Grid item xs={4} sm={4} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Age</Typography>
+			<Grid item xs={false} sm={false} md={1} lg={1} >
+				{(!isMobile()) &&
+				<Typography className={gClasses.patientInfo2Orange}>Age</Typography>
+				}
 			</Grid>
-			<Grid item xs={4} sm={4} md={3} lg={3} >
-				<Typography className={gClasses.patientInfo2Blue}>Email</Typography>
+			<Grid item xs={false} sm={false} md={3} lg={3} >
+			{(!isMobile()) &&
+				<Typography className={gClasses.patientInfo2Orange}>Email</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Mobile</Typography>
+			<Grid align="center" item xs={4} sm={4} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Mobile</Typography>
 			</Grid>
-			<Grid item align="right" xs={4} sm={4} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Dues</Typography>
+			<Grid item align="right" xs={3} sm={3} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Dues</Typography>
 			</Grid>
 		</Grid>
 		{dueArray.map( (v, index) => {
@@ -370,33 +395,29 @@ export default function Summary() {
 			if (!myPat) return null;
 			let myName = myPat.displayName;
 			return (
-			<Grid className={gClasses.noPadding} key={"DUES"+index} container justify="center" alignItems="center" >
-			<Grid item xs={4} sm={4} md={4} lg={4} >
+			<Grid className={gClasses.noPadding} key={"DUES"+index} container align="center" alignItems="center" >
+			<Grid align="left" item xs={5} sm={5} md={4} lg={4} >
 				<Typography className={gClasses.patientInfo2}>{myName}</Typography>
 			</Grid>
-			<Grid item xs={4} sm={4} md={1} lg={1} >
+			<Grid item xs={false} sm={false} md={1} lg={1} >
+			{(!isMobile()) &&
 				<Typography className={gClasses.patientInfo2}>{dispAge(myPat.age, myPat.gender)}</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={3} lg={3} >
+			<Grid item xs={false} sm={false} md={3} lg={3} >
+			{(!isMobile()) &&
 				<Typography className={gClasses.patientInfo2}>{dispEmail(myPat.email)}</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={2} lg={2} >
+			<Grid align="center" item xs={4} sm={4} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>{dispMobile(myPat.mobile)}</Typography>
 			</Grid>
-			<Grid align="right" item xs={4} sm={4} md={1} lg={1} >
+			<Grid align="right" item xs={3} sm={3} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>{INR+Math.abs(v.due)}</Typography>
 			</Grid>
 			</Grid>
 			)}
 		)}
-		<Grid className={gClasses.noPadding} key="DUESTTOAL" container justify="center" alignItems="center" >
-			<Grid item align="right" xs={10} sm={10} md={10} lg={10} >
-			<Typography className={gClasses.patientInfo2Green}>Total Dues</Typography>
-			</Grid>
-			<Grid item xs={4} sm={4} md={1} lg={1} >
-				<Typography align="right" className={gClasses.patientInfo2Green}>{totalDue}</Typography>
-			</Grid>
-		</Grid>
 		</Box>
 		)}
 
@@ -507,21 +528,25 @@ export default function Summary() {
 		//console.log(visitArray);
 		return (
 		<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-		<Grid className={gClasses.noPadding} key="DUESHDR" container justify="center" alignItems="left" >
-			<Grid item xs={4} sm={4} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Date</Typography>
+		<Grid className={gClasses.noPadding} key="DUESHDR" container align="center" alignItems="left" >
+			<Grid align="left" item xs={3} sm={3} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Date</Typography>
 			</Grid>
-			<Grid item xs={4} sm={4} md={4} lg={4} >
-				<Typography className={gClasses.patientInfo2Blue}>Name</Typography>
+			<Grid align="left" item xs={6} sm={6} md={4} lg={4} >
+				<Typography className={gClasses.patientInfo2Orange}>Name</Typography>
 			</Grid>
-			<Grid item xs={4} sm={4} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Age</Typography>
+			<Grid item xs={false} sm={false} md={1} lg={1} >
+			{(!isMobile()) &&
+				<Typography className={gClasses.patientInfo2Orange}>Age</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={3} lg={3} >
-				<Typography className={gClasses.patientInfo2Blue}>Email</Typography>
+			<Grid item xs={false} sm={false} md={3} lg={3} >
+			{(!isMobile()) &&
+				<Typography className={gClasses.patientInfo2Orange}>Email</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Mobile</Typography>
+			<Grid align="center" item xs={3} sm={3} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Mobile</Typography>
 			</Grid>
 		</Grid>
 		{visitArray.map( (v, index) => {
@@ -529,22 +554,26 @@ export default function Summary() {
 			if (!myPat) { console.log(`patient ${v.pid} not found`); return null; }
 			let myName = (myPat) ? myPat.displayName : "";
 			let d = new Date(v.nextVisitDate);
-			let visitDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+			let visitDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()%100}`;
 			return (
-			<Grid className={gClasses.noPadding} key={"DUES"+index} container justify="center" alignItems="center" >
-			<Grid item xs={4} sm={4} md={2} lg={2} >
+			<Grid className={gClasses.noPadding} key={"DUES"+index} container align="center" alignItems="center" >
+			<Grid align="left" item xs={3} sm={3} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>{visitDate}</Typography>
 			</Grid>
-			<Grid item xs={4} sm={4} md={4} lg={4} >
+			<Grid align="left" item xs={6} sm={6} md={4} lg={4} >
 				<Typography className={gClasses.patientInfo2}>{myName}</Typography>
 			</Grid>
-			<Grid item xs={4} sm={4} md={1} lg={1} >
+			<Grid item xs={false} sm={false} md={1} lg={1} >
+			{(!isMobile()) &&
 				<Typography className={gClasses.patientInfo2}>{dispAge(myPat.age, myPat.gender)}</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={3} lg={3} >
+			<Grid item xs={false} sm={false} md={3} lg={3} >
+			{(!isMobile()) &&
 				<Typography className={gClasses.patientInfo2}>{dispEmail(myPat.email)}</Typography>
+			}
 			</Grid>
-			<Grid item xs={4} sm={4} md={2} lg={2} >
+			<Grid align="center" item xs={3} sm={3} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>{dispMobile(myPat.mobile)}</Typography>
 			</Grid>
 			</Grid>
@@ -771,7 +800,22 @@ export default function Summary() {
 							<DisplayProfChargeBalance balance={balance} />
 							<DisplayProfCharge profChargeArray={billingArray} patientArray={patientMasterArray} />
 						</div>
-					}														
+					}	
+					{(currentDateWiseSelection === "") &&
+					<div>
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					</div>
+					}
 					</div>
 				}
 				{(currentSelection === "Patient wise") &&
@@ -808,7 +852,7 @@ export default function Summary() {
 							{(currentPatientWiseSelection === "Billing") && 
 								<div>
 								<DisplayProfChargeBalance balance={balance} />
-								<DisplayProfCharge profChargeArray={billingArray} patientArray={patientMasterArray} />
+								<DisplayProfCharge_WO_Name profChargeArray={billingArray} patientArray={patientMasterArray} />
 								</div>
 							}
 						</div>
@@ -817,6 +861,7 @@ export default function Summary() {
 				}
 				{(currentSelection === "Dues") && 
 				<div>
+				<TotalDues />
 				<DisplayPatientDues />
 				</div>
 				}	

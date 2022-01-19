@@ -11,13 +11,14 @@ import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import PDFViewer from 'pdf-viewer-reactjs';
 import lodashSumBy from 'lodash/sumBy';
+import lodashMapBy from 'lodash/map';
 //import VsCancel from "CustomComponents/VsCancel";
 
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import {red, blue, green, deepOrange, yellow} from '@material-ui/core/colors';
 import {
   validateSpecialCharacters, validateEmail, validateMobile, validateInteger, validateUpi,
-  encrypt, decrypt, 
+  encrypt, decrypt, isMobile,
   currentAPLVersion, latestAPLVersion,
 	getImageName,
 	dispOnlyAge, dispAge, dispEmail, dispMobile,
@@ -1214,39 +1215,57 @@ export function DisplayProfCharge(props) {
 	let _edit =   (props.handleEdit == null);
 	let _cancel = (props.handleCancel == null);
 	let _receipt = (props.handleReceipt == null);
-	let tmp = props.profChargeArray.filter(x => x.amount > 0);
+
+	let allPids = lodashMapBy(props.patientArray, 'pid');
+	let myProfChargeArray = props.profChargeArray.filter(x => allPids.includes(x.pid) );
+
+	let tmp = myProfChargeArray.filter(x => x.amount > 0);
 	let myCollection = lodashSumBy(tmp, 'amount');
-	tmp = props.profChargeArray.filter(x => x.amount < 0);
+	tmp = myProfChargeArray.filter(x => x.amount < 0);
 	let myBilling = Math.abs(lodashSumBy(tmp, 'amount'));
+	let myTotal = myCollection - myBilling;
+	console.log(myCollection, myBilling, myTotal);
+	//console.log(myProfChargeArray);
 	return (
 		<div>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
 		<div>
 		<Grid  key={"HDR"} container alignItems="center" >
-			<Grid item  align="left" xs={2} sm={2} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Date</Typography>
+			<Grid item  align="left" xs={3} sm={3} md={1} lg={1} >
+				<Typography className={gClasses.patientInfo2Orange}>Date</Typography>
 			</Grid>
-			<Grid item align="left" xs={3} sm={3} md={3} lg={3} >
-				<Typography className={gClasses.patientInfo2Blue}>Name</Typography>
+			<Grid item align="left" xs={5} sm={5} md={3} lg={3} >
+				<Typography className={gClasses.patientInfo2Orange}>Name</Typography>
 			</Grid>
-			<Grid item align="left" xs={4} sm={4} md={4} lg={4} >
-				<Typography className={gClasses.patientInfo2Blue}>Description</Typography>
+			{(!isMobile()) &&
+			<Grid item align="left" xs={false} sm={false} md={4} lg={4} >
+				<Typography className={gClasses.patientInfo2Orange}>Description</Typography>
 			</Grid>
-			<Grid item  align="center" xs={1} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Mode</Typography>
+			}
+				<Grid item  align="center" xs={false} sm={false} md={1} lg={1} >
+			{(!isMobile()) &&
+				<Typography className={gClasses.patientInfo2Orange}>Mode</Typography>
+			}
 			</Grid>
-			<Grid item align="right" xs={1} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Billing</Typography>
+			{(isMobile()) &&
+			<Grid item align="right" xs={4} sm={4} md={false} lg={false} >
+				<Typography className={gClasses.patientInfo2Orange}>Amount</Typography>
 			</Grid>
-			<Grid item  xs={1} sm={1} md={1} lg={1} >
-			<Typography align="right" className={gClasses.patientInfo2Blue}>Collection</Typography>
+			}
+			{(!isMobile()) &&
+			<Grid item align="right" xs={false} sm={false} md={1} lg={1} >
+				<Typography className={gClasses.patientInfo2Orange}>Billing</Typography>
 			</Grid>
-			<Grid item xs={1} sm={1} md={1} lg={1} >
+			}
+			{(!isMobile()) &&
+			<Grid item  xs={false} sm={false} md={1} lg={1} >
+			<Typography align="right" className={gClasses.patientInfo2Orange}>Payment</Typography>
 			</Grid>
+			}
 		</Grid>
-		{props.profChargeArray.map( (p, index) => {
+		{myProfChargeArray.map( (p, index) => {
 		let d = new Date(p.date);
-		let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+		let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear() % 100}`;
 		//myDate += ` ${HOURSTR[d.getHours()]}:${MINUTESTR[d.getMinutes()]}`;
 		let isBilling = (p.treatment !== "");
 		let myInfo = "";
@@ -1264,13 +1283,16 @@ export function DisplayProfCharge(props) {
 		//console.log(myDesc);
 		return (
 			<Grid  key={"PAY"+index} container alignItems="center" align="center">
-			<Grid item align="left" xs={1} sm={1} md={1} lg={1} >
+			<Grid item align="left" xs={3} sm={3} md={1} lg={1} >
 				<Typography className={gClasses.patientInfo2}>{myDate}</Typography>
 			</Grid>
-			<Grid item align="left" xs={3} sm={3} md={3} lg={3} >
-			<Typography className={gClasses.patientInfo2}>{myName}</Typography>
+			<Grid item align="left" xs={5} sm={5} md={3} lg={3} >
+			<Typography>
+				<span className={gClasses.patientInfo2}>{myName}</span>
+			</Typography>
 			</Grid>
-			<Grid item align="left" xs={4} sm={4} md={4} lg={4} >
+			{(!isMobile()) &&
+			<Grid item align="left" xs={false} sm={false} md={4} lg={4} >
 				<Typography >
 				<span className={gClasses.patientInfo2}>{myDesc}</span>
 				{(isBilling) &&
@@ -1284,49 +1306,80 @@ export function DisplayProfCharge(props) {
 				}
 				</Typography>
 			</Grid>
-			<Grid item align="left" xs={false} sm={false} md={false} lg={false} />
-			<Grid item align="center" xs={1} sm={1} md={1} lg={1} >
+			}
+			{(!isMobile()) &&
+			<Grid item align="center" xs={false} sm={false} md={1} lg={1} >
 				<Typography className={gClasses.patientInfo2}>{myMode}</Typography>
 			</Grid>
-			<Grid item align="right" xs={1} sm={1} md={1} lg={1} >
+			}
+			{(isMobile()) &&
+			<Grid item align="right" xs={3} sm={3} md={false} lg={false} >
+				<Typography>
+					<span className={gClasses.patientInfo2}>
+					{INR+Math.abs(p.amount)}
+					</span>
+				</Typography>
+			</Grid>
+			}
+			{(isMobile()) &&
+			<Grid item align="center" xs={1} sm={1} md={false} lg={false} >
+				<Typography>
+					<span className={gClasses.patientInfo2}>
+					{(p.amount > 0) ? " CR" : ""}
+					</span>
+					{(isBilling) &&
+					<span align="left"
+							data-for={"TREAT"+p.tid}
+							data-tip={myInfo}
+							data-iscapture="true"
+						>
+						<InfoIcon color="primary" size="small"/>
+					</span>
+					}
+				</Typography>
+			</Grid>
+			}
+			{(!isMobile()) &&
+			<Grid item align="right" xs={false} sm={false} md={1} lg={1} >
 				{(p.amount <= 0) &&
 				<Typography className={gClasses.patientInfo2}>{INR+Math.abs(p.amount)}</Typography>
 				}
 			</Grid>
-			<Grid item align="right" xs={1} sm={1} md={1} lg={1} >
+			}
+			{(!isMobile()) &&
+			<Grid item align="right" xs={3} sm={3} md={1} lg={1} >
 				{(p.amount > 0) &&
 				<Typography className={gClasses.patientInfo2}>{INR+p.amount}</Typography>
 				}
 			</Grid>
-			<Grid item xs={1} sm={1} md={1} lg={1} >
-				{(!isBilling) &&
-				<div>
-					{(!_edit) &&  
-						<EditIcon color="primary" size="small" onClick={() =>  props.handleEdit(p)}  />
-					}
-					{(!_cancel) &&  
-						<CancelIcon color="secondary" size="small" onClick={() =>  props.handleCancel(p)}  />
-					}
-				</div>
-				}
-				{((isBilling) && (!_receipt)) &&
-					<ReceiptRoundedIcon color="primary" size="small" onClick={() =>  props.handleReceipt(p)}  />
-				}				
-			</Grid>
+			}
 			</Grid>
 		)}
 		)}
+		{(!isMobile()) &&
 		<Grid  key={"SUM"} container alignItems="center" align="center">
-			<Grid item align="right" xs={9} sm={9} md={9} lg={9} >
+			<Grid item align="right" xs={4} sm={4} md={9} lg={9} >
 				<Typography className={gClasses.patientInfo2Green}>{"Grand Total"}</Typography>
 			</Grid>
-			<Grid item align="right" xs={1} sm={1} md={1} lg={1} >
+			<Grid item align="right" xs={3} sm={3} md={1} lg={1} >
 				<Typography className={gClasses.patientInfo2Green}>{INR+myBilling}</Typography>
 			</Grid>
-			<Grid item align="right" xs={3} sm={2} md={1} lg={1} >
+			<Grid item align="right" xs={3} sm={3} md={1} lg={1} >
 				<Typography className={gClasses.patientInfo2Green}>{INR+myCollection}</Typography>
 			</Grid>
 		</Grid>
+		}
+		{(isMobile()) &&
+		<Grid  key={"SUM"} container alignItems="center" align="center">
+			<Grid item align="right" xs={8} sm={8} md={false} lg={false} >
+				<Typography className={gClasses.patientInfo2Green}>{"Amount Due: "}</Typography>
+			</Grid>
+			<Grid item align="right" xs={3} sm={3} md={false} lg={false} >
+				<Typography className={gClasses.patientInfo2Green}>{INR+Math.abs(myTotal)+((myTotal > 0) ? " CR" : "")}</Typography>
+			</Grid>
+			<Grid item align="right" xs={1} sm={1} md={false} lg={false} />
+			</Grid>
+		}
 		</div>
 		</Box>
 		<DisplayAllToolTips profChargeArray={props.profChargeArray} />
@@ -1339,32 +1392,35 @@ export function DisplayProfCharge_WO_Name(props) {
 	let _edit =   (props.handleEdit == null);
 	let _cancel = (props.handleCancel == null);
 	let _receipt = (props.handleReceipt == null);
+	
+	//console.log("WO");
+	//let allPids = lodashMapBy(props.patientArray, 'pid');
+	//let myProfChargeArray = props.profChargeArray;
 	let tmp = props.profChargeArray.filter(x => x.amount > 0);
 	let myCollection = lodashSumBy(tmp, 'amount');
 	tmp = props.profChargeArray.filter(x => x.amount < 0);
 	let myBilling = Math.abs(lodashSumBy(tmp, 'amount'));
-
 	return (
 		<div>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
 		<div>
 		<Grid  key={"HDR"} container alignItems="center" >
-			<Grid item  align="left" xs={3} sm={3} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Date</Typography>
+			<Grid item  align="left" xs={4} sm={4} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Date</Typography>
 			</Grid>
-			<Grid item align="left" xs={6} sm={6} md={4} lg={4} >
-				<Typography className={gClasses.patientInfo2Blue}>Description</Typography>
+			<Grid item align="left" xs={8} sm={8} md={3} lg={3} >
+				<Typography className={gClasses.patientInfo2Orange}>Description</Typography>
 			</Grid>
-			<Grid item  align="center" xs={3} sm={3} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Mode</Typography>
+			<Grid item  align="left" xs={4} sm={4} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Mode</Typography>
 			</Grid>
-			<Grid item align="right" xs={1} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2Blue}>Billing</Typography>
+			<Grid item align="right" xs={3} sm={3} md={2} lg={2} >
+				<Typography className={gClasses.patientInfo2Orange}>Billing</Typography>
 			</Grid>
-			<Grid item  xs={1} sm={1} md={1} lg={1} >
-			<Typography align="right" className={gClasses.patientInfo2Blue}>Collection</Typography>
+			<Grid item  xs={3} sm={3} md={2} lg={2} >
+			<Typography align="right" className={gClasses.patientInfo2Orange}>Collection</Typography>
 			</Grid>
-			<Grid item xs={1} sm={1} md={1} lg={1} >
+			<Grid item xs={2} sm={2} md={1} lg={1} >
 			</Grid>
 		</Grid>
 		{props.profChargeArray.map( (p, index) => {
@@ -1373,7 +1429,7 @@ export function DisplayProfCharge_WO_Name(props) {
 			let myName = tmp.displayName;
 
 			let d = new Date(p.date);
-			let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+			let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear() % 100}`;
 			//myDate += ` ${HOURSTR[d.getHours()]}:${MINUTESTR[d.getMinutes()]}`;
 
 			let isBilling = (p.treatment !== "");
@@ -1393,10 +1449,10 @@ export function DisplayProfCharge_WO_Name(props) {
 			
 		return (
 			<Grid  key={"PAY"+index} container alignItems="center" align="center">
-			<Grid item align="left" xs={4} sm={4} md={1} lg={1} >
+			<Grid item align="left" xs={4} sm={4} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>{myDate}</Typography>
 			</Grid>
-			<Grid item align="left" xs={8} sm={8} md={4} lg={4} >
+			<Grid item align="left" xs={8} sm={8} md={3} lg={3} >
 				<Typography >
 				<span className={gClasses.patientInfo2}>{myActualDesc}</span>
 				{(isBilling) &&
@@ -1410,15 +1466,15 @@ export function DisplayProfCharge_WO_Name(props) {
 				}
 				</Typography>
 			</Grid>
-			<Grid item align="left" xs={4} sm={4} md={1} lg={1} >
+			<Grid item align="left" xs={4} sm={4} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>{myMode}</Typography>
 			</Grid>
-			<Grid item align="right" xs={3} sm={3} md={1} lg={1} >
+			<Grid item align="right" xs={3} sm={3} md={2} lg={2} >
 				{(p.amount <= 0) &&
 				<Typography className={gClasses.patientInfo2}>{INR+Math.abs(p.amount)}</Typography>
 				}
 			</Grid>
-			<Grid item align="right" xs={3} sm={3} md={1} lg={1} >
+			<Grid item align="right" xs={3} sm={3} md={2} lg={2} >
 				{(p.amount > 0) &&
 				<Typography className={gClasses.patientInfo2}>{INR+p.amount}</Typography>
 				}

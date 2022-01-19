@@ -68,6 +68,20 @@ export default function PatientHome() {
 		}			
 	}
 
+	function backButton() {
+		// reload patient array. Must have been modified by profile.
+		if (currentSelection === "Profile") {
+			userCid = sessionStorage.getItem("cid");
+			let tmp = JSON.parse(sessionStorage.getItem("patients"));
+			tmp = tmp.filter(x => x.cid === userCid);
+			setPatientArray(tmp);
+			let tmp1 = tmp.find(x => x.pid === currentPatientData.pid);
+			setCurrentPatientData(tmp1);
+			setCurrentPatientName(tmp1.displayName);
+		}
+		setCurrentSelection("")
+	}
+	
 	function handleSelectPatient(patRec) {
 		if (patRec) {
 			setCurrentPatientData(patRec);
@@ -94,9 +108,6 @@ export default function PatientHome() {
 	</Grid>	
 	)}
 	
-	function setHome() {
-
-	}
 
   return (
   <div className={gClasses.webPage} align="center" key="main">
@@ -116,12 +127,15 @@ export default function PatientHome() {
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Profile")} label="Profile" image="PH_PROFILE.JPG" />
+			<br />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Appointment")} label="Appointment" image="PH_APPOINTMENT.JPG" />
+			<br />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Visit")} label="Prescription" image="PH_VISIT.JPG" />
+			<br />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
 		<div>
@@ -131,13 +145,16 @@ export default function PatientHome() {
 		{(customerData.type !== "Dentist") &&
 			<DisplayLogo onClick={() => setCurrentSelection("AlagTreatment")} label="Treatment" image="PH_TREATMENT.JPG" />
 		}
+		<br />
     </div>
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Report")} label="Report" image="PH_REPORT.JPG" />
+			<br />
 		</Grid>
 		<Grid item xs={6} sm={4} md={4} lg={4} >
       <DisplayLogo onClick={() => setCurrentSelection("Payment")} label="Payment" image="PH_PAYMENT.JPG" />
+			<br />
 		</Grid>
 	</Grid>
 	</ Container>
@@ -146,7 +163,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Appointment Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={doHome} />
+		<VsButton align="right" name="Home" onClick={backButton} />
 		<PatientAppointment patient={currentPatientData} />
 		</div>
 	}
@@ -154,7 +171,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Report Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={doHome} />
+		<VsButton align="right" name="Home" onClick={backButton} />
 		<Report patient={currentPatientData} />
 		</div>
 	}
@@ -162,7 +179,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Payment Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={doHome} />
+		<VsButton align="right" name="Home" onClick={backButton} />
 		<ProfCharge patient={currentPatientData} />
 		</div>
 	}
@@ -170,7 +187,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Visit Details"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={doHome} />
+		<VsButton align="right" name="Home" onClick={backButton} />
 		<Visit patient={currentPatientData} />
 		</div>
 	}
@@ -178,7 +195,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Patient Profile"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={doHome} />
+		<VsButton align="right" name="Home" onClick={backButton} />
 		<Profile patient={currentPatientData} />
 		</div>
 	}
@@ -186,7 +203,7 @@ export default function PatientHome() {
 		<div>
 		<DisplayPageHeader headerName={"Patient Treatment"} groupName="" tournament=""/>
 		<Typography className={gClasses.patientInfo2}>{"( " + currentPatientData.displayName + " )"}</Typography>
-		<VsButton align="right" name="Home" onClick={doHome} />
+		<VsButton align="right" name="Home" onClick={backButton} />
 		<DentalTreatment patient={currentPatientData} />
 		</div>
 	}

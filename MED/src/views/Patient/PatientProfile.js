@@ -258,7 +258,7 @@ export default function PatientProfile(props) {
 	async function handleAddEditSubmit() {
 		let myDate = patientDob.toDate();
 		let testAge = new Date().getFullYear() - myDate.getFullYear();
-		console.log(testAge, myDate);
+		//console.log(testAge, myDate);
 		if ((testAge >= 100) || (testAge <= 1)) return setRegisterStatus(1001);
 		let myMobile = (patientMobile !== "") ? patientMobile : 0;
 		let myEmail = (patientEmail !== "") ? patientEmail : "-";

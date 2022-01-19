@@ -15,7 +15,7 @@ import Box from '@material-ui/core/Box';
 import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel";
 import VsCheckBox from "CustomComponents/VsCheckBox";
-
+import VsTextSearch from "CustomComponents/VsTextSearch";
 
 import ReactTooltip from "react-tooltip";
 import Drawer from '@material-ui/core/Drawer';
@@ -35,14 +35,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Grid from "@material-ui/core/Grid";
 import Typography from '@material-ui/core/Typography';
 import { useAlert } from 'react-alert';
-import "react-datetime/css/react-datetime.css";
-// icons
-import CancelIcon from '@material-ui/icons/Cancel';
-import EditIcon from '@material-ui/icons/Edit';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AddIcon from '@material-ui/icons/AddCircleOutline';
-import MinusIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import InfoIcon from 			'@material-ui/icons/Info';
+
 
 import lodashSumBy from 'lodash/sumBy';
 import lodashSortBy from 'lodash/sortBy';
@@ -51,10 +44,13 @@ import Datetime from "react-datetime";
 import "react-datetime/css/react-datetime.css";
 import moment from "moment";
 
-//import SearchIcon from '@material-ui/icons/Search';
-//import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
-//import EventNoteIcon from '@material-ui/icons/EventNote';
-//import NoteAddIcon from '@material-ui/icons/NoteAdd';
+// icons
+import CancelIcon from '@material-ui/icons/Cancel';
+import EditIcon from '@material-ui/icons/Edit';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import AddIcon from '@material-ui/icons/AddCircleOutline';
+import MinusIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import InfoIcon from 			'@material-ui/icons/Info';
 
 /*
 import GridItem from "components/Grid/GridItem.js";
@@ -100,6 +96,7 @@ export default function Inventory() {
 	const [registerStatus, setRegisterStatus] = useState("");
 	
 	const [currentSelection, setCurrentSelection] = useState("Items");
+	const [inventoryMasterItems, setInventoryMasterItems] = useState([]);
 	const [inventoryItems, setInventoryItems] = useState([]);
 	const [inventorySummary, setInventorySummary] = useState([]);
 	const [inventoryTransactions, setInventoryTransactions ] = useState([])
@@ -119,6 +116,12 @@ export default function Inventory() {
 	const [isDrawerOpened, setIsDrawerOpened] = useState("");
   const [expandedPanel, setExpandedPanel] = useState(false);
 
+	// for pagination
+	const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+	const [inventoryItemFilter, setInventoryItemFilter] = useState("");
+
+
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedPanel(isExpanded ? panel : false);
 		setExpandedPanel2(false);
@@ -137,15 +140,27 @@ export default function Inventory() {
 		getInventoryTransactions();
   }, [])
 
+	// pagination function 
+	const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+
 	async function getInventoryItems() {
 		try {
 			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/inventory/list/${userCid}`;
 			let resp = await axios.get(myUrl);
+			setInventoryMasterItems(resp.data);
 			setInventoryItems(resp.data);
 		} catch (e) {
 			console.log(e);
 			alert.error("Error fetching Inventory Items");
-			setInventoryItems([]);
+			//setInventoryItems([]);
 		}		
 	}
 	
@@ -333,10 +348,10 @@ export default function Inventory() {
 	grandAmount = parseFloat(grandAmount).toFixed(2);
 	return (
 		<div>
-			<Box align="right" className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
-			<Typography className={gClasses.patientInfo2}>{"Total Inventory value: "+grandAmount+"/-"}</Typography>
-			</Box>
-			{inventoryItems.map((i, index) => {
+		<Box align="right" className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+		<Typography className={gClasses.patientInfo2}>{"Total Inventory value: "+grandAmount+"/-"}</Typography>
+		</Box>
+			{inventoryItems.slice(page*rowsPerPage, (page+1)*rowsPerPage).map((i, index) => {
 				let myTransactions = inventoryTransactions.filter(x => x.inventoryId === i.id);
 				//let balance =  lodashSumBy(myTransactions, 'quantity');
 				// calculate grand balance
@@ -375,6 +390,16 @@ export default function Inventory() {
       </Accordion>
 			)}
 			)}
+			<TablePagination
+          rowsPerPageOptions={[5, 10, 15, 20, 25]}
+          component="div"
+					labelRowsPerPage="Inventory items per page"
+          count={inventoryItems.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
 		</div>
 	)}
 
@@ -617,27 +642,35 @@ export default function Inventory() {
   }
 
 
-	/*
-	function handlePurchaseDate(d) {
-		//console.log(d);
-		setEmurPurchaseDate(d);
+	function filterInventory(newText) {
+		newText = newText.trim().toLowerCase();
+		let tmpArray;
+		if (newText.length !== "") {
+			tmpArray = inventoryMasterItems.filter(x => x.name.toLowerCase().includes(newText));
+		} else {
+			tmpArray = inventoryMasterItems;
+		}
+		setInventoryItemFilter(newText);
+		setInventoryItems(tmpArray);
 	}
 
-
-	function handleExpireDate(d) {
-		//console.log(d);
-		setEmurExpireDate(d);
-	}
-	*/
 	
   return (
   <div className={gClasses.webPage} align="center" key="main">
-		<br />
 		<DisplayPageHeader headerName="Inventory" groupName="" tournament=""/>
-		<br />
 		<CssBaseline />
-		<VsButton name="Add new Inventory Item" align="right" onClick={handleAddItem} />
-		<br />
+		<Grid className={gClasses.noPadding} container align="center" alignItems='center'>
+		<Grid align="left" item xs={12} sm={12} md={4} lg={4} >
+			<VsTextSearch label="Filter Inventory by name" value={inventoryItemFilter}
+				onChange={(event) => filterInventory(event.target.value)}
+				onClear={(event) => filterInventory("")}
+			/>
+		</Grid>
+		<Grid align="right" item xs={false} sm={false} md={4} lg={4} />
+		<Grid align="right" item xs={12} sm={12} md={4} lg={4} >
+			<VsButton name="Add new Inventory Item" onClick={handleAddItem} />
+		</Grid>
+		</Grid>
 		<DisplayInventorySummary />
 		<Drawer className={gClasses.drawer} anchor="right" variant="temporary" open={isDrawerOpened !== ""} >
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
