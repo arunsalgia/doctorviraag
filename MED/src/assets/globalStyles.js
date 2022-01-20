@@ -12,8 +12,8 @@ const globalStyles = makeStyles((theme) => ({
 	logo: {
     width: theme.spacing(10),
     height: theme.spacing(10),
-		borderWidth: 4,
-		borderStyle: 'solid',
+		//borderWidth: 4,
+		//borderStyle: 'solid',
 		margin: 'none',
   },
 	avatar: {
