@@ -967,7 +967,7 @@ export function DisplayProfCharge_WO_Name(props) {
 	let _edit =   (props.handleEdit == null);
 	let _cancel = (props.handleCancel == null);
 	let _receipt = (props.handleReceipt == null);
-	//console.log(_edit, _cancel, _receipt);
+	console.log(_edit, _cancel, _receipt);
 	
 	//console.log("WO");
 	//let allPids = lodashMapBy(props.patientArray, 'pid');

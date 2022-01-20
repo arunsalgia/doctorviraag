@@ -16,12 +16,6 @@ const globalStyles = makeStyles((theme) => ({
 		borderStyle: 'solid',
 		margin: 'none',
   },
-	avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-    width: theme.spacing(10),
-    height: theme.spacing(10),
-  },
   blue14: {
 		color: 'blue',
 		fontSize: theme.typography.pxToRem(14),

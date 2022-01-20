@@ -294,7 +294,7 @@ export default function Patient() {
 					//console.log("starting JSON");
 					customerData = JSON.parse(sessionStorage.getItem("customerData"));
 					//console.log("starting axios");
-					//console.log(userCid);
+					console.log(userCid);
 					let rrr =  await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/patient/checkexpiry/${userCid}`);
 					//console.log("over axios");
 					if (rrr.data.status) return alert.error('Plan has expired');

@@ -466,7 +466,8 @@ export default function ProfCharge(props) {
 		<DisplayProfChargeBalance balance={balance}/>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 			<DisplayNewBtn />
-			<DisplayProfCharge_WO_Name profChargeArray={profChargeArray} patientArray={[currentPatientData]}
+			<DisplayProfCharge_WO_Name profChargeArray={profChargeArray} 
+				patientArray={[currentPatientData]}
 				handleReceipt={handleReceipt}
 				handleEdit={handleEditPayment} 
 				handleCancel={handleDeletePayment}
