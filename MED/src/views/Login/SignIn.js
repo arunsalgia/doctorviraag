@@ -17,6 +17,8 @@ import lodashSortby from "lodash/sortBy";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
+import VsButton from "CustomComponents/VsButton";
+
 /*
 const useStyles = makeStyles((theme) => ({
   bgImage: {
@@ -73,6 +75,19 @@ import {
 } from "CustomComponents/CustomComponents";
 
 
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)',
+    backgroundColor       : '#B3E5FC',
+    //color                 : '#FFFFFF',
+  }
+};
+
 let deviceIsMobile=isMobile();
 
 export default function SignIn() {
@@ -98,8 +113,26 @@ export default function SignIn() {
   }
   function closeModal(){ setIsOpen(false); }
 	
-  useEffect(() => {		
-  }, []);
+  useEffect(() => {
+    if (window.localStorage.getItem("logout")) {
+      localStorage.clear();
+    }
+    if (window.localStorage.getItem("uid")) {
+    } else {
+    }
+		
+    const checkVersion = async () => {
+      //console.log("about to call upgrade");
+      let upg = await upGradeRequired();
+      //console.log("Checkversion");
+      if (upg.latest) setLatestApk(upg.latest);
+
+      setUpgrade(upg.status);
+      if (upg.status) setIsOpen(true);
+    }
+    
+		checkVersion(); 
+	}, []);
 
 	function DisplayLeft() {
 	return (	
