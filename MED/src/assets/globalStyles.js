@@ -1,6 +1,8 @@
+//import bgImage from ./image/SI_BGD.JPG'
+
 import {
   successColor,
-  whiteColor,
+  whiteColor, 
   grayColor,
   hexToRgb
 } from "assets/jss/material-dashboard-react.js";
@@ -9,6 +11,14 @@ import { makeStyles } from '@material-ui/core/styles';
 
 
 const globalStyles = makeStyles((theme) => ({
+  bgImage: {
+    backgroundImage: `url(${process.env.PUBLIC_URL}/image/SI_BGD.JPG)`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    width: '50vw',
+    height: '100vh'
+  },
 	logo: {
     width: theme.spacing(10),
     height: theme.spacing(10),
@@ -171,6 +181,7 @@ const globalStyles = makeStyles((theme) => ({
 	functionUnselected: {
 		fontSize: theme.typography.pxToRem(16),
 		fontWeight: theme.typography.fontWeightBold,
+		color: "#BDBDBD",
 	},
 	green: {
 		color: green[900],
@@ -526,6 +537,11 @@ const globalStyles = makeStyles((theme) => ({
   modalTitle: {
     color: blue[700],
     fontSize: theme.typography.pxToRem(20),
+    fontWeight: theme.typography.fontWeightBold,
+  },
+	modalTitle1: {
+    color: deepOrange[700],
+    fontSize: theme.typography.pxToRem(28),
     fontWeight: theme.typography.fontWeightBold,
   },
   modalMessage: {

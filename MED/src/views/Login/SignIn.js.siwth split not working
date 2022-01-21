@@ -1,0 +1,115 @@
+import React, { useEffect, useState ,useContext} from 'react';
+//import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+//import red from '@material-ui/core/colors/red';
+//import bgImage from './SKY.JPG'
+import {SplitPane,  Pane } from 'react-split-pane';
+import globalStyles from "assets/globalStyles";
+
+/*
+const useStyles = makeStyles((theme) => ({
+  bgImage: {
+    backgroundImage: `url(${bgImage})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    width: '50vw',
+    height: '100vh'
+  },
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+  error:  {
+      // right: 0,
+      fontSize: '12px',
+      color: red[700],
+      // position: 'absolute',
+      alignItems: 'center',
+      marginTop: '0px',
+  },
+  textData: {
+    fontSize: '14px',
+    margin: theme.spacing(0),
+  },
+}));
+
+const BackgroundImage = `${process.env.PUBLIC_URL}/image/SI_BGD.JPG`;
+
+*/
+
+import { 
+  isMobile, 
+ } from "views/functions.js"
+
+import {
+  CricDreamLogo,
+} from "CustomComponents/CustomComponents";
+
+
+let deviceIsMobile=isMobile();
+
+export default function SignIn() {
+  const gClasses = globalStyles();
+	
+	function DispLeft() {
+  return(
+  <div align="center">
+    <br />
+    <br />
+    <CricDreamLogo />
+    <br />
+    <br />
+		<Typography className={gClasses.indexSelection}>{"Welcome to Doctor Viraag"}</Typography>
+		<br />
+  </div>
+  )}
+
+  function LoginIn() {
+  return (
+    <Typography>SHow login</Typography>
+  )}
+
+
+  useEffect(() => {		
+  }, []);
+
+  //console.log(classes);
+  /*
+  return (
+    <div>
+    {(!isMobile()) &&
+      <SplitPane split="vertical">
+      <div >
+        or you can use a plain old div
+      </div>
+      <LoginIn />
+      </SplitPane>
+    }
+    {(isMobile()) &&
+      <LoginIn />
+    }
+    </div>
+  )
+  */
+
+    return (
+    <SplitPane split="vertical">
+      <Pane>This is a Pane</Pane>
+      <Pane>This is a Pane</Pane>
+    </SplitPane>
+  )
+}

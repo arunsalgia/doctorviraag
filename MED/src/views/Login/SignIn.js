@@ -1,100 +1,149 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
-import Modal from 'react-modal';
-import Avatar from '@material-ui/core/Avatar';
-//import Box from '@material-ui/core/Box';
+import React, { useEffect, useState ,useContext} from 'react';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { TextField, InputAdornment } from "@material-ui/core";
-import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
-import { Switch, Route } from 'react-router-dom';
-//import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Grid from "@material-ui/core/Grid";
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-//import { makeStyles } from '@material-ui/core/styles';
-import globalStyles from "assets/globalStyles";
+import Link from '@material-ui/core/Link';
+import Modal from 'react-modal';
 import Container from '@material-ui/core/Container';
-import { useHistory } from "react-router-dom";
-import { UserContext } from "../../UserContext";
 import axios from "axios";
-//import {red, green, blue } from '@material-ui/core/colors';
-//import { DesktopWindows } from '@material-ui/icons';
-import { isMobile, cdRefresh, specialSetPos, encrypt, upGradeRequired, clearBackupData, downloadApk } from "views/functions.js"
-import {setTab} from "CustomComponents/CricDreamTabs.js"
-import { DisplayLogo, CricDreamLogo, ValidComp } from 'CustomComponents/CustomComponents.js';
-//import { BlankArea } from 'CustomComponents/CustomComponents';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import SplitPane, { Pane } from 'react-split-pane';
+import globalStyles from "assets/globalStyles";
 
 import lodashSortby from "lodash/sortBy";
 
-import VsButton from "CustomComponents/VsButton";
-//import VsCheckBox from "CustomComponents/VsCheckBox.js"
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
+/*
+const useStyles = makeStyles((theme) => ({
+  bgImage: {
+    backgroundImage: `url(${bgImage})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    width: '50vw',
+    height: '100vh'
+  },
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+  error:  {
+      // right: 0,
+      fontSize: '12px',
+      color: red[700],
+      // position: 'absolute',
+      alignItems: 'center',
+      marginTop: '0px',
+  },
+  textData: {
+    fontSize: '14px',
+    margin: theme.spacing(0),
+  },
+}));
 
-const customStyles = {
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)',
-    backgroundColor       : '#B3E5FC',
-    //color                 : '#FFFFFF',
-  }
-};
+const BackgroundImage = `${process.env.PUBLIC_URL}/image/SI_BGD.JPG`;
+
+*/
+
+import { 
+  isMobile, cdRefresh, specialSetPos, encrypt, upGradeRequired, clearBackupData, downloadApk,
+ } from "views/functions.js"
+
+import {setTab} from "CustomComponents/CricDreamTabs.js"
+
+import {
+  CricDreamLogo, ValidComp
+} from "CustomComponents/CustomComponents";
+
 
 let deviceIsMobile=isMobile();
 
 export default function SignIn() {
   const gClasses = globalStyles();
-  const history = useHistory();
+	
+	const [currentSelection, setCurrentSelection] = useState("Doctor");
 	
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
-  const [isPatient, setIsPatient] = useState(false);
-	const [selectionDone, setSelectionDone] = useState(false);
-	const [currentSelection, setCurrentSelection] = useState("");
-
+	const [showPassword, setShowPassword] = useState(false);
+		
   const [ errorMessage, setErrorMessage ] = useState({msg: "", isError: false });
-  const [ downloadMessage, setDownloadMessage ] = useState("");
+
+	const [downloadMessage, setDownloadMessage ] = useState("");
 	const [latestApk, setLatestApk] = React.useState(null);
 	const [upgrade, setUpgrade] = React.useState(false);
+
   const [modalIsOpen,setIsOpen] = React.useState(true);
-	
 	function openModal() { setIsOpen(true); }
- 
   function afterOpenModal() {
     // references are now sync'd and can be accessed.
     //subtitle.style.color = '#f00';
   }
- 
   function closeModal(){ setIsOpen(false); }
 	
-  useEffect(() => {
-    if (window.localStorage.getItem("logout")) {
-      localStorage.clear();
-    }
-    if (window.localStorage.getItem("uid")) {
-      // setUser({ uid: window.localStorage.getItem("uid"), admin: window.localStorage.getItem("admin") })
-      // history.push("/admin")
-    } else {
-      // setShowPage(true)
-    }
-		
-    const checkVersion = async () => {
-      //console.log("about to call upgrade");
-      let upg = await upGradeRequired();
-      //console.log("Checkversion");
-      if (upg.latest) setLatestApk(upg.latest);
+  useEffect(() => {		
+  }, []);
 
-      setUpgrade(upg.status);
-      if (upg.status) setIsOpen(true);
-    }
-    
-		checkVersion(); 
-	}, []);
+	function DisplayLeft() {
+	return (	
+		<div align="center" className={gClasses.bgImage} >
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<CricDreamLogo />
+		<br />
+		<br />
+		<br />
+		<br />
+		<Typography className={gClasses.modalTitle1}>{"Welcome to Doctor Viraag"}</Typography>
+		</div>
+	)}
+
+	function DisplayFunctionItem(props) {
+		let itemName = props.item;
+		return (
+		<Grid key={"BUT"+itemName} item xs={4} sm={4} md={4} lg={4} >	
+			<Typography onClick={() => setSelection(itemName)}>
+				<span 
+					className={(itemName === currentSelection) ? gClasses.functionSelected : gClasses.functionUnselected}>
+				{itemName}
+				</span>
+			</Typography>
+		</Grid>
+	)}
+	
+	async function setSelection(item) {
+		setCurrentSelection(item);
+	}
+	
+	function DisplayFunctionHeader() {
+	return (
+	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
+		<Grid item xs={2} sm={2} md={2} lg={2} />
+		<DisplayFunctionItem item="Doctor" />
+		<DisplayFunctionItem item="Patient" />
+		<Grid item xs={2} sm={2} md={2} lg={2} />
+	</Grid>	
+	)}
 
 	async function handleUpgrade() {
     //console.log("upgrade requested");
@@ -152,135 +201,6 @@ export default function SignIn() {
       return(null);
   }
 
-  function setError(msg, isError) {
-    setErrorMessage({msg: msg, isError: isError});
-  }
-
-
-	async function handleSubmit(e) {
-  e.preventDefault();
-  if (isPatient) {
-    try {
-      let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendrabypatient/${userName}`); 
-      window.sessionStorage.setItem("uid", userName);
-      window.sessionStorage.setItem("userName", userName);
-      window.sessionStorage.setItem("userType", "Patient");
-      window.sessionStorage.setItem("cid", "");
-      let myPatients =  lodashSortby(response.data.patient, 'pid');
-      window.sessionStorage.setItem("patients", JSON.stringify(myPatients));
-      window.sessionStorage.setItem("clinics", JSON.stringify(response.data.clinic));
-      
-      setTab("6");
-    } catch (e) {
-      setError("Mobile number not registered with any clinic", true);
-    }
-  } else {
-    try { 
-      let enPassword = encrypt(password);
-      let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendra/${userName}/${enPassword}`); 
-      setError("", false);
-      let userData = response.data.user;
-      window.sessionStorage.setItem("uid", userData.uid)
-      window.sessionStorage.setItem("userName", userData.displayName);
-      window.sessionStorage.setItem("userType", userData.userType);
-      window.sessionStorage.setItem("cid", userData.cid);
-
-      window.sessionStorage.setItem("customerData", JSON.stringify(response.data.customer));
-      
-      //window.sessionStorage.setItem("doctorData", JSON.stringify(response.data.doctor));
-      
-      //window.sessionStorage.setItem("admin", true)
-      setTab(process.env.REACT_APP_HOME);
-    } catch (err) {
-      setError("Invalid User name / Password", true);
-    }
-  }
-};
-
-	function handleForgot() {
-  console.log("Call forgot password here")
-  // history.push('/admin/emailpassword');
-  sessionStorage.setItem("currentLogin", "FORGOT");
-  cdRefresh();
-}
-
-
-  const handleClick = async () => {
-    let myUserName = document.getElementById("userName").value;
-    let myPassword = document.getElementById("password").value;
-    setUserName(myUserName);
-    setPassword(myPassword);
-
-    let response = ""
-    try { 
-      let enPassword = encrypt(myPassword);
-      response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendra/${myUserName}/${enPassword}`); 
-      setError("", false);
-    } catch (err) {
-      setError("Invalid Username / Password", true);
-    }
-    // console.log("Signinresponse", response.data);
-
-    if (response.status === 200) {
-			console.log("Signinresponse", response.data);
-			
-			let userData = response.data.user;
-      window.sessionStorage.setItem("uid", userData.uid)
-      window.sessionStorage.setItem("userName", userData.displayName);
-      window.sessionStorage.setItem("userType", userData.userType);
-			window.sessionStorage.setItem("cid", userData.cid);
-
-			window.sessionStorage.setItem("customerData", JSON.stringify(response.data.customer));
-			
-			window.sessionStorage.setItem("doctorData", JSON.stringify(response.data.doctor));
-			 
-			//window.sessionStorage.setItem("admin", true)
-			setTab(process.env.REACT_APP_HOME);
-			 
-			//setUser({ uid: myUID, admin: true })
-			
-			/*
-      response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/group/default/${myUID}`);
-      // console.log("default respose", response.data);
-      // SAMPLE OUTPUT
-      // {"uid":"8","gid":2,"displayName":"Salgia Super Stars",
-      // "groupName":"Happy Home Society Grp 2","tournament":"ENGAUST20","ismember":true,"admin":true}
-      window.localStorage.setItem("gid", response.data.gid);
-      window.localStorage.setItem("groupName", response.data.groupName);
-      window.localStorage.setItem("tournament", response.data.tournament);
-      
-      window.localStorage.setItem("SNG", "");
-      window.localStorage.setItem("cGroup", "");
-      clearBackupData();
-			*/
-			
-      // setUser({ uid: myUID, admin: response.data.admin });
-      // cdRefresh(true);
-      //let newPos = specialSetPos();
-      //if (newPos < 0) newPos = 0;
-      // let newPos = (response.data.gid > 0) ? process.env.REACT_APP_DASHBOARD : process.env.REACT_APP_GROUP;
-      // console.log(`User is ${localStorage.getItem("uid")}`)
-     
-    }
-  }
-
- 
-  async function handleAndroid() {
-    try {
-      setDownloadMessage("DOCTORVIRAAG Android app. download started. Please wait...")
-      // console.log("Download Android app.");
-      await downloadApk();
-      setDownloadMessage("DOCTORVIRAAG Android app. download complete.")
-      // console.log("APK has to be downloaded");
-    } catch (e) {
-      setDownloadMessage("Error encountered while downloading DOCTORVIRAAG Android app", true)
-    }
-  }
-
-  function handleIos() {
-    console.log("Download IOS app");
-  }
-
 
   function DisplayDownload() {
     if (process.env.REACT_APP_DEVICE !== "WEB") return null;
@@ -305,60 +225,114 @@ export default function SignIn() {
     )  
   } 
 
-  
-  const [showPassword, setShowPassword] = useState(false);
-
-  function handleVisibility(visible) {
-    let myName = document.getElementById("userName").value;
-    let myPassword = document.getElementById("password").value;
-    setUserName(myName);
-    setPassword(myPassword);
-    setShowPassword(visible);
+	async function handleAndroid() {
+    try {
+      setDownloadMessage("DOCTORVIRAAG Android app. download started. Please wait...")
+      // console.log("Download Android app.");
+      await downloadApk();
+      setDownloadMessage("DOCTORVIRAAG Android app. download complete.")
+      // console.log("APK has to be downloaded");
+    } catch (e) {
+      setDownloadMessage("Error encountered while downloading DOCTORVIRAAG Android app", true)
+    }
   }
 
-  function NonMobile() {
-    return (
-      <TextField variant="outlined" required fullWidth
-        id="password" label="Password" type="password"
-        defaultValue={password}
-        // onChange={(event) => setPassword(event.target.value)}
-      />
-    )
+  function handleIos() {
+    console.log("Download IOS app");
+  }
+	
+	
+  function setError(msg, isError) {
+    setErrorMessage({msg: msg, isError: isError});
   }
 
-	function selectCategory(category) {
-		//console.log(category);
-		setIsPatient((category.toLowerCase() === "patient"));
-		setSelectionDone(true);
-		setCurrentSelection((category.toLowerCase() === "patient") ? " Patient" : " Doctor");
+	function handleForgot() {
+		console.log("Call forgot password here")
+		sessionStorage.setItem("currentLogin", "FORGOT");
+		cdRefresh();
 	}
+	
+	async function handleSubmit(e) {
+		console.log("in submit", currentSelection);
+		e.preventDefault();
+		if (currentSelection === "Patient") {
+			try {
+				let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendrabypatient/${userName}`); 
+				console.log("axios okay");
+				window.sessionStorage.setItem("uid", userName);
+				window.sessionStorage.setItem("userName", userName);
+				window.sessionStorage.setItem("userType", "Patient");
+				window.sessionStorage.setItem("cid", "");
+				let myPatients =  lodashSortby(response.data.patient, 'pid');
+				window.sessionStorage.setItem("patients", JSON.stringify(myPatients));
+				window.sessionStorage.setItem("clinics", JSON.stringify(response.data.clinic));
+				
+				setTab("6");
+				
+			} catch (e) {
+				setError("Mobile number not registered with any clinic", true);
+			}
+		} else {
+			try { 
+				let enPassword = encrypt(password);
+				let response = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/user/jaijinendra/${userName}/${enPassword}`); 
+				setError("", false);
+				let userData = response.data.user;
+				window.sessionStorage.setItem("uid", userData.uid)
+				window.sessionStorage.setItem("userName", userData.displayName);
+				window.sessionStorage.setItem("userType", userData.userType);
+				window.sessionStorage.setItem("cid", userData.cid);
 
-  return (
-	<Container component="main" maxWidth="xs">
-	<CssBaseline />
-	<div className={gClasses.paper}>
-	<CricDreamLogo />
-	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
-		<Typography component="h1" variant="h5" align="center">{"Sign in as "+((selectionDone) ? ((isPatient) ? " Patient" : " Doctor") :  "")}</Typography>
-		<br />
-		{(!selectionDone) &&
-		<div>
-		<br />
-		<Grid className={gClasses.fullWidth} key="LOGO" container align="center">
-		<Grid item xs={12} sm={12} md={12} lg={12} >
-		</Grid>
-		<Grid item xs={false} sm={false} md={1} lg={1} />
-		<Grid item xs={6} sm={6} md={5} lg={5} >
-      <DisplayLogo onClick={() => selectCategory("Patient")} label="Patient" image="SI_PATIENT.JPG" />;
-		</Grid>
-		<Grid item xs={6} sm={6} md={5} lg={5} >
-      <DisplayLogo onClick={() => selectCategory("Doctor")} label="Doctor" image="SI_DOCTOR.JPG" />;
-		</Grid>
-		<Grid item xs={false} sm={false} md={1} lg={1} />
-		</Grid>
-		</div>
+				window.sessionStorage.setItem("customerData", JSON.stringify(response.data.customer));
+				
+				//window.sessionStorage.setItem("doctorData", JSON.stringify(response.data.doctor));
+				
+				//window.sessionStorage.setItem("admin", true)
+				setTab(process.env.REACT_APP_HOME);
+			} catch (err) {
+				setError("Invalid User name / Password", true);
+			}
 		}
-    {((isPatient) && (selectionDone)) &&
+	};
+
+	function LoginHeader() {
+	return (
+	<div align="center">
+	<br />
+	<br />
+	<Typography className={gClasses.modalTitle1}>{"Sign In"}</Typography>
+	<br />
+	<br />
+	<DisplayFunctionHeader />
+	<br />
+	<br />
+	</div>
+	)}
+	
+	function LoginFooter() {
+	return (
+	<div align="center">
+	<br />
+	<Link href="#" onClick={handleForgot} variant="body2">Forgot password</Link>
+	<DisplayDownload />
+	<DisplayUpgrade/>
+	</div>
+	)}
+	
+  function LoginIn() {
+  return (
+	<div align="center">
+	<Container component="main" maxWidth="xs">
+	<br />
+	<br />
+	<Typography className={gClasses.modalTitle1}>{"Sign In"}</Typography>
+	<br />
+	<br />
+	<DisplayFunctionHeader />
+	<br />
+	<br />
+	<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
+    {(currentSelection === "Patient") &&
 		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
 			id="newPatientName" label="Mobile Number" type="number"
 			value={userName} 
@@ -367,76 +341,201 @@ export default function SignIn() {
 			errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
 		/>
     }
-    {((!isPatient) && (selectionDone)) &&
-		<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
-			id="newPatientName" label="Name" type="text"
-			value={userName} 
-			onChange={() => { setUserName(event.target.value) }}
-			validators={['noSpecialCharacters']}
-			errorMessages={['Special characters not permitted']}
-		/>
-    }
-    <br/>
-		{((!isPatient) &&  (showPassword) && (selectionDone)) &&
-			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
-				id="password" label="Password" type={"text"}
-				value={password} 
-				InputProps={{
-					endAdornment: (
-						<InputAdornment position="end">
-							<VisibilityIcon onClick={() => { setShowPassword(false); }} />
-						</InputAdornment>
-					),
-				}}
-				onChange={() => { setPassword(event.target.value) }}
+    {(currentSelection === "Doctor") &&
+			<div>
+			<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
+				id="newPatientName" label="Name" type="text"
+				value={userName} 
+				onChange={() => { setUserName(event.target.value) }}
 				validators={['noSpecialCharacters']}
 				errorMessages={['Special characters not permitted']}
 			/>
+			{(showPassword) &&
+				<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
+					id="password" label="Password" type={"text"}
+					value={password} 
+					InputProps={{
+						endAdornment: (
+							<InputAdornment position="end">
+								<VisibilityIcon onClick={() => { setShowPassword(false); }} />
+							</InputAdornment>
+						),
+					}}
+					onChange={() => { setPassword(event.target.value) }}
+					validators={['noSpecialCharacters']}
+					errorMessages={['Special characters not permitted']}
+				/>
+			}
+			{(!showPassword) &&
+				<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
+					id="password" label="Password" type={"password"}
+					value={password} 
+					InputProps={{
+						endAdornment: (
+							<InputAdornment position="end">
+								<VisibilityOffIcon onClick={() => { setShowPassword(true); }} />
+							</InputAdornment>
+						),
+					}}
+					onChange={() => { setPassword(event.target.value) }}
+					validators={['noSpecialCharacters']}
+					errorMessages={['Special characters not permitted']}
+				/>
+			}
+			</div>
 		}
-		{((!isPatient) &&  (!showPassword)  && (selectionDone)) &&
-			<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
-				id="password" label="Password" type={"password"}
-				value={password} 
-				InputProps={{
-					endAdornment: (
-						<InputAdornment position="end">
-							<VisibilityOffIcon onClick={() => { setShowPassword(true); }} />
-						</InputAdornment>
-					),
-				}}
-				onChange={() => { setPassword(event.target.value) }}
-				validators={['noSpecialCharacters']}
-				errorMessages={['Special characters not permitted']}
-			/>
-		}
-		<Typography className={(errorMessage.isError) ? gClasses.error : gClasses.nonerror} align="left">{errorMessage.msg}</Typography>
+    <Typography className={(errorMessage.isError) ? gClasses.error : gClasses.nonerror} align="left">{errorMessage.msg}</Typography>
+		<br/>
+		<Button fullWidth type="submit" variant="contained" color="primary" className={gClasses.submit} >
+			Sign In
+		</Button>
 		<ValidComp />
-		{(selectionDone) &&
-		<Grid className={gClasses.fullWidth} key="LOGO" container align="center" alignItems="center" >
-		<Grid item xs={1} sm={1} md={1} lg={1} />
-		<Grid item xs={4} sm={4} md={4} lg={4} >
-			<Button type="submit" fullWidth variant="contained" color="primary" className={gClasses.submit}>
+	</ValidatorForm>	
+	<ValidComp />
+	<Link href="#" onClick={handleForgot} variant="body2">Forgot password</Link>
+	<DisplayDownload />
+	<DisplayUpgrade/>
+	</Container>
+	</div>
+  )}
+
+	return (
+		<div>
+		{(!deviceIsMobile) &&
+		<SplitPane split="vertical" >
+		<DisplayLeft />
+		<Container component="main" maxWidth="xs">
+		<LoginHeader />
+		<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
+			{(currentSelection === "Patient") &&
+			<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
+				id="newPatientName" label="Mobile Number" type="number"
+				value={userName} 
+				onChange={() => { setUserName(event.target.value) }}
+				validators={['minNumber:1000000000', 'maxNumber:9999999999']}
+				errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
+			/>
+			}
+			{(currentSelection === "Doctor") &&
+				<div>
+				<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
+					id="newPatientName" label="Name" type="text"
+					value={userName} 
+					onChange={() => { setUserName(event.target.value) }}
+					validators={['noSpecialCharacters']}
+					errorMessages={['Special characters not permitted']}
+				/>
+				{(showPassword) &&
+					<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
+						id="password" label="Password" type={"text"}
+						value={password} 
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<VisibilityIcon onClick={() => { setShowPassword(false); }} />
+								</InputAdornment>
+							),
+						}}
+						onChange={() => { setPassword(event.target.value) }}
+						validators={['noSpecialCharacters']}
+						errorMessages={['Special characters not permitted']}
+					/>
+				}
+				{(!showPassword) &&
+					<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
+						id="password" label="Password" type={"password"}
+						value={password} 
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<VisibilityOffIcon onClick={() => { setShowPassword(true); }} />
+								</InputAdornment>
+							),
+						}}
+						onChange={() => { setPassword(event.target.value) }}
+						validators={['noSpecialCharacters']}
+						errorMessages={['Special characters not permitted']}
+					/>
+				}
+				</div>
+			}
+			<Typography className={(errorMessage.isError) ? gClasses.error : gClasses.nonerror} align="left">{errorMessage.msg}</Typography>
+			<br/>
+			<Button fullWidth type="submit" variant="contained" color="primary" className={gClasses.submit} >
 				Sign In
 			</Button>
-		</Grid>
-		<Grid item xs={1} sm={1} md={1} lg={1} />
-		<Grid item xs={4} sm={4} md={4} lg={4} >
-			<Button fullWidth variant="contained" color="primary" className={gClasses.submit} onClick={() => setSelectionDone(false)}>
-				Back
-			</Button>
-		</Grid>
-		</Grid>
-		}
+			<ValidComp />
 		</ValidatorForm>	
-		{(selectionDone) &&
-		<div align="left">
-			<br />
-			<Link href="#" onClick={handleForgot} variant="body2">Forgot password</Link>
-		</div>
+		<LoginFooter />
+		</Container>
+		</SplitPane>
 		}
-		<DisplayDownload />
-		<DisplayUpgrade/>
-	</div>
-	</Container>
-  );
+		{(deviceIsMobile) &&
+		<Container component="main" maxWidth="xs">
+		<LoginHeader />
+		<ValidatorForm align="center" className={gClasses.form} onSubmit={handleSubmit}>
+			{(currentSelection === "Patient") &&
+			<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
+				id="newPatientName" label="Mobile Number" type="number"
+				value={userName} 
+				onChange={() => { setUserName(event.target.value) }}
+				validators={['minNumber:1000000000', 'maxNumber:9999999999']}
+				errorMessages={['Invalid Mobile Number','Invalid Mobile Number']}
+			/>
+			}
+			{(currentSelection === "Doctor") &&
+				<div>
+				<TextValidator fullWidth  variant="outlined" required className={gClasses.vgSpacing}
+					id="newPatientName" label="Name" type="text"
+					value={userName} 
+					onChange={() => { setUserName(event.target.value) }}
+					validators={['noSpecialCharacters']}
+					errorMessages={['Special characters not permitted']}
+				/>
+				{(showPassword) &&
+					<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
+						id="password" label="Password" type={"text"}
+						value={password} 
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<VisibilityIcon onClick={() => { setShowPassword(false); }} />
+								</InputAdornment>
+							),
+						}}
+						onChange={() => { setPassword(event.target.value) }}
+						validators={['noSpecialCharacters']}
+						errorMessages={['Special characters not permitted']}
+					/>
+				}
+				{(!showPassword) &&
+					<TextValidator fullWidth variant="outlined"  required className={gClasses.vgSpacing}
+						id="password" label="Password" type={"password"}
+						value={password} 
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<VisibilityOffIcon onClick={() => { setShowPassword(true); }} />
+								</InputAdornment>
+							),
+						}}
+						onChange={() => { setPassword(event.target.value) }}
+						validators={['noSpecialCharacters']}
+						errorMessages={['Special characters not permitted']}
+					/>
+				}
+				</div>
+			}
+			<Typography className={(errorMessage.isError) ? gClasses.error : gClasses.nonerror} align="left">{errorMessage.msg}</Typography>
+			<br/>
+			<Button fullWidth type="submit" variant="contained" color="primary" className={gClasses.submit} >
+				Sign In
+			</Button>
+			<ValidComp />
+		</ValidatorForm>	
+		<LoginFooter />
+		</Container>
+		}
+		</div>
+  )
 }
