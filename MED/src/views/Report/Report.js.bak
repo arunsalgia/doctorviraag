@@ -761,6 +761,26 @@ export default function Document(props) {
 					}
 				/>
 				}
+				{(useris !== "Patient") &&
+				<DisplayDocumentDetails
+					document={d} 
+					button1={
+						<IconButton color="primary" size="small" onClick={() => {handleFileView(d)}} >
+							<VisibilityIcon	 />
+						</IconButton>	
+					}
+					button2={
+						<IconButton color="primary" size="small" onClick={() => {editDoc(d)}}  >
+							<EditIcon  />
+						</IconButton>
+					}
+					button3={
+						<IconButton color="secondary" size="small" onClick={() => {deleteDoc(d)}}  >
+							<CancelIcon  />
+						</IconButton>
+					}
+				/>
+				}
 				{(useris === "Patient") &&
 				<DisplayDocumentDetails
 					document={d} 

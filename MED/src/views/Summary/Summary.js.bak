@@ -224,7 +224,7 @@ export default function Summary() {
 	function DisplayPatientDues() {
 		return (
 		<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-		<Grid className={gClasses.noPadding} key="DUESHDR" container align="center" alignItems="center" >
+		<Grid className={gClasses.noPadding} key="DUESHDR" container align="center" alignItems="left" >
 			<Grid align="left"  item xs={5} sm={5} md={4} lg={4} >
 				<Typography className={gClasses.patientInfo2Orange}>Name</Typography>
 			</Grid>

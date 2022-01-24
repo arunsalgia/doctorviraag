@@ -287,7 +287,7 @@ export default function SignIn() {
 	}
 	
 	async function handleSubmit(e) {
-		//console.log("in submit", currentSelection);
+		console.log("in submit", currentSelection);
 		e.preventDefault();
 		if (currentSelection === "Patient") {
 			try {

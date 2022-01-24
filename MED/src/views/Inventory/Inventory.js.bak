@@ -652,7 +652,6 @@ export default function Inventory() {
 		} else {
 			tmpArray = inventoryMasterItems;
 		}
-		setPage(0);
 		setInventoryItemFilter(newText);
 		setInventoryItems(tmpArray);
 	}

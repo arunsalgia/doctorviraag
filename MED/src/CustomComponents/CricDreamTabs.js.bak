@@ -531,8 +531,8 @@ export function CricDreamTabs() {
 					}
 					{(sessionStorage.getItem("userType") === "Patient") &&
 					<Typography onClick={handleClinic}>
-						{/*<span className={classes.doctor}>+</span>*/}
-						<span className={classes.ankit}> DoctorViraag</span>
+						<span className={classes.doctor}>+</span>
+						<span className={classes.ankit}> Doctor Viraag</span>
 					</Typography>
 					}
 					{((itIsMobile === false) && (window.sessionStorage.getItem("userType") !== "Patient")) &&

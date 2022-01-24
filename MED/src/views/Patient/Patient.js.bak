@@ -546,7 +546,7 @@ export default function Patient() {
 	function handleSelectPatient(pat) {
 		setCurrentPatientData(pat);
 		setCurrentPatient(pat.displayName);
-		setCurrentSelection("Investigation");
+		setCurrentSelection("");
 		//setIsBirday(checkIfBirthday(pat.dob));
 	}
 

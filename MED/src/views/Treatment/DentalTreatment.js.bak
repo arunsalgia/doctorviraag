@@ -630,7 +630,7 @@ export default function DentalTreatment(props) {
 	}
 	
 	function updateNewTreatment(sArray, tPlan, tNotes) {
-		//console.log(tPlan, tNotes);
+		console.log(tPlan, tNotes);
 		let tmp = JSON.stringify({
 			treatment: sArray,
 			plan: tPlan,
