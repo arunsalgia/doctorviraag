@@ -2,6 +2,7 @@ import React, {useEffect, useState, createContext }  from 'react';
 import { Container } from '@material-ui/core';
 import axios from "axios";
 import Drawer from '@material-ui/core/Drawer';
+//import lodashSortBy from "lodash/sortBy"
 import lodashCloneDeep from 'lodash/cloneDeep';
 import { useAlert } from 'react-alert'
 import Grid from "@material-ui/core/Grid";
@@ -235,6 +236,7 @@ export default function PanelDoctor() {
 
 	return (
   <div className={gClasses.webPage} align="center" key="main">
+	<br />
 	<DisplayPageHeader headerName="List of Panel Doctors" groupName="" tournament=""/>
 	<br />
 	{(!panelSubscribed) &&

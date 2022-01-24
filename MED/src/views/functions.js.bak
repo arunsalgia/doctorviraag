@@ -6,7 +6,6 @@ import download from 'js-file-download';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import 'assets/react-confirm-alert_mod.css'; // Import css
 import {cloneDeep} from "lodash";
 import { func } from "prop-types";
 import {dialogOptions } from "views/globals";

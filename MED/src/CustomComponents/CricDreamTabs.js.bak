@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
 	ankit: {
 		fontSize: theme.typography.pxToRem(22),
     fontWeight: theme.typography.fontWeightBold,
-		color: 'black',
+		color: 'white',
 	},
   noSpacing: { 
     marginTop: theme.spacing(0),
@@ -129,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
     //marginRight: theme.spacing(2),
     marginLeft: theme.spacing(2),
 		fontWeight: theme.typography.fontWeightBold,
-		color: 'black',
+		color: 'white',
   },
   teamButton: {
     marginRight: theme.spacing(0),
@@ -526,13 +526,13 @@ export function CricDreamTabs() {
 					{(sessionStorage.getItem("userType") !== "Patient") &&
 					<Typography onClick={handleHome}>
 						{/*<span className={classes.doctor}>+</span>*/}
-						<span className={classes.ankit}> DoctorViraag</span>
+						<span className={classes.ankit}> Dr.Viraag</span>
 					</Typography>
 					}
 					{(sessionStorage.getItem("userType") === "Patient") &&
 					<Typography onClick={handleClinic}>
-						<span className={classes.doctor}>+</span>
-						<span className={classes.ankit}> Doctor Viraag</span>
+						{/*<span className={classes.doctor}>+</span>*/}
+						<span className={classes.ankit}> Dr.Viraag</span>
 					</Typography>
 					}
 					{((itIsMobile === false) && (window.sessionStorage.getItem("userType") !== "Patient")) &&
