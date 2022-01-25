@@ -31,9 +31,9 @@ const globalStyles = makeStyles((theme) => ({
   },
 	avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-    width: theme.spacing(10),
-    height: theme.spacing(10),
+    backgroundColor: 'EFF7FA', 					//theme.palette.secondary.main,
+    width: theme.spacing(20),
+    height: theme.spacing(20),
   },
   blue14: {
 		color: 'blue',
@@ -185,7 +185,7 @@ const globalStyles = makeStyles((theme) => ({
 		
 	},
 	functionUnselected: {
-		fontSize: theme.typography.pxToRem(16),
+		fontSize: theme.typography.pxToRem(20),
 		fontWeight: theme.typography.fontWeightBold,
 		color: "#BDBDBD",
 	},

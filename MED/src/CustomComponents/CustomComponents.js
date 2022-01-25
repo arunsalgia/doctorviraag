@@ -319,7 +319,7 @@ export function DisplayLogo(props) {
 }
 
 export function CricDreamLogo () {
-  let mylogo = `${process.env.PUBLIC_URL}/DV.ICO`;
+  let mylogo = `${process.env.PUBLIC_URL}/image/DVLOGO.PNG`;
   const gClasses = globalStyles();
   return (
     <Avatar variant="square" className={gClasses.avatar}  src={mylogo}/>

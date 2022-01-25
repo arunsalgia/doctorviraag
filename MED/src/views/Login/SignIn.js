@@ -135,20 +135,22 @@ export default function SignIn() {
 	}, []);
 
 	function DisplayLeft() {
+	let dvStyle =  {color: '#04b1ef', fontSize: '45px', fontWeight: 'bold' };
+	let appStyle = {color: '#78797A', fontSize: '30px', fontWeight: 'bold' };
 	return (	
 		<div align="center" className={gClasses.bgImage} >
-			{/*
+		<br />
+		<br />
 		<br />
 		<br />
 		<br />
 		<br />
 		<br />
 		<CricDreamLogo />
+		<Typography style={dvStyle}>Doctor Viraag</Typography>
 		<br />
-		<br />
-		<br />
-		<br />
-			<Typography className={gClasses.modalTitle1}>{"Welcome to Doctor Viraag"}</Typography>*/}
+		<Typography style={appStyle}>Dental Practice Management</Typography>
+		<Typography style={appStyle}>Software</Typography>
 		</div>
 	)}
 
