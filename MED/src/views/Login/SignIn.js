@@ -242,8 +242,9 @@ export default function SignIn() {
     if (process.env.REACT_APP_DEVICE !== "WEB") return null;
 		if (!isMobile()) return null;
 		
-    let androidImage = `${process.env.PUBLIC_URL}/image/ANDROID.JPG`;
+    let androidImage = `${process.env.PUBLIC_URL}/image/ANDROID.PNG`;
     let iosImage = `${process.env.PUBLIC_URL}/image/IOS.JPG`;
+		let androidStyle = {width: '150px', borderColor: 'white', border: 'none'}
     return (
       <div align="center">
       <Typography className={gClasses.message18}>Download the offical app</Typography>
@@ -251,7 +252,7 @@ export default function SignIn() {
       <Typography className={gClasses.nonerror} align="center">{downloadMessage}</Typography>
       <Grid key="jp1" container align="center">
         <Grid item xs={12} sm={12} md={12} lg={12} >
-        <button><img src={androidImage} alt="my image" onClick={handleAndroid} /></button>
+        <button><img style={androidStyle} src={androidImage} alt="my image" onClick={handleAndroid} /></button>
         </Grid>
         {/* <Grid item className={classes.downloadButon} xs={6} sm={6} md={6} lg={6} >
         <button disabled><img src={iosImage}  alt="my image" onClick={handleIos} /></button>
@@ -356,7 +357,7 @@ export default function SignIn() {
 	)}
 	
 	return (
-		<div>
+		<div style={{backgroundColor: 'white'}} >
 		{(!deviceIsMobile) &&
 		<SplitPane split="vertical" >
 		<DisplayLeft />

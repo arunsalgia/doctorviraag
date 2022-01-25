@@ -95,7 +95,7 @@ export default function ForgotPassword() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <div className={classes.paper}>
+      <div align="center" >
       <CricDreamLogo />
       {/* <Avatar className={classes.avatar}>
         <LockOutlinedIcon />
