@@ -596,7 +596,7 @@ return (
 		<Typography> 
 		{/*<span className={gClasses.patientName}>{"Appt.: "}</span>*/}
 		<span className={gClasses.patientInfo2}>{myDate+" "+myTime}</span>
-		<span>
+		<span style={{paddingLeft: 10}}>
 		{(!_button1) && props.button1}
 		{(!_button2) && props.button2}
 		{(!_button3) && props.button3}

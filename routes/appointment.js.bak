@@ -106,7 +106,7 @@ router.get('/add/:cid/:apptdata', async function (req, res) {
 
 	hRec.save();
 
-	sendAppointmentSms(hRec)
+	//sendAppointmentSms(hRec)
 	sendok(res, hRec);
 });	
 

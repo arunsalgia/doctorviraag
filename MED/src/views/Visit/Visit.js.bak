@@ -984,10 +984,14 @@ export default function Visit(props) {
 		<Grid item xs={false} sm={false} md={false} lg={1} />
 		<Grid item xs={2} sm={2} md={2} lg={1} >
 			{(x.visitNumber === MAGICNUMBER) &&
-				<EditIcon color="primary" size="small" onClick={() => { handleEditMedicine(x.visitNumber, index)}} />
+				<IconButton color="primary" size="small" onClick={() => { handleEditMedicine(x.visitNumber, index)}} >
+				<EditIcon />
+				</IconButton>
 			}
 			{(x.visitNumber === MAGICNUMBER) &&
-				<DeleteIcon color="secondary" size="small" onClick={() => { handleDeleteMedicine(x.visitNumber, index)}} />
+				<IconButton color="secondary" size="small" onClick={() => { handleDeleteMedicine(x.visitNumber, index)}} >
+				<DeleteIcon />
+				</IconButton>
 			}
 		</Grid>
 		</Grid>
@@ -1042,14 +1046,18 @@ export default function Visit(props) {
 		<Grid item xs={10} sm={10} md={10} lg={10} >
 			<Typography className={gClasses.patientInfo2}>{r.name}</Typography>
 		</Grid>
-		<Grid item xs={false} sm={false} md={false} lg={1} >
+		<Grid item xs={1} sm={1} md={1} lg={1} >
+		{(x.visitNumber === MAGICNUMBER) &&
+			<IconButton color="primary" size="small" onClick={() => { handleEditRemark(x.visitNumber, index)}} >
+			<EditIcon />
+			</IconButton>
+		}
 		</Grid>
-		<Grid item xs={2} sm={2} md={2} lg={1} >
+		<Grid item xs={1} sm={1} md={1} lg={1} >
 			{(x.visitNumber === MAGICNUMBER) &&
-				<EditIcon color="primary" size="small" onClick={() => { handleEditRemark(x.visitNumber, index)}}/ >
-			}
-			{(x.visitNumber === MAGICNUMBER) &&
-				<DeleteIcon color="secondary" size="small" onClick={() => { handleDeleteRemark(x.visitNumber, index)}} />
+				<IconButton color="secondary" size="small" onClick={() => { handleDeleteRemark(x.visitNumber, index)}} >
+				<DeleteIcon />
+				</IconButton>
 			}
 		</Grid>
 	</Grid>
