@@ -359,7 +359,7 @@ export default function SignIn() {
 	return (
 		<div style={{backgroundColor: 'white'}} >
 		{(!deviceIsMobile) &&
-		<SplitPane split="vertical" allowResize={false} resizable={false}>
+		<SplitPane split="vertical" borderleft='0px' allowResize={false} resizable={false}>
 		<DisplayLeft />
 		<Container component="main" maxWidth="xs">
 		<LoginHeader />
