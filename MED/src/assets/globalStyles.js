@@ -32,8 +32,8 @@ const globalStyles = makeStyles((theme) => ({
 	avatar: {
     margin: theme.spacing(1),
     backgroundColor: 'EFF7FA', 					//theme.palette.secondary.main,
-    width: theme.spacing(30),
-    height: theme.spacing(30),
+    width: theme.spacing(50),
+    height: theme.spacing(50),
   },
   blue14: {
 		color: 'blue',
