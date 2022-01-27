@@ -173,7 +173,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 */
 
-let infoStyle={backgroundColor: '#C5C5C5', paddingTop: '5px', paddingLeft: '5px'}
+let infoStyle={backgroundColor: '#EEEEEE', paddingTop: '5px', paddingLeft: '5px'}
 
 let test=[];
 let medQty=[];
@@ -1214,6 +1214,7 @@ export default function Visit(props) {
 				<Typography align="center" className={gClasses.functionSelected}>
 					{((isDrawerOpened === "ADDMED") ? "New Medicine" : "Edit Medicine")+` for ${currentPatient}`}
 				</Typography>
+				{(false) && <VsButton name="Select Medicine" align="right" onClick={() => setIsListDrawer("LIST")} />}
 				<BlankArea />
 				{/*<TextValidator required fullWidth color="primary"
 					id="newName" label="Medicine" name="newName"

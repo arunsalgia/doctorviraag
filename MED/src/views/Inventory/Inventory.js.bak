@@ -260,7 +260,7 @@ export default function Inventory() {
 			
 			d = new Date(i.expiryDate);
 			let expiryStr =  (d.getFullYear() == 2030) ? "Never Expire" :
-				`Expiry: ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;
+				`Expiry: ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
 
 			var myId = "INV" + ("00" + i.inventoryId).slice(-3) + ("00" + i.id).slice(-3);
 			let myInfo = "";
