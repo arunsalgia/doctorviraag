@@ -143,7 +143,7 @@ export default function SignIn() {
 	return (	
 		<div align="center" className={gClasses.bgImage} >
 			{/*<Avatar variant="square" sx={{ height: '300px', width: '300px' }} src={mylogo}/>*/}
-		<img src={mylogo} alt="IMG" className={gClasses.avatar}  />
+		<img src={mylogo} alt="IMG" paddingTop="25%" width="500" height="600" />
 		<Typography style={dvStyle}>Doctor Viraag</Typography>
 		<br />
 		<Typography style={appStyle}>Dental Practice Management</Typography>

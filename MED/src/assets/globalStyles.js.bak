@@ -34,7 +34,7 @@ const globalStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     backgroundColor: 'EFF7FA', 					//theme.palette.secondary.main,
     width: theme.spacing(25),
-    height: theme.spacing(20),
+    height: theme.spacing(25),
   },
   blue14: {
 		color: 'blue',
