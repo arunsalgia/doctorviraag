@@ -30,7 +30,7 @@ const globalStyles = makeStyles((theme) => ({
 		margin: 'none',
   },
 	avatar: {
-		marginTop: '35%',
+		marginTop: '30%',
     margin: theme.spacing(1),
     backgroundColor: 'EFF7FA', 					//theme.palette.secondary.main,
     width: theme.spacing(25),
