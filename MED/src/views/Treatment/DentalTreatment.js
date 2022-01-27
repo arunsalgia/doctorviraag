@@ -397,7 +397,7 @@ export default function DentalTreatment(props) {
 			//console.log(treatmentIndex, treatmentArray);
 			let v = treatmentArray[treatmentIndex];
 			let d = new Date(v.treatmentDate);
-			myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+			myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;
 			if (v.treatmentNumber === MAGICNUMBER)
 					myDate += "(New)";
 			else {

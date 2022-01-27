@@ -350,7 +350,7 @@ export default function Visit(props) {
 		if (visitArray.length > 0) {
 			let v = visitArray[visitIndex];
 			let d = new Date(v.visitDate);
-			myDate = `Visit dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;	
+			myDate = `Visit dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;	
 			if (v.visitNumber === MAGICNUMBER)
 					myDate += " (New)";
 		}
@@ -1093,7 +1093,7 @@ export default function Visit(props) {
 			break;			
 	}
 	//console.log(d);
-	let reviewDate = DATESTR[d.getDate()] + "/" + MONTHNUMBERSTR[d.getMonth()] + "/" + d.getFullYear();
+	let reviewDate = DATESTR[d.getDate()] + "/" + MONTHNUMBERSTR[d.getMonth()] + "/" + d.getFullYear().toString().slice(-2);
 	reviewDate += " (" + WEEKSTR[d.getDay()] + ")";
 	return (
 		<div align="left">

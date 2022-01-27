@@ -248,7 +248,7 @@ export default function Visit(props) {
 		if (investigationArray.length > 0) {	
 			let v = investigationArray[investigationIndex];
 			let d = new Date(v.investigationDate);
-			myDate = `Investigation dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear()}`;
+			myDate = `Investigation dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;
 			if (v.investigationNumber === MAGICNUMBER) {
 					myDate += " (New)";
 			}

@@ -472,7 +472,7 @@ return (
 export function DisplayDocumentDetails(props) {
 	const gClasses = globalStyles();
 	let d = new Date(props.document.date);
-	let myDate = DATESTR[d.getDate()] + "/" + MONTHNUMBERSTR[d.getMonth()] + "/" + d.getFullYear();
+	let myDate = DATESTR[d.getDate()] + "/" + MONTHNUMBERSTR[d.getMonth()] + "/" + d.getFullYear().toString().slice(-2);
 	let myTime = HOURSTR[d.getHours()] + ":" + MINUTESTR[d.getMinutes()];
 	let _button1 = (props.button1 == null);
 	let _button2 = (props.button2 == null);
