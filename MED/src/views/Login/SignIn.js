@@ -333,6 +333,9 @@ export default function SignIn() {
 	return (
 	<div align="center">
 	<br />
+	{(process.env.REACT_APP_DEVICE === "DUMMY") &&
+	<CricDreamLogo />
+	}
 	<br />
 	<Typography className={gClasses.modalTitle1}>{"Login"}</Typography>
 	<br />

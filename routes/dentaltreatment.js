@@ -29,6 +29,7 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 	iRec.treatment = newInfo.treatment;
 	iRec.plan = newInfo.plan;
 	iRec.notes = newInfo.notes;
+	iRec.discount = newInfo.discount;
 	console.log(iRec);
 	await iRec.save();
 	
@@ -59,7 +60,7 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 			MONTHNUMBERSTR[iRec.treatmentDate.getMonth()] + "/" +
 			iRec.treatmentDate.getFullYear();
 		myProfChargeRec.date = iRec.treatmentDate;
-		myProfChargeRec.amount = -(_.sumBy(newInfo.treatment, 'amount'));
+		myProfChargeRec.amount = -(_.sumBy(newInfo.treatment, 'amount')) + iRec.discount;
 		myProfChargeRec.treatmentDetails = _.map(newInfo.treatment,  o => _.pick(o, ['name', 'amount']));
 		myProfChargeRec.save();
 	} else {

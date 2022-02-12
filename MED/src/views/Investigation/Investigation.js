@@ -338,6 +338,11 @@ export default function Visit(props) {
 		let tmp = JSON.stringify({symptom: sArray, diagnosis: dArray});
 		let tmp1 = encodeURIComponent(tmp);
 		axios.post(`${process.env.REACT_APP_AXIOS_BASEPATH}/investigation/update/${userCid}/${currentPatientData.pid}/${tmp1}`)
+		
+		let tmpArray = lodashCloneDeep(investigationArray);
+		tmpArray[tmpArray.length-1].investigationDate = new Date().toString();
+		setInvestigationArray(tmpArray);
+		setShowCloseVisit(true);
 	}
 	
 	async function getAllDiagnosis() {

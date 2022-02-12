@@ -119,8 +119,14 @@ function AppRouter() {
 				//console.log(history, hist);
 				
       } else {
-				//console.log("About to call Welcome");
-				if (process.env.REACT_APP_SHOWWELCOMEPAGE === 'true')
+				
+				let showWelcome = true;
+				if (process.env.REACT_APP_DEVICE === 'APK')
+					showWelcome = false;
+				else if (process.env.REACT_APP_SHOWWELCOMEPAGE !== 'true')
+					showWelcome = false;
+				
+				if (showWelcome)
 					return (<Welcome/>)
 				else
 					return <SignIn />

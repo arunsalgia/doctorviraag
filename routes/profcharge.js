@@ -165,7 +165,7 @@ router.post('/delete/:cid/:pid/:tid', async function(req, res, next) {
 	sendok(res, "done");
 });
 
-router.get('/test', async function(req, res, next) {
+router.get('/testold', async function(req, res, next) {
   setHeader(res);
 	
 	let allTreatment = await M_DentalTreatment.find({});
@@ -190,6 +190,20 @@ router.get('/test', async function(req, res, next) {
 	}
 	sendok(res, "done");
 });
+
+router.get('/test', async function(req, res, next) {
+  setHeader(res);
+	
+	let allTreatment = await M_DentalTreatment.find({});
+	let count = 0;
+	for(let i=0; i<allTreatment.length; ++i) {
+		iRec = allTreatment[i];
+		iRec.discount = 0;
+		await iRec.save();
+	}
+	sendok(res, "done");
+});
+
 
 function sendok(res, usrmsg) { res.send(usrmsg); }
 function senderr(res, errcode, errmsg) { res.status(errcode).send(errmsg); }

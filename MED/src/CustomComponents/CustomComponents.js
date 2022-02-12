@@ -412,10 +412,12 @@ export function DisplayPatientBox(props) {
 			<span className={gClasses.patientInfo}>Age: </span>
 			<span className={gClasses.patientInfo2}>{dispAge(props.patient.age, props.patient.gender)}</span>
 		</Typography>
+		{(false) &&
 		<Typography onClick={props.onClick} > 
 			<span className={gClasses.patientInfo}>Email: </span>
 			<span className={gClasses.patientInfo2}>{dispEmail(props.patient.email)}</span>
 		</Typography>
+		}
 		<Typography onClick={props.onClick} > 
 			<span className={gClasses.patientInfo}>Mob.: </span>
 			<span className={gClasses.patientInfo2}>{dispMobile(props.patient.mobile)}</span>

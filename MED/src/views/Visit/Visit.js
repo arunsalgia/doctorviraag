@@ -224,25 +224,17 @@ export default function Visit(props) {
 	const [filterItemArray, setFilterItemArray] = useState([]);
 	
 	const [isDrawerOpened, setIsDrawerOpened] = useState("");
-	//const [isListDrawer, setIsListDrawer] = useState("");
-	//const [selectPatient, setSelectPatient] = useState(false);
-  //const [patientArray, setPatientArray] = useState([])
-	//const [patientMasterArray, setPatientMasterArray] = useState([])
 	const [currentPatient, setCurrentPatient] = useState("");
 	const [currentPatientData, setCurrentPatientData] = useState({});
 	const [showCloseVisit, setShowCloseVisit] = useState(false);
 
 	const [startLoading, setStartLoading] = useState(false);
-	
-	//const [showDocument, setShowDocument] = useState(false);
-	//const [documentArray, setDocumentArray] = useState([]);
-	
+
 	
 	const [medicineArray, setMedicineArray] = useState([])
 	const [noteArray, setNoteArray] = useState([]);
 	const [remarkArray, setRemarkArray] = useState([]);
 	
-	//const [currentAppt, setCurrentAppt] = useState(null);
 	const [visitArray, setVisitArray] = useState([])
 
 	const [nextVisitTime, setNextVisitTime] = useState(2);
@@ -254,7 +246,7 @@ export default function Visit(props) {
 	
 	//const [newPatient, setNewPatient] = useState(false)
 	
-	//const [emurVisitNumber, setEmurVisitNumber] = useState(0);
+	const [emurVisitNumber, setEmurVisitNumber] = useState(0);
 	const [emurNumber, setEmurNumber] = useState(0);
 	const [emurName, setEmurName] = useState("");
 	
@@ -567,7 +559,9 @@ export default function Visit(props) {
 		//console.log(newVisit);
 		let newVisitInfo = encodeURIComponent(JSON.stringify(newVisit));
 		axios.post(`${process.env.REACT_APP_AXIOS_BASEPATH}/visit/update/${userCid}/${newVisitInfo}`);
-		//console.log("posted");
+		let tmpArray = lodashCloneDeep(visitArray);
+		tmpArray[tmpArray.length-1].visitDate = new Date().toString();
+		setVisitArray(tmpArray);
 		setShowCloseVisit(true);
 	}
 	
@@ -777,7 +771,7 @@ export default function Visit(props) {
 		setEmedTime (tmp.medicines[mNumber].time);
 		setEmedUnit (tmp.medicines[mNumber].unit);
 		let ttt = medicineArray.find(x => x.name == tmp.medicines[mNumber].name);
-		setStandard(ttt != null);
+		//setStandard(ttt != null);
 		
 				// for filter
 		setFilterItem("MED");
@@ -1215,11 +1209,6 @@ export default function Visit(props) {
 					{((isDrawerOpened === "ADDMED") ? "New Medicine" : "Edit Medicine")+` for ${currentPatient}`}
 				</Typography>
 				<BlankArea />
-				{/*<TextValidator required fullWidth color="primary"
-					id="newName" label="Medicine" name="newName"
-					onChange={(event) => setEmurNameWithFilter(event.target.value)}
-					value={emurName}
-				/>*/}
 				<VsTextFilter type="text" label="Medicine" value={emurName}
 					onChange={(event) => setEmurNameWithFilter(event.target.value)}
 					onClear={(event) => setEmurNameWithFilter("")}
@@ -1227,60 +1216,61 @@ export default function Visit(props) {
 				<VsCheckBox align='left' label="Remember" checked={remember} onClick={() => setRemember(!remember)} />
 				<VsList listArray={filterItemArray} onSelect={handleVsSelect} onDelete={handleVsMedicineDelete} />
 				<BlankArea />
-				<Grid key="editmed" container justify="center" alignItems="left" >
-				<Grid className={gClasses.vgSpacing} item xs={1} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2}>Dose1:</Typography>
+				<Grid key="editmed" container justify="center" alignItems="center">
+				<Grid align="right" className={gClasses.vgSpacing} item xs={4} sm={1} md={1} lg={1} >
+					<Typography className={gClasses.patientInfo2}>Dose1:</Typography>
 				</Grid>
-				<Grid className={gClasses.vgSpacing} item xs={2} sm={2} md={2} lg={2} >
-				<Select labelId='dose1' id='dose1' name="dose1" 
-					required fullWidth label="Dose 1" 
-					value={emedDose1}
-					inputProps={{
-						name: 'Group',
-						id: 'filled-age-native-simple',
-					}}
-					onChange={(event) => setEmedDose1(event.target.value)}
-					>
-				{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
-				</Select>
+				<Grid className={gClasses.vgSpacing} item xs={5} sm={2} md={2} lg={2} >
+					<Select labelId='dose1' id='dose1' name="dose1" 
+						required fullWidth label="Dose 1" 
+						value={emedDose1}
+						inputProps={{
+							name: 'Group',
+							id: 'filled-age-native-simple',
+						}}
+						onChange={(event) => setEmedDose1(event.target.value)}
+						>
+					{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
+					</Select>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={1} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2}>Dose2</Typography>
+				<Grid item align="right" className={gClasses.vgSpacing}  xs={4} sm={1} md={1} lg={1} >
+					<Typography className={gClasses.patientInfo2}>Dose2:</Typography>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={2} sm={2} md={2} lg={2} >
-				<Select labelId='dose2' id='dose2' name="dose2" 
-					required fullWidth label="Dose 2" 
-					value={emedDose2}
-					inputProps={{
-						name: 'Group',
-						id: 'filled-age-native-simple',
-					}}
-					onChange={(event) => setEmedDose2(event.target.value)}
-					>
-				{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
-				</Select>
+				<Grid item className={gClasses.vgSpacing}  xs={5} sm={2} md={2} lg={2} >
+					<Select labelId='dose2' id='dose2' name="dose2" 
+						required fullWidth label="Dose 2" 
+						value={emedDose2}
+						inputProps={{
+							name: 'Group',
+							id: 'filled-age-native-simple',
+						}}
+						onChange={(event) => setEmedDose2(event.target.value)}
+						>
+					{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
+					</Select>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={1} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2}>Dose3</Typography>
+				<Grid item align="right"  className={gClasses.vgSpacing}  xs={4} sm={1} md={1} lg={1} >
+					<Typography className={gClasses.patientInfo2}>Dose3:</Typography>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={2} sm={2} md={2} lg={2} >
-				<Select labelId='dose3' id='dose3' name="dose3" 
-					required fullWidth label="Dose 3" 
-					value={emedDose3}
-					inputProps={{
-						name: 'Group',
-						id: 'filled-age-native-simple',
-					}}
-					onChange={(event) => setEmedDose3(event.target.value)}
-					>
-				{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
-				</Select>
+				<Grid item className={gClasses.vgSpacing}  xs={5} sm={2} md={2} lg={2} >
+					<Select labelId='dose3' id='dose3' name="dose3" 
+						required fullWidth label="Dose 3" 
+						value={emedDose3}
+						inputProps={{
+							name: 'Group',
+							id: 'filled-age-native-simple',
+						}}
+						onChange={(event) => setEmedDose3(event.target.value)}
+						>
+					{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
+					</Select>
 				</Grid>
-				<Grid className={gClasses.vgSpacing}  item xs={1} sm={1} md={1} lg={1} />
-				<Grid item className={gClasses.vgSpacing}  xs={1} sm={1} md={1} lg={1} >
+				</Grid>
+				<Grid key="editdur" container justify="center" alignItems="center" >
+				<Grid item className={gClasses.vgSpacing}  xs={2} sm={1} md={1} lg={1} >
 				<Typography className={gClasses.patientInfo2}>for</Typography>
 				</Grid>
-				<Grid className={gClasses.vgSpacing} item xs={2} sm={2} md={2} lg={2} >
+				<Grid className={gClasses.vgSpacing} item xs={3} sm={2} md={2} lg={2} >
 				<Select labelId='time' id='time' name="time"
 					required fullWidth label="Time" 
 					value={emedTime}
@@ -1294,7 +1284,7 @@ export default function Visit(props) {
 				{timeArray.map(x =>	<MenuItem key={x} value={x}>{x}</MenuItem>)}
 				</Select>
 				</Grid>
-				<Grid className={gClasses.vgSpacing}  item xs={2} sm={2} md={2} lg={2} >
+				<Grid className={gClasses.vgSpacing}  item xs={4} sm={2} md={2} lg={2} >
 				<Select labelId='unit' id='unit' name="unit" 
 					required fullWidth label="Unit" 
 					value={emedUnit}

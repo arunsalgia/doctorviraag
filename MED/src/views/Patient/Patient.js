@@ -688,9 +688,9 @@ export default function Patient() {
 						onClear={(event) => filterPatients("")}
 					/>
 					</Grid>
-					<Grid key={"F4"} item xs={8} sm={8} md={3} lg={3} >
+					<Grid key={"F4"} item xs={8} sm={8} md={2} lg={3} >
 					</Grid>
-					<Grid key={"F5"} item xs={4} sm={4} md={1} lg={1} >
+					<Grid key={"F5"} item xs={4} sm={4} md={3} lg={1} >
 						<VsButton name="New Patient" onClick={handleAdd} />
 					</Grid>
 					<Grid key={"F6"} item xs={false} sm={false} md={2} lg={2} />

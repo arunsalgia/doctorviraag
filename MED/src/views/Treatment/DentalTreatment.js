@@ -244,6 +244,7 @@ export default function DentalTreatment(props) {
 	const [emurName, setEmurName] = useState("");
 	const [emurToothArray, setEmurToothArray] = useState([]);
 	const [emurAmount, setEmurAmount] = useState(0);
+	const [emurMaxDiscount, setEmurMaxDiscount] = useState(0);
 	
 	const [balance, setBalance] = useState(0);
 	
@@ -289,6 +290,7 @@ export default function DentalTreatment(props) {
 		try {
 			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/list/${userCid}/${patRec.pid}`)
 			setTreatmentArray(resp.data);
+			console.log(resp.data);
 			setTreatmentIndex(resp.data.length - 1);
 			} catch (e) {
 			console.log(e)
@@ -520,6 +522,7 @@ export default function DentalTreatment(props) {
 		setEmurName(xxx.name);
 		setEmurToothArray(xxx.toothArray);
 		setEmurAmount(xxx.amount);
+		
 		let childtooth = false;
 		for(let i=0; i<xxx.toothArray.length; ++i) {
 			if (xxx.toothArray[i] > 50) {
@@ -555,14 +558,42 @@ export default function DentalTreatment(props) {
 		tmpArray[lastIndex].treatment = tmpArray[lastIndex].treatment.filter(x => x.name !== itemName);
 		//console.log(tmpArray);
 		setTreatmentArray(tmpArray);
-		updateNewTreatment(tmpArray[lastIndex].treatment, treatmentPlan, treatmentNotes);
+		updateNewTreatment(tmpArray[lastIndex].treatment, treatmentPlan, treatmentNotes, tmpArray[lastIndex].discount);
 	}
 	
-
+	function handleEditDiscount() {
+		setEmurAmount(treatmentArray[treatmentIndex].discount);
+		let maxAmt = lodashSumBy(treatmentArray[treatmentIndex].treatment, 'amount')
+		console.log(maxAmt);
+		setEmurMaxDiscount(maxAmt);
+		setIsDrawerOpened("EDITDISCOUNT");
+	}
+	
+	function updateDiscount() {
+		let tmpArray = lodashCloneDeep(treatmentArray);
+		tmpArray[treatmentIndex].discount = emurAmount;
+		setTreatmentArray(tmpArray);
+		setIsDrawerOpened("");
+		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
+			tmpArray[treatmentIndex].plan, 
+			tmpArray[treatmentIndex].notes, 
+			emurAmount);
+	}
+	
+	function handleDeleteDiscount() {
+		let tmpArray = lodashCloneDeep(treatmentArray);
+		tmpArray[treatmentIndex].discount = 0;
+		setTreatmentArray(tmpArray);
+		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
+			tmpArray[treatmentIndex].plan, 
+			tmpArray[treatmentIndex].notes, 
+			0);
+	}
+	
 	function ArunTreatment() {
 		if (treatmentArray.length === 0) return null;
 		let x = treatmentArray[treatmentIndex];
-		//console.log(x.treatment);
+		console.log(x);
 		return (
 			<div> 
 			{(x.treatmentNumber === MAGICNUMBER) && 
@@ -597,14 +628,33 @@ export default function DentalTreatment(props) {
 				)}
 			)}
 			</Box>
+			<Box borderColor="primary.main" border={1}>
+			<Grid  key={"DISCOUNT"} container >
+			<Grid item align="left" xs={8} sm={10} md={10} lg={10} >
+				<Typography className={gClasses.patientInfo2}>{"Discount"}</Typography>
+			</Grid>
+			<Grid item align="right" xs={2} sm={1} md={1} lg={1} >
+				<Typography className={gClasses.patientInfo2}>{INR+x.discount}</Typography>
+			</Grid>
+			<Grid item xs={2} sm={1} md={1} lg={1} >
+				{(x.treatmentNumber === MAGICNUMBER) &&
+					<div>
+					<EditIcon color="primary" size="small" onClick={handleEditDiscount} />
+					<DeleteIcon color="secondary" size="small" onClick={handleDeleteDiscount} />
+					</div>
+				}
+			</Grid>
+			</Grid>			
+			</Box>
 			{/*<Box borderColor="primary.main" border={1}>*/}
 			<Grid  key={"PC"} container >
-			<Grid item align="right" xs={9} sm={9} md={10} lg={10} >
-			<Typography className={gClasses.patientInfo2}>{"Total Professional Charges: "}</Typography>
+			<Grid item align="right" xs={7} sm={9} md={9} lg={9} >
+			<Typography className={gClasses.patientInfo2}>{"Professional Charges:"}</Typography>
 			</Grid>
-			<Grid item xs={3} sm={3} md={2} lg={2} >
-			<Typography className={gClasses.patientInfo2}>{INR+" "+lodashSumBy(x.treatment, 'amount')}</Typography>
+			<Grid align="right" item xs={3} sm={2} md={2} lg={2} >
+			<Typography className={gClasses.patientInfo2}>{INR+" "+(lodashSumBy(x.treatment, 'amount')-x.discount)}</Typography>
 			</Grid>
+			<Grid item align="right" xs={2} sm={1} md={1} lg={1} />
 			</Grid>
 			{/*</Box>*/}
 			</div>
@@ -629,15 +679,20 @@ export default function DentalTreatment(props) {
 		}
 	}
 	
-	function updateNewTreatment(sArray, tPlan, tNotes) {
+	function updateNewTreatment(sArray, tPlan, tNotes, discount) {
 		//console.log(tPlan, tNotes);
-		let tmp = JSON.stringify({
+		let tmp = encodeURIComponent(JSON.stringify({
 			treatment: sArray,
 			plan: tPlan,
-			notes: tNotes
-		});
-		let tmp1 = encodeURIComponent(tmp);
-		axios.post(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/update/${userCid}/${currentPatientData.pid}/${tmp1}`)
+			notes: tNotes,
+			discount: discount
+		}));
+		axios.post(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/update/${userCid}/${currentPatientData.pid}/${tmp}`)
+
+		let tmpArray = lodashCloneDeep(treatmentArray);
+		tmpArray[tmpArray.length-1].treatmentDate = new Date().toString();
+		setTreatmentArray(tmpArray);
+		setShowCloseVisit(true);
 	}	
 
 	
@@ -670,7 +725,7 @@ export default function DentalTreatment(props) {
 		setIsDrawerOpened("");
 		
 		tmp[lastIndex].treatment[index].name = emurName;
-		updateNewTreatment(tmp[lastIndex].treatment, treatmentPlan, treatmentNotes);
+		updateNewTreatment(tmp[lastIndex].treatment, treatmentPlan, treatmentNotes, tmp[lastIndex].discount);
 		setTreatmentArray(tmp);
 	}
 	
@@ -727,7 +782,8 @@ export default function DentalTreatment(props) {
 		setTreatmentArray(tmpArray);
 		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
 			tmpArray[treatmentIndex].plan, 
-			tmpArray[treatmentIndex].notes
+			tmpArray[treatmentIndex].notes,
+			tmpArray[treatmentIndex].discount
 		);
 		setIsDrawerOpened("");
 	}
@@ -764,7 +820,8 @@ export default function DentalTreatment(props) {
 		setTreatmentArray(tmpArray);
 		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
 			tmpArray[treatmentIndex].plan, 
-			tmpArray[treatmentIndex].notes
+			tmpArray[treatmentIndex].notes,
+			tmpArray[treatmentIndex].discount
 		);
 		setIsDrawerOpened("");
 	}
@@ -811,9 +868,7 @@ export default function DentalTreatment(props) {
 			}
 		</Box>
 		<Drawer 
-			classes={{
-				paper: gClasses.drawer90
-			}}
+			classes={{ paper:(isDrawerOpened === "EDITDISCOUNT") ? gClasses.drawer : gClasses.drawer90}}
 			anchor="right" variant="temporary" open={isDrawerOpened !== ""}
 		>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
@@ -855,6 +910,24 @@ export default function DentalTreatment(props) {
 				<VsButton type ="submit" name= {(isDrawerOpened === "ADDTREAT") ? "Add" : "Update"} />
 			</ValidatorForm>
 		}  
+		{(isDrawerOpened === "EDITDISCOUNT") &&
+			<ValidatorForm align="center" onSubmit={updateDiscount}>
+				<Typography align="center" className={gClasses.patientInfo2Blue}>
+					{"Treatment Discount"}
+				</Typography>
+				<br />
+				<TextValidator required color="primary" type="number" className={gClasses.vgSpacing} 
+					id="newName" label="Discount" name="newName"
+					onChange={(event) => setEmurAmount(Number(event.target.value))}
+					value={emurAmount}
+					validators={['minNumber:0', `maxNumber:${emurMaxDiscount}`]}
+					errorMessages={['Invalid Discount Amount', 'Invalid Discount Amount']}
+				/>
+				<ModalResisterStatus />
+				<br />
+				<VsButton type ="submit" name="Update" />
+			</ValidatorForm>
+		}
 		{(isDrawerOpened === "EDITTREATMENTPLAN") &&
 			<div align="center">
 				<Typography className={gClasses.patientInfo2Blue}>Treatment Plan</Typography>
