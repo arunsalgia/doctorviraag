@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.0.0",
+  "version": "12.18.3",
   "private": true,
   "scripts": {
     "start": "node app"
