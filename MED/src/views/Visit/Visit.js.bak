@@ -1267,10 +1267,10 @@ export default function Visit(props) {
 				</Grid>
 				</Grid>
 				<Grid key="editdur" container justify="center" alignItems="center" >
-				<Grid item className={gClasses.vgSpacing}  xs={2} sm={2} md={2} lg={2} >
+				<Grid item className={gClasses.vgSpacing}  xs={2} sm={1} md={1} lg={1} >
 				<Typography className={gClasses.patientInfo2}>for</Typography>
 				</Grid>
-				<Grid className={gClasses.vgSpacing} item xs={3} sm={3} md={3} lg={3} >
+				<Grid className={gClasses.vgSpacing} item xs={3} sm={2} md={2} lg={2} >
 				<Select labelId='time' id='time' name="time"
 					required fullWidth label="Time" 
 					value={emedTime}
@@ -1284,7 +1284,7 @@ export default function Visit(props) {
 				{timeArray.map(x =>	<MenuItem key={x} value={x}>{x}</MenuItem>)}
 				</Select>
 				</Grid>
-				<Grid className={gClasses.vgSpacing}  item xs={4} sm={4} md={4} lg={4} >
+				<Grid className={gClasses.vgSpacing}  item xs={4} sm={2} md={2} lg={2} >
 				<Select labelId='unit' id='unit' name="unit" 
 					required fullWidth label="Unit" 
 					value={emedUnit}
