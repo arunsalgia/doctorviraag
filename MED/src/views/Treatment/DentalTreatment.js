@@ -781,7 +781,7 @@ export default function DentalTreatment(props) {
 	}
 	
 	function updateEditNotes(newText) {
-		let tmpArray = lodashCloneDeep(treatmentArray);
+		let tmpArray = [].concat(treatmentArray);
 		tmpArray[treatmentIndex].notes = newText;
 		setTreatmentArray(tmpArray);
 		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
@@ -819,7 +819,7 @@ export default function DentalTreatment(props) {
 	}
 
 	function updateEditPlan(newText) {
-		let tmpArray = lodashCloneDeep(treatmentArray);
+		let tmpArray = [].concat(treatmentArray);
 		tmpArray[treatmentIndex].plan = newText;
 		setTreatmentArray(tmpArray);
 		updateNewTreatment(tmpArray[treatmentIndex].treatment, 

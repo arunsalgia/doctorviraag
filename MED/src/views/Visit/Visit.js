@@ -756,11 +756,11 @@ export default function Visit(props) {
 	
 	function handleEditMedicine(vNumber, mNumber) {
 		//await getAllMedicines();
-		console.log("handleEditMedicine "+vNumber+" Medicine "+mNumber);
+		//console.log("handleEditMedicine "+vNumber+" Medicine "+mNumber);
 		let lastIndex = visitArray.length - 1;
 		let tmp = visitArray[lastIndex];
 		setEditMedicine(tmp.medicines[mNumber]);
-		console.log(tmp.medicines[mNumber]);
+		//console.log(tmp.medicines[mNumber]);
 		
 		setEmurVisitNumber(vNumber);
 		setEmurNumber(mNumber);
@@ -893,7 +893,7 @@ export default function Visit(props) {
 			tmp[lastIndex].medicines.push({name: "", dose1: 0, dose2: 0, dose3: 0, unit: "", time: 0});
 			index = tmp[lastIndex].medicines.length - 1;
 		} else {
-			console.log("in edit");
+			//console.log("in edit");
 			if (tmp[lastIndex].medicines[index].name.toLowerCase() !== emurName.toLowerCase()) {
 				//console.log("in edit different");
 				if (tmp[lastIndex].medicines.find(x => x.name.toLowerCase() === emurName.toLowerCase())) {
