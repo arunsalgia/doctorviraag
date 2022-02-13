@@ -856,6 +856,8 @@ export function DisplayProfCharge(props) {
 		for(let i=0; i<p.treatmentDetails.length; ++i) {
 			myInfo += p.treatmentDetails[i].name + ": "+p.treatmentDetails[i].amount + "<br />";
 		}
+		let myDIscount = lodashSumBy(p.treatmentDetails,'amount')+p.amount;
+		if (myDIscount !== 0)	myInfo += "Discount: "+myDIscount;
 		let myMode = "-";
 		if ((p.paymentMode) && (p.paymentMode !== ""))
 			myMode =  p.paymentMode;
@@ -1035,6 +1037,8 @@ export function DisplayProfCharge_WO_Name(props) {
 			for(let i=0; i<p.treatmentDetails.length; ++i) {
 				myInfo += p.treatmentDetails[i].name + ": "+p.treatmentDetails[i].amount + "<br />";
 			}
+			let myDIscount = lodashSumBy(p.treatmentDetails,'amount')+p.amount;
+			if (myDIscount !== 0)	myInfo += "Discount: "+myDIscount;
 			//console.log(myInfo);
 			
 			let myMode = ((p.paymentMode) && (p.paymentMode !== "")) ? p.paymentMode : "-";

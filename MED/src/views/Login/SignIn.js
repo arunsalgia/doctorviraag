@@ -142,8 +142,9 @@ export default function SignIn() {
 	let mylogo = `${process.env.PUBLIC_URL}/image/DVLOGO.PNG`;
 	return (	
 		<div align="center" className={gClasses.bgImage} >
-			{/*<Avatar variant="square" sx={{ height: '300px', width: '300px' }} src={mylogo}/>*/}
 		<img src={mylogo} alt="IMG" className={gClasses.avatar}  />
+		{/*<Avatar variant="square" sx={{ height: '300px', width: '300px' }} src={mylogo}/>
+		<img src={mylogo} alt="IMG" className={gClasses.avatar}  />*/}
 		<Typography style={dvStyle}>Doctor Viraag</Typography>
 		<br />
 		<Typography style={appStyle}>Dental Practice Management</Typography>

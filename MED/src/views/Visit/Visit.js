@@ -173,7 +173,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 */
 
-let infoStyle={backgroundColor: '#C5C5C5', paddingTop: '5px', paddingLeft: '5px'}
+let infoStyle={backgroundColor: '#EEEEEE', paddingTop: '5px', paddingLeft: '5px'}
 
 let test=[];
 let medQty=[];
@@ -317,7 +317,7 @@ export default function Visit(props) {
 	function DisplayFunctionHeader() {
 	let lastIndex = visitArray.length - 1;
 	return (
-	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={0} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<DisplayFunctionItem item="Medicine" />
 		<DisplayFunctionItem item="User Note" />

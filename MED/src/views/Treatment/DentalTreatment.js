@@ -209,6 +209,8 @@ const DrawerWidth={drawerStyle: {width: 500, },};
 const MAXDISPLAYTEXTROWS=12;
 const MAXEDITTEXTROWS=25;
 
+const infoStyle={backgroundColor: '#EEEEEE', paddingTop: '5px', paddingLeft: '5px'}
+ 
 var userCid;
 export default function DentalTreatment(props) {
   
@@ -290,7 +292,7 @@ export default function DentalTreatment(props) {
 		try {
 			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/list/${userCid}/${patRec.pid}`)
 			setTreatmentArray(resp.data);
-			console.log(resp.data);
+			//console.log(resp.data);
 			setTreatmentIndex(resp.data.length - 1);
 			} catch (e) {
 			console.log(e)
@@ -326,7 +328,7 @@ export default function DentalTreatment(props) {
 	
 	function DisplayFunctionHeader() {
 	return (
-	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
+	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={0}>
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<DisplayFunctionItem item="Treatment" />
 		<DisplayFunctionItem item="Plan" />
@@ -564,13 +566,13 @@ export default function DentalTreatment(props) {
 	function handleEditDiscount() {
 		setEmurAmount(treatmentArray[treatmentIndex].discount);
 		let maxAmt = lodashSumBy(treatmentArray[treatmentIndex].treatment, 'amount')
-		console.log(maxAmt);
+		//console.log(maxAmt);
 		setEmurMaxDiscount(maxAmt);
 		setIsDrawerOpened("EDITDISCOUNT");
 	}
 	
 	function updateDiscount() {
-		let tmpArray = lodashCloneDeep(treatmentArray);
+		let tmpArray = [].concat(treatmentArray);
 		tmpArray[treatmentIndex].discount = emurAmount;
 		setTreatmentArray(tmpArray);
 		setIsDrawerOpened("");
@@ -581,21 +583,23 @@ export default function DentalTreatment(props) {
 	}
 	
 	function handleDeleteDiscount() {
-		let tmpArray = lodashCloneDeep(treatmentArray);
+		//console.log("in delete");
+		let tmpArray = [].concat(treatmentArray);
 		tmpArray[treatmentIndex].discount = 0;
 		setTreatmentArray(tmpArray);
 		updateNewTreatment(tmpArray[treatmentIndex].treatment, 
 			tmpArray[treatmentIndex].plan, 
 			tmpArray[treatmentIndex].notes, 
 			0);
+		//console.log("Over");
 	}
 	
 	function ArunTreatment() {
 		if (treatmentArray.length === 0) return null;
 		let x = treatmentArray[treatmentIndex];
-		console.log(x);
+		//console.log(treatmentArray);
 		return (
-			<div> 
+			<div style={infoStyle}>
 			{(x.treatmentNumber === MAGICNUMBER) && 
 				<VsButton name="New treatment type" align="left" onClick={handleAddTreatmentType} />
 			}	
@@ -692,7 +696,7 @@ export default function DentalTreatment(props) {
 		let tmpArray = lodashCloneDeep(treatmentArray);
 		tmpArray[tmpArray.length-1].treatmentDate = new Date().toString();
 		setTreatmentArray(tmpArray);
-		setShowCloseVisit(true);
+		//setShowCloseVisit(true);
 	}	
 
 	
@@ -793,9 +797,9 @@ export default function DentalTreatment(props) {
 		let myNotes = treatmentArray[treatmentIndex].notes;
 		let myNumber = treatmentArray[treatmentIndex].treatmentNumber;
 	return (
-		<Box borderColor="primary.main" border={1}>
+		<Box borderColor="primary.main" border={0}>
 		{(myNumber === MAGICNUMBER) &&
-		<div align="right">
+		<div style={infoStyle} align="right">
 			<EditIcon color="primary" size="small" onClick={editNotes} />
 			<CancelIcon color="secondary" size="small" onClick={() => updateEditNotes("")} />
 		</div>
@@ -832,7 +836,8 @@ export default function DentalTreatment(props) {
 		let myNumber = treatmentArray[treatmentIndex].treatmentNumber;
 		//setTreatmentPlan(myPlan);
 		return (
-		<Box borderColor="primary.main" border={1}>
+		<div style={infoStyle}>
+		<Box borderColor="primary.main" border={0}>
 		{(myNumber === MAGICNUMBER) &&
 		<div align="right">
 			<EditIcon color="primary" size="small" onClick={editPlan} />
@@ -841,6 +846,7 @@ export default function DentalTreatment(props) {
 		}
 		<TextareaAutosize maxRows={MAXDISPLAYTEXTROWS} className={gClasses.textAreaFixed} readOnly value={myPlan} />
 		</Box>
+		</div>
 	)}
 
 	return (
@@ -855,7 +861,7 @@ export default function DentalTreatment(props) {
 		<CssBaseline />
 		<DisplayTreatmentDates />
 		<DisplayFunctionHeader />
-		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={0} >
 			<DisplayNewBtn />
 			{(currentSelection === "Treatment") &&
 				<ArunTreatment />
@@ -925,7 +931,7 @@ export default function DentalTreatment(props) {
 				/>
 				<ModalResisterStatus />
 				<br />
-				<VsButton type ="submit" name="Update" />
+				<VsButton type ="submit" name="Update" />`
 			</ValidatorForm>
 		}
 		{(isDrawerOpened === "EDITTREATMENTPLAN") &&

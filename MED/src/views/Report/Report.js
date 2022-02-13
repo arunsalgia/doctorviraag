@@ -721,7 +721,7 @@ export default function Document(props) {
 	function DisplayAllReports() {
 		let useris = sessionStorage.getItem("userType")
 	return (
-	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+	<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={0} >
 		{(useris !== "Patient") &&
 		<VsButton align="right" name="Add new Medical Report" onClick={addDoc} />
 		}

@@ -385,7 +385,7 @@ export default function ProfCharge(props) {
 	<div className={gClasses.webPage} align="center" key="main">
 	<CssBaseline />
 		<DisplayProfChargeBalance balance={balance}/>
-		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
+		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={0} >
 			<DisplayNewBtn />
 			<DisplayProfCharge_WO_Name profChargeArray={profChargeArray} patientArray={[currentPatientData]}
 				handleReceipt={handleReceipt}

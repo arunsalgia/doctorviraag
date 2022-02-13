@@ -63,6 +63,8 @@ import {
 	vsDialog,
 } from "views/functions.js";
 
+const infoStyle={backgroundColor: '#EEEEEE', paddingTop: '5px', paddingLeft: '5px'}
+
 const useStyles = makeStyles((theme) => ({
 	slotTitle: {
 		color: 'green',
@@ -647,11 +649,11 @@ export default function Visit(props) {
 	//console.log(investigationArray);
 	let x = investigationArray[investigationIndex];
 	return (
-	<div>	
+	<div style={infoStyle}>
 	{(x.investigationNumber === MAGICNUMBER) && 
 		<VsButton name="Add new Symptom" align="left" onClick={handleAddNewSymptom} />
 	}	
-	<Box borderColor="primary.main" border={1}>
+	<Box borderColor="primary.main" border={0}>
 	{x.symptom.map( (m, index) =>
 		<Grid className={classes.noPadding} key={"SYM"+index} container align="center" alignItems="center" >
 		<Grid align="left" item xs={10} sm={10} md={11} lg={11} >
@@ -659,9 +661,7 @@ export default function Visit(props) {
 		</Grid>
 		<Grid item xs={1} sm={1} md={1} lg={1} >
 			{(x.investigationNumber === MAGICNUMBER) &&
-				<IconButton color="secondary" size="small" onClick={() => { handleDeleteSymptom(m.name)}} >
-				<DeleteIcon />
-				</IconButton>
+				<DeleteIcon color="secondary" size="small" onClick={() => { handleDeleteSymptom(m.name)}} />
 			}
 		</Grid>
 		</Grid>
@@ -674,11 +674,11 @@ export default function Visit(props) {
 	if (investigationArray.length === 0) return null;
 	let x = investigationArray[investigationIndex];
 	return (
-		<div> 
+		<div style={infoStyle}>
 		{(x.investigationNumber === MAGICNUMBER) && 
 			<VsButton name="Add new diagnosis" align="left" onClick={handleAddDiagnosis} />
 		}	
-		<Box borderColor="primary.main" border={1}>
+		<Box borderColor="primary.main" border={0}>
 		{x.diagnosis.map( (un, index) =>
 			<Grid className={classes.noPadding} key={"NOTES"+index} container align="center" alignItems="center" >
 			<Grid align="left" item xs={10} sm={10} md={11} lg={11} >
@@ -686,9 +686,7 @@ export default function Visit(props) {
 			</Grid>
 			<Grid item xs={1} sm={1} md={1} lg={1} >
 				{(x.investigationNumber === MAGICNUMBER) &&
-					<IconButton color="secondary" size="small" onClick={() => { handleDeleteDiagnosis(un.name)}} >
-					<DeleteIcon />
-					</IconButton>
+					<DeleteIcon color="secondary" size="small" onClick={() => { handleDeleteDiagnosis(un.name)}} />
 				}
 			</Grid>
 			</Grid>
