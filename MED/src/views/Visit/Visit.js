@@ -950,7 +950,7 @@ export default function Visit(props) {
 		<VsButton name="Add new Medicine" align="left" onClick={handleAddNewMedicine} />
 	}	
 	<Box borderColor="primary.main" border={0}>
-	<Grid  key="MEDHDR" container justify="center" alignItems="center" >
+	<Grid  key="MEDHDR" container align="center" alignItems="center" >
 		<Grid item xs={6} sm={6} md={6} lg={6} >
 			<Typography className={gClasses.patientInfo2Orange}>Medicine</Typography>
 		</Grid>
@@ -963,7 +963,7 @@ export default function Visit(props) {
 		<Grid item xs={2} sm={2} md={2} lg={2} />
 	</Grid>
 	{x.medicines.map( (m, index) =>
-		<Grid  key={"MED"+x.visitNumber+"-"+index} container justify="center" alignItems="center" >
+		<Grid  key={"MED"+x.visitNumber+"-"+index} container align="center" alignItems="center" >
 		<Grid item xs={6} sm={6} md={6} lg={6} >
 			<Typography className={gClasses.patientInfo2}>{m.name}</Typography>
 		</Grid>
@@ -1001,7 +1001,7 @@ export default function Visit(props) {
 	}
 	<Box borderColor="primary.main" border={0}>
 	{x.userNotes.map( (un, index) =>
-		<Grid key={"NOTES"+x.visitNumber+"notes"+index} container justify="center" alignItems="center" >
+		<Grid key={"NOTES"+x.visitNumber+"notes"+index} container align="center" alignItems="center" >
 		<Grid item xs={10} sm={10} md={10} lg={10} >
 			<Typography className={gClasses.patientInfo2}>{un.name}</Typography>
 		</Grid>
@@ -1032,7 +1032,7 @@ export default function Visit(props) {
 	}
 	<Box borderColor="primary.main" border={0}>
 	{x.remarks.map( (r, index) =>
-		<Grid key={"REM"+x.visitNumber+"-"+index} container justify="center" alignItems="center" >
+		<Grid key={"REM"+x.visitNumber+"-"+index} container align="center" alignItems="center" >
 		<Grid item xs={10} sm={10} md={10} lg={10} >
 			<Typography className={gClasses.patientInfo2}>{r.name}</Typography>
 		</Grid>
@@ -1216,11 +1216,11 @@ export default function Visit(props) {
 				<VsCheckBox align='left' label="Remember" checked={remember} onClick={() => setRemember(!remember)} />
 				<VsList listArray={filterItemArray} onSelect={handleVsSelect} onDelete={handleVsMedicineDelete} />
 				<BlankArea />
-				<Grid key="editmed" container justify="center" alignItems="center">
-				<Grid className={gClasses.vgSpacing} item xs={4} sm={1} md={1} lg={1} >
+				<Grid key="editmed" container align="center" alignItems="center">
+				<Grid className={gClasses.vgSpacing} item xs={4} sm={4} md={4} lg={4} >
 					<Typography className={gClasses.patientInfo2}>Dose1:</Typography>
 				</Grid>
-				<Grid className={gClasses.vgSpacing} item xs={5} sm={2} md={2} lg={2} >
+				<Grid className={gClasses.vgSpacing} item xs={5} sm={5} md={5} lg={5} >
 					<Select labelId='dose1' id='dose1' name="dose1" 
 						required fullWidth label="Dose 1" 
 						value={emedDose1}
@@ -1233,10 +1233,10 @@ export default function Visit(props) {
 					{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
 					</Select>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={4} sm={1} md={1} lg={1} >
+				<Grid item className={gClasses.vgSpacing}  xs={4} sm={4} md={4} lg={4} >
 					<Typography className={gClasses.patientInfo2}>Dose2:</Typography>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={5} sm={2} md={2} lg={2} >
+				<Grid item className={gClasses.vgSpacing}  xs={5} sm={5} md={5} lg={5} >
 					<Select labelId='dose2' id='dose2' name="dose2" 
 						required fullWidth label="Dose 2" 
 						value={emedDose2}
@@ -1249,10 +1249,10 @@ export default function Visit(props) {
 					{medQty.map(x =>	<MenuItem key={x.str} value={x.num}>{x.str}</MenuItem>)}
 					</Select>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={4} sm={1} md={1} lg={1} >
+				<Grid item className={gClasses.vgSpacing}  xs={4} sm={4} md={4} lg={4} >
 					<Typography className={gClasses.patientInfo2}>Dose3:</Typography>
 				</Grid>
-				<Grid item className={gClasses.vgSpacing}  xs={5} sm={2} md={2} lg={2} >
+				<Grid item className={gClasses.vgSpacing}  xs={5} sm={5} md={5} lg={5} >
 					<Select labelId='dose3' id='dose3' name="dose3" 
 						required fullWidth label="Dose 3" 
 						value={emedDose3}
@@ -1266,7 +1266,7 @@ export default function Visit(props) {
 					</Select>
 				</Grid>
 				</Grid>
-				<Grid key="editdur" container justify="center" alignItems="center" >
+				<Grid key="editdur" container align="center" alignItems="center" >
 				<Grid item className={gClasses.vgSpacing}  xs={2} sm={2} md={2} lg={2} >
 				<Typography className={gClasses.patientInfo2}>for</Typography>
 				</Grid>
