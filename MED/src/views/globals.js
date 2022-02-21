@@ -111,3 +111,18 @@ export const ChildToothRange = {
 	lowerRight:  {start: 81, end: 85}
 }
 export const MAGICNUMBER = 99999;
+
+export const  SELECTSTYLE = {
+	marginBottom: 20, 
+	marginLeft: 15
+} ;
+
+export const APPTBLOCKLIST = [
+"00:15","00:30","00:45",
+"01:00","01:15","01:30","01:45",
+"02:00","02:15","02:30","02:45",
+"03:00","03:15","03:30","03:45",
+"04:00","04:15","04:30","04:45",
+"05:00","05:15","05:30","05:45",
+"06:00"
+];

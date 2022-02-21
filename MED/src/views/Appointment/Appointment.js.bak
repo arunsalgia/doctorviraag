@@ -648,7 +648,7 @@ export default function Appointment() {
 		let iHour = parseInt(xxx[0]);
 		let iMinute = parseInt(xxx[1]);
 		let numBlocks = iHour*4 + iMinute/15;
-		//console.log(numBlocks);
+		console.log(numBlocks);
 		
 		xxx = currSlot.slot.split(':');
 		iHour = parseInt(xxx[0]);

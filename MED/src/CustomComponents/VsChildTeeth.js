@@ -38,6 +38,8 @@ return (
 					)}
 			)}
 		</TableCell>
+		</TableRow>
+		<TableRow align="center" key={"TROW2"}>
 		<TableCell key={"TD12"} align="center" component="td" scope="row" align="center" padding="none" >
 		<span className={gClasses.toothType}>UL</span>
 		</TableCell>
@@ -53,7 +55,7 @@ return (
 			)}
 		</TableCell>
 	</TableRow>
-	<TableRow align="center" key={"TROW2"}>
+	<TableRow align="center" key={"TROW3"}>
 		<TableCell key={"TD13"} align="center" component="td" scope="row" align="center" padding="none" >
 		<span className={gClasses.toothType}>LR</span>
 		</TableCell>
@@ -68,10 +70,11 @@ return (
 					)}
 			)}
 		</TableCell>
+	</TableRow>
+	<TableRow align="center" key={"TROW4"}>
 		<TableCell key={"TD14"} align="center" component="td" scope="row" align="center" padding="none" >
 		<span className={gClasses.toothType}>LL</span>
 		</TableCell>
-
 		<TableCell key={"TD4"} align="center" component="td" scope="row" align="center" padding="none">
 			{ChildToothNumber.lowerLeft.map( (t) => {
 					let myClass = (props.toothArray.includes(t)) ? gClasses.selectedTooth : gClasses.normalTooth;

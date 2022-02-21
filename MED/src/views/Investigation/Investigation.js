@@ -2,6 +2,9 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Container, CssBaseline } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
+import moment from "moment";
+import Datetime from "react-datetime";
+import "react-datetime/css/react-datetime.css";
 
 import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel";
@@ -52,7 +55,7 @@ import {
 
 // icons
 import DeleteIcon from '@material-ui/icons/Cancel';
-
+import EditIcon from '@material-ui/icons/Edit';
 
 
 //colours 
@@ -61,6 +64,8 @@ import { red, blue
 
 import { 
 	vsDialog,
+	disableFutureDt,
+	isMobile,
 } from "views/functions.js";
 
 const infoStyle={backgroundColor: '#EEEEEE', paddingTop: '5px', paddingLeft: '5px'}
@@ -197,6 +202,8 @@ export default function Visit(props) {
 	const [diagnosisDbArray, setDiagnosisDbArray] = useState([]);
 	const [symptomDbArray, setSymptomDbArray] = useState([]);
 	
+	const [emedTime,  setEmedTime] = useState(0);
+	
 	//const [emurVisitNumber, setEmurIndex] = useState(0);
 	//const [emurNumber, setEmurNumber] = useState(0);
 	const [emurName, setEmurName] = useState("");
@@ -245,36 +252,56 @@ export default function Visit(props) {
 		setCurrentSelection("Symptom");
 	}
 	
+	function editInvestigationDate() {
+		setEmedTime(moment(investigationArray[investigationIndex].investigationDate));
+		setIsDrawerOpened("EDITDATE");
+	}
+	
+	async function submitInvestigationDate() {
+		let d = emedTime.toDate();
+		let myDateStr = `${d.getFullYear()}${MONTHNUMBERSTR[d.getMonth()]}${DATESTR[d.getDate()]}`;
+		console.log(myDateStr);
+		try {
+			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/investigation/setdate/${userCid}/${currentPatientData.pid}/${myDateStr}`);
+			setInvestigationArray(investigationArray.slice(0, investigationArray.length-1).concat([resp.data]));
+		} catch(e) {
+			console.log(e);
+		}
+		setIsDrawerOpened("");
+	}
+	
 	function DisplayInvestigationDates() {
 		let myDate = "No Investigation history available";
+		let newInv = false;
 		if (investigationArray.length > 0) {	
 			let v = investigationArray[investigationIndex];
 			let d = new Date(v.investigationDate);
-			myDate = `Investigation dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;
-			if (v.investigationNumber === MAGICNUMBER) {
-					myDate += " (New)";
-			}
+			myDate = (isMobile()) ? "" : "Investigation dated ";
+			myDate += `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;
+			newInv = (v.investigationNumber === MAGICNUMBER);
+			//if (v.investigationNumber === MAGICNUMBER) {
+			//		myDate += " (New)";
+			//}
 		}
 	return (
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 		<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >	
 		{(investigationArray.length > 0) &&
-			<IconButton color={'primary'} onClick={() => {changeIndex(-1)}}  >
-				<LeftIcon />
-			</IconButton>
+			<LeftIcon color={'primary'} onClick={() => {changeIndex(-1)}}  />
 		}
 		</Grid>
 		<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
-			<Typography className={gClasses.dateSelection} >
-				{myDate}
+			<Typography>
+				<span className={gClasses.dateSelection} >{myDate}</span>
+				{(newInv) &&
+				<span><EditIcon color={'primary'} onClick={editInvestigationDate} /></span>
+				}
 			</Typography>
 		</Grid>
 		<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
 		{(investigationArray.length > 0) &&
-			<IconButton color={'primary'} onClick={() => {changeIndex(1)}}  >
-				<RightIcon />
-			</IconButton>
+			<RightIcon color={'primary'} onClick={() => {changeIndex(1)}}  />
 		}
 		</Grid>
 	</Grid>	
@@ -818,6 +845,28 @@ export default function Visit(props) {
 				<BlankArea />
 				<VsButton type ="submit" name= {(isDrawerOpened === "ADDDIAG") ? "Add" : "Update"} />
 			</ValidatorForm>
+		}
+		{(isDrawerOpened === "EDITDATE") &&
+			<div>
+			<Typography align="center" className={gClasses.functionSelected}>
+					{`Set investigation date for ${currentPatient}`}
+			</Typography>
+			<br />
+			<br />
+			<Datetime 
+				className={gClasses.dateTimeBlock}
+				inputProps={{className: gClasses.dateTimeNormal}}
+				timeFormat={false} 
+				initialValue={emedTime}
+				dateFormat="DD/MM/yyyy"
+				isValidDate={disableFutureDt}
+				onClose={setEmedTime}
+				closeOnSelect={true}
+			/>
+			<br />
+			<br />
+			<VsButton align="center" name="Update" onClick={submitInvestigationDate} />
+			</div>
 		}
 		</Box>
 		</Drawer>

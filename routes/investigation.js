@@ -40,6 +40,24 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 	sendok(res, 'Done');
 });
 
+router.get('/setdate/:cid/:pid/:newDate', async function(req, res, next) {
+  setHeader(res);
+  var {cid, pid, newDate} = req.params;
+	
+	let myRec = await M_Investigation.findOne({cid: cid, pid: pid, investigationNumber: MAGICNUMBER});
+	if (!myRec) return senderr(res, 601, 'Invalid cid / pid');
+	
+	let invDate = new Date(
+		Number(newDate.substr(0, 4)),
+		Number(newDate.substr(4, 2))-1,
+		Number(newDate.substr(6, 2)),
+		0, 0, 0
+	);
+	myRec.investigationDate = invDate;
+	myRec.save();
+	sendok(res, myRec);
+});
+
 router.get('/close/:cid/:pid', async function(req, res, next) {
   setHeader(res);
   

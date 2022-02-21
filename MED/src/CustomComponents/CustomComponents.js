@@ -18,6 +18,7 @@ import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import {red, blue, green, deepOrange, yellow} from '@material-ui/core/colors';
 import {
   validateSpecialCharacters, validateEmail, validateMobile, validateInteger, validateUpi,
+	dateString,
   encrypt, decrypt, isMobile,
   currentAPLVersion, latestAPLVersion,
 	getImageName,
@@ -250,7 +251,7 @@ export class ValidComp extends React.Component {
   }
 
   render() {
-    return <br/>;
+    return null;
   }
 
 }
@@ -845,23 +846,30 @@ export function DisplayProfCharge(props) {
 			}
 		</Grid>
 		{myProfChargeArray.map( (p, index) => {
-		let d = new Date(p.date);
-		let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear() % 100}`;
-		//myDate += ` ${HOURSTR[d.getHours()]}:${MINUTESTR[d.getMinutes()]}`;
-		let isBilling = (p.treatment !== "");
-		let myInfo = "";
-		let tmp = props.patientArray.find(x => x.pid === p.pid);
-		if (!tmp) return null;
-		let myName = tmp.displayName;
-		for(let i=0; i<p.treatmentDetails.length; ++i) {
-			myInfo += p.treatmentDetails[i].name + ": "+p.treatmentDetails[i].amount + "<br />";
+			let tmp = props.patientArray.find(x => x.pid === p.pid);
+			if (!tmp) return null;
+			let myName = tmp.displayName;
+
+			let myDate = dateString(p.date);
+			let isBilling = (p.treatment !== "");
+			
+			let myInfo = "";
+			for(let i=0; i<p.treatmentDetails.length; ++i) {
+			myInfo += p.treatmentDetails[i].name + ": " + INR +
+				(p.treatmentDetails[i].amount - p.treatmentDetails[i].discount);
+			if (p.treatmentDetails[i].isDiscount) {
+				myInfo += " (after ";
+				myInfo += (p.treatmentDetails[i].isPercent) ?
+					Math.floor(p.treatmentDetails[i].discount*100/p.treatmentDetails[i].amount) + "% discount)" :
+					(INR + p.treatmentDetails[i].discount) + " discount)";
+				myInfo += "<br />";
+			}
 		}
-		let myDIscount = lodashSumBy(p.treatmentDetails,'amount')+p.amount;
-		if (myDIscount !== 0)	myInfo += "Discount: "+myDIscount;
-		let myMode = "-";
-		if ((p.paymentMode) && (p.paymentMode !== ""))
-			myMode =  p.paymentMode;
-		let myDesc = (p.description !== "") ? p.description : "Payment by patient"
+
+			let myMode = "-";
+			if ((p.paymentMode) && (p.paymentMode !== ""))
+				myMode =  p.paymentMode;
+			let myDesc = (p.description !== "") ? p.description : "Payment by patient"
 		//console.log(myMode);
 		//console.log(myDesc);
 		return (
@@ -975,11 +983,6 @@ export function DisplayProfCharge_WO_Name(props) {
 	let _edit =   (props.handleEdit == null);
 	let _cancel = (props.handleCancel == null);
 	let _receipt = (props.handleReceipt == null);
-	//console.log(_edit, _cancel, _receipt);
-	
-	//console.log("WO");
-	//let allPids = lodashMapBy(props.patientArray, 'pid');
-	//let myProfChargeArray = props.profChargeArray;
 	let tmp = props.profChargeArray.filter(x => x.amount > 0);
 	let myCollection = lodashSumBy(tmp, 'amount');
 	tmp = props.profChargeArray.filter(x => x.amount < 0);
@@ -1027,18 +1030,22 @@ export function DisplayProfCharge_WO_Name(props) {
 			let tmp = props.patientArray.find(x => x.pid === p.pid);
 			if (!tmp) return null;
 			let myName = tmp.displayName;
-
-			let d = new Date(p.date);
-			let myDate = `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().substring(2)}`;
-			//myDate += ` ${HOURSTR[d.getHours()]}:${MINUTESTR[d.getMinutes()]}`;
-			
+			let myDate = dateString(p.date);
 			let isBilling = (p.treatment !== "");
 			let myInfo = "";
 			for(let i=0; i<p.treatmentDetails.length; ++i) {
-				myInfo += p.treatmentDetails[i].name + ": "+p.treatmentDetails[i].amount + "<br />";
+				myInfo += p.treatmentDetails[i].name + ": " + INR +
+					(p.treatmentDetails[i].amount - p.treatmentDetails[i].discount);
+				if (p.treatmentDetails[i].isDiscount) {
+					myInfo += " (after ";
+					myInfo += (p.treatmentDetails[i].isPercent) ?
+						Math.floor(p.treatmentDetails[i].discount*100/p.treatmentDetails[i].amount) + "% discount)" :
+						(INR + p.treatmentDetails[i].discount) + " discount)";
+					myInfo += "<br />";
+				}
 			}
-			let myDIscount = lodashSumBy(p.treatmentDetails,'amount')+p.amount;
-			if (myDIscount !== 0)	myInfo += "Discount: "+myDIscount;
+			//let myDIscount = lodashSumBy(p.treatmentDetails,'amount')+p.amount;
+			//if (myDIscount !== 0)	myInfo += "Discount: "+myDIscount;
 			//console.log(myInfo);
 			
 			let myMode = ((p.paymentMode) && (p.paymentMode !== "")) ? p.paymentMode : "-";
@@ -1057,7 +1064,7 @@ export function DisplayProfCharge_WO_Name(props) {
 			<Grid item align="left" xs={4} sm={6} md={3} lg={3} >	
 			<Typography>
 				<span className={gClasses.patientInfo2}>{myActualDesc}</span>
-				{(isBilling && (!isMobile())) &&
+				{(isBilling) &&
 					<span align="left"
 						data-for={"TREAT"+p.tid}
 						data-tip={myInfo}

@@ -1,11 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { TextareaAutosize, TextField, CssBaseline } from '@material-ui/core';
 import axios from "axios";
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import SwitchBtn from '@material-ui/core/Switch';
-import { usePromiseTracker, trackPromise } from "react-promise-tracker";
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
+import ReactTooltip from "react-tooltip";
+import moment from "moment";
+import Datetime from "react-datetime";
+import "react-datetime/css/react-datetime.css";
+
+//import FormControlLabel from '@material-ui/core/FormControlLabel';
+//import SwitchBtn from '@material-ui/core/Switch';
+//import { usePromiseTracker, trackPromise } from "react-promise-tracker";
+//import InputLabel from '@material-ui/core/InputLabel';
+//import FormControl from '@material-ui/core/FormControl';
 
 import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel";
@@ -14,7 +19,7 @@ import VsAdultTeeth from "CustomComponents/VsAdultTeeth";
 import VsChildTeeth from "CustomComponents/VsChildTeeth";
 import VsTextFilter from "CustomComponents/VsTextFilter";
 import VsCheckBox from "CustomComponents/VsCheckBox";
-
+import VsRadioGroup from "CustomComponents/VsRadioGroup";
 
 import Drawer from '@material-ui/core/Drawer';
 import { useAlert } from 'react-alert'
@@ -35,16 +40,18 @@ import 'react-step-progress/dist/index.css';
 import globalStyles from "assets/globalStyles";
 
 // icons
-import IconButton from '@material-ui/core/IconButton';
-import SearchIcon from '@material-ui/icons/Search';
-import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
+//import IconButton from '@material-ui/core/IconButton';
+//import SearchIcon from '@material-ui/icons/Search';
+//import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
+//import EventNoteIcon from '@material-ui/icons/EventNote';
+//import AddIcon from '@material-ui/icons/AddCircleOutline';
+
 import CancelIcon from '@material-ui/icons/Cancel';
-import EventNoteIcon from '@material-ui/icons/EventNote';
-import AddIcon from '@material-ui/icons/AddCircleOutline';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Cancel';
+import InfoIcon from 	'@material-ui/icons/Info';
 
 // import Table from "components/Table/Table.js";
 // import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -65,9 +72,11 @@ DATESTR, MONTHNUMBERSTR, MAGICNUMBER, INR,
 
 import { 
 	isMobile,
+	dateString,
 	validateInteger,
 	vsDialog,
 	ordinalSuffix,
+	disableFutureDt,
 } from "views/functions.js";
 
 /*
@@ -210,7 +219,8 @@ const MAXDISPLAYTEXTROWS=12;
 const MAXEDITTEXTROWS=25;
 
 const infoStyle={backgroundColor: '#EEEEEE', paddingTop: '5px', paddingLeft: '5px'}
- 
+
+const DISCOUNTTYPE = ["Percentage", "Fixed"]; 
 var userCid;
 export default function DentalTreatment(props) {
   
@@ -246,9 +256,15 @@ export default function DentalTreatment(props) {
 	const [emurName, setEmurName] = useState("");
 	const [emurToothArray, setEmurToothArray] = useState([]);
 	const [emurAmount, setEmurAmount] = useState(0);
-	const [emurMaxDiscount, setEmurMaxDiscount] = useState(0);
 	
 	const [balance, setBalance] = useState(0);
+
+	const [emurMaxDiscount, setEmurMaxDiscount] = useState(0);
+	const [isDiscount, setIsDiscount] = useState(false);
+	const [discountStyle, setDiscountStyle] = useState("Fixed");
+	const [percentageDiscount, setPercentageDiscount] =  useState(0);
+	const [fixedDiscount, setFixedDiscount] = useState(0);
+	const [finalDiscount, setFinalDiscount] = useState(0);
 	
 	const [modalRegister, setModalRegister] = useState(0);
 	
@@ -291,6 +307,7 @@ export default function DentalTreatment(props) {
 	async function getPatientTreatment(patRec) {
 		try {
 			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/list/${userCid}/${patRec.pid}`)
+			//console.log(resp.data);
 			setTreatmentArray(resp.data);
 			//console.log(resp.data);
 			setTreatmentIndex(resp.data.length - 1);
@@ -347,86 +364,58 @@ export default function DentalTreatment(props) {
 		//setCurrentSelection("Medicine");
 	}
 
-	function OrgDisplayTreatmentDates() {
-		if (treatmentArray.length === 0) {
-			return (
-				<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-				<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
-					<Grid key={"VISIST"} item xs={12} sm={12} md={12} lg={12} >
-						<Typography className={gClasses.indexSelection} >
-							{"No Treatment history available"}
-						</Typography>
-					</Grid>
-				</Grid>	
-				</Box>
-			);
-		}
-		
-		//console.log(treatmentArray);
-		let v = treatmentArray[treatmentIndex];
-		let d = new Date(v.treatmentDate);
-		let myYear = d.getFullYear() % 100;
-		console.log(myYear);
-		let myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${myYear}`;
-		if (v.treatmentNumber === MAGICNUMBER)
-				myDate += "(New)";
-		else {
-		}
-		return (
-		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-		<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
-			<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >	
-				<IconButton color={'primary'} onClick={() => {changIndex(-1)}}  >
-					<LeftIcon />
-				</IconButton>
-			</Grid>
-			<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
-				<Typography className={gClasses.dateSelection} >
-					{myDate}
-				</Typography>
-			</Grid>
-			<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
-				<IconButton color={'primary'} onClick={() => {changIndex(1)}}  >
-						<RightIcon />
-					</IconButton>
-			</Grid>
-		</Grid>	
-		</Box>
-		)
+	function editTreatmentDate() {
+		setEmurNumber(moment(treatmentArray[treatmentIndex].treatmentDate));
+		setIsDrawerOpened("EDITDATE");
 	}
+	
+	async function submitTreatmentDate() {
+		let d = emurNumber.toDate();
+		let myDateStr = `${d.getFullYear()}${MONTHNUMBERSTR[d.getMonth()]}${DATESTR[d.getDate()]}`;
+		//console.log(myDateStr);
+		try {
+			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/dentaltreatment/setdate/${userCid}/${currentPatientData.pid}/${myDateStr}`);
+			//console.log(resp.data);
+			//treatmentArray.pop();
+			let tmpArray = [].concat(treatmentArray);
+			tmpArray[tmpArray.length-1] = resp.data;
+			setTreatmentArray(tmpArray);
+			//setTreatmentArray(treatmentArray.concat([resp.data]));
+		} catch(e) {
+			console.log(e);
+		}
+		setIsDrawerOpened("");
+	}
+	
 
 	function DisplayTreatmentDates() {
+		//console.log(treatmentIndex, treatmentArray);
 		let myDate = "No Treatment history available";
+		let newTreat = false;
 		if (treatmentArray.length > 0) {
-			//console.log(treatmentIndex, treatmentArray);
 			let v = treatmentArray[treatmentIndex];
-			let d = new Date(v.treatmentDate);
-			myDate = `Treatment dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;
-			if (v.treatmentNumber === MAGICNUMBER)
-					myDate += "(New)";
-			else {
-			}
+			myDate = ((!isMobile()) ? 'Treatment dated ' : '') + dateString(v.treatmentDate);
+			newTreat = (treatmentArray[treatmentIndex].treatmentNumber === MAGICNUMBER);
 		}
 		return (
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
 		<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
 			<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >
 				{ (treatmentArray.length > 0)	 &&
-					<IconButton color={'primary'} onClick={() => {changIndex(-1)}}  >
-						<LeftIcon />
-					</IconButton>
+					<LeftIcon color={'primary'} onClick={() => {changIndex(-1)}}  />
 				}	
 			</Grid>
 			<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
-				<Typography className={gClasses.dateSelection} >
-					{myDate}
+				<Typography>
+					<span className={gClasses.dateSelection} >{myDate}</span>
+				{(newTreat) &&
+				<span><EditIcon color={'primary'} onClick={editTreatmentDate} /></span>
+				}
 				</Typography>
 			</Grid>
 			<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
 			{ (treatmentArray.length > 0)	 &&
-				<IconButton color={'primary'} onClick={() => {changIndex(1)}}  >
-						<RightIcon />
-					</IconButton>
+				<RightIcon color={'primary'} onClick={() => {changIndex(1)}}  />
 			}
 			</Grid>
 		</Grid>	
@@ -507,13 +496,21 @@ export default function DentalTreatment(props) {
 		setEmurToothArray([]);
 		setEmurAmount(0);
 		setIsChild(false);
+		
+		// discount
+		setIsDiscount(false);
+		setDiscountStyle("Percentage");
+		setPercentageDiscount(0);
+		setFixedDiscount(0);
+		setFinalDiscount(0);
 
-		setIsDrawerOpened("ADDTREAT");
 		// set filter
 		setFilterItem("TREATMENT");
 		setFilterItemText("");
 		setFilterItemArray([]);
 		setRemember(false);
+
+		setIsDrawerOpened("ADDTREAT");
 	}
 	
 	function handleEditTreatmentType(index) {
@@ -534,6 +531,13 @@ export default function DentalTreatment(props) {
 		}
 		setIsChild(childtooth);
 
+		// discount 
+		setIsDiscount(xxx.isDiscount);
+		setDiscountStyle((xxx.isPercent) ? "Percentage" : "Fixed");
+		setPercentageDiscount(Math.floor(xxx.discount*100/xxx.amount));
+		setFixedDiscount(xxx.discount);
+		setFinalDiscount(xxx.discount);
+		
 		// set filter
 		setFilterItem("TREATMENT");
 		setFilterItemText("");
@@ -594,23 +598,69 @@ export default function DentalTreatment(props) {
 		//console.log("Over");
 	}
 	
+	function DisplayAllToolTips() {
+	if (treatmentArray.length === 0) return null;
+	return(
+		<div>
+		{treatmentArray[treatmentIndex].treatment.map( (t, index) =>
+			<ReactTooltip key={"TREAT"+index} type="info" effect="float" id={"TREAT"+index} multiline={true}/>
+		)}
+		</div>
+	)}
+	
 	function ArunTreatment() {
 		if (treatmentArray.length === 0) return null;
 		let x = treatmentArray[treatmentIndex];
-		//console.log(treatmentArray);
+		//console.log(x.treatment);
+		let discountValue = lodashSumBy(x.treatment, 'discount');
+		let payableValue = lodashSumBy(x.treatment, 'amount') - discountValue;
+		//console.log(discountValue, payableValue);
 		return (
 			<div style={infoStyle}>
 			{(x.treatmentNumber === MAGICNUMBER) && 
 				<VsButton name="New treatment type" align="left" onClick={handleAddTreatmentType} />
 			}	
 			<Box borderColor="primary.main" border={1}>
+				<Grid  key={"NOTESHDR"} container >
+				<Grid item align="left" xs={8} sm={10} md={3} lg={3} >
+						<Typography className={gClasses.patientInfo2Orange}>Treatment</Typography>
+				</Grid>
+				{(!isMobile()) &&
+					<Grid item align="left" xs={12} sm={4} md={7} lg={7} >
+						<Typography className={gClasses.patientInfo2Orange}>Tooth(s)</Typography>
+					</Grid>
+				}
+				<Grid item align="right" xs={2} sm={1} md={1} lg={1} >
+					<Typography className={gClasses.patientInfo2Orange}>Amount</Typography>
+				</Grid>
+				<Grid item xs={2} sm={1} md={1} lg={1} >
+				</Grid>
+				</Grid>
 			{x.treatment.map( (un, index) => {
+				//console.log(un);
 				let arr = lodashSortBy(un.toothArray).toString();
-				//console.log(arr);
+				let myInfo = "Professional Charge: " + INR + un.amount;
+				if (un.isDiscount) {
+					myInfo  += "<br />";
+					if (un.isPercent) 
+						myInfo += "Discount : " + Math.floor(un.discount*100/un.amount) + "%" + "<br />";
+					else 
+						myInfo += "Discount : " + un.discount + "<br />";
+					myInfo += "Amount Payable : " + (un.amount - un.discount);
+				}
 				return (
 					<Grid  key={"NOTES"+index} container >
 					<Grid item align="left" xs={8} sm={10} md={3} lg={3} >
-						<Typography className={gClasses.patientInfo2}>{"Treatment: "+un.name}</Typography>
+						<Typography>
+						<span className={gClasses.patientInfo2}>{un.name}</span>
+						<span align="left"
+							data-for={"TREAT"+index}
+							data-tip={myInfo}
+							data-iscapture="true"
+						>
+						<InfoIcon color="primary" size="small"/>
+						</span>
+						</Typography>
 					</Grid>
 					{(!isMobile()) &&
 					<Grid item align="left" xs={12} sm={4} md={7} lg={7} >
@@ -638,10 +688,10 @@ export default function DentalTreatment(props) {
 				<Typography className={gClasses.patientInfo2}>{"Discount"}</Typography>
 			</Grid>
 			<Grid item align="right" xs={2} sm={1} md={1} lg={1} >
-				<Typography className={gClasses.patientInfo2}>{INR+x.discount}</Typography>
+				<Typography className={gClasses.patientInfo2}>{INR+discountValue}</Typography>
 			</Grid>
 			<Grid item xs={2} sm={1} md={1} lg={1} >
-				{(x.treatmentNumber === MAGICNUMBER) &&
+				{((false) && (x.treatmentNumber === MAGICNUMBER)) &&
 					<div>
 					<EditIcon color="primary" size="small" onClick={handleEditDiscount} />
 					<DeleteIcon color="secondary" size="small" onClick={handleDeleteDiscount} />
@@ -656,7 +706,7 @@ export default function DentalTreatment(props) {
 			<Typography className={gClasses.patientInfo2}>{"Professional Charges:"}</Typography>
 			</Grid>
 			<Grid align="right" item xs={3} sm={2} md={2} lg={2} >
-			<Typography className={gClasses.patientInfo2}>{INR+" "+(lodashSumBy(x.treatment, 'amount')-x.discount)}</Typography>
+			<Typography className={gClasses.patientInfo2}>{INR+" "+ payableValue}</Typography>
 			</Grid>
 			<Grid item align="right" xs={2} sm={1} md={1} lg={1} />
 			</Grid>
@@ -711,10 +761,18 @@ export default function DentalTreatment(props) {
 				setModalRegister(2001);
 				return;
 			} 
-			tmp[lastIndex].treatment.push({name: emurName, toothArray: emurToothArray, amount: emurAmount});
+			tmp[lastIndex].treatment.push({
+				name: emurName, 
+				toothArray: emurToothArray, 
+				amount: emurAmount,
+				isDiscount: isDiscount,
+				isPercent: (discountStyle === 'Percentage'),
+				discount: finalDiscount
+			});
 			setTreatTypeArray(tmp);
 			//index = tmp[lastIndex].treatment.length - 1;
-		} else {
+		} 
+		else {
 			if (tmp[lastIndex].treatment[emurIndex].name.toLowerCase() !== emurName.toLowerCase()) {
 				if (tmp[lastIndex].treatment.find(x => x.name.toLowerCase() === emurName.toLowerCase())) {
 					setModalRegister(2001);
@@ -724,11 +782,14 @@ export default function DentalTreatment(props) {
 			tmp[lastIndex].treatment[emurIndex].name = emurName;
 			tmp[lastIndex].treatment[emurIndex].toothArray = emurToothArray;
 			tmp[lastIndex].treatment[emurIndex].amount = emurAmount;
+			tmp[lastIndex].treatment[emurIndex].isDiscount = isDiscount;
+			tmp[lastIndex].treatment[emurIndex].isPercent = (discountStyle === 'Percentage');
+			tmp[lastIndex].treatment[emurIndex].discount = finalDiscount;
 			setTreatmentArray(tmp);
 		}
 		setIsDrawerOpened("");
 		
-		tmp[lastIndex].treatment[index].name = emurName;
+		//tmp[lastIndex].treatment[index].name = emurName;
 		updateNewTreatment(tmp[lastIndex].treatment, treatmentPlan, treatmentNotes, tmp[lastIndex].discount);
 		setTreatmentArray(tmp);
 	}
@@ -849,6 +910,48 @@ export default function DentalTreatment(props) {
 		</div>
 	)}
 
+	function verifyAmount(item, value) {
+		//console.log(item, value);
+		if (item === "AMOUNT") {
+			setEmurAmount(value);
+			let myFix = Math.min(fixedDiscount, value);
+			setFixedDiscount(myFix);
+			setFinalDiscount((discountStyle === 'Fixed') ? myFix : Math.floor(value*percentageDiscount/100));
+		} 
+		else if (item === "YESNODISCOUNT") {
+			setIsDiscount(value);		// true or false
+			if (value) {
+				if (discountStyle === "Fixed") {
+					if (fixedDiscount > emurAmount) {
+						setFixedDiscount(emurAmount);
+						setFinalDiscount(0);
+					} else {
+						setFinalDiscount(emurAmount - fixedDiscount);
+					}
+				} 
+				else {
+					setFinalDiscount(Math.floor(emurAmount*(100-percentageDiscount)/100))
+				}				
+			} 
+			else {
+				setFinalDiscount(0);
+			}
+		}
+		else if (item === "DISCOUNTSTYLE") {
+			setDiscountStyle(value);
+			setFinalDiscount((value === "Fixed") ? Math.min(emurAmount,fixedDiscount) : Math.floor(emurAmount*percentageDiscount/100));
+		}
+		else if (item === "PERCENT") {
+			setPercentageDiscount(value);
+			setFinalDiscount(Math.floor(emurAmount*value/100));
+		}
+		else if (item === "FIXED") {
+			let myDis = Math.min(emurAmount, value)
+			setFixedDiscount(myDis);
+			setFinalDiscount(myDis);
+		}
+	}
+	
 	return (
 	<div>
 	{(sessionStorage.getItem("userType") === "Assistant") &&
@@ -864,7 +967,10 @@ export default function DentalTreatment(props) {
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={0} >
 			<DisplayNewBtn />
 			{(currentSelection === "Treatment") &&
+				<div>
 				<ArunTreatment />
+				<DisplayAllToolTips />
+				</div>
 			}
 			{(currentSelection === "Plan") &&
 				<ArunPlan />
@@ -873,10 +979,11 @@ export default function DentalTreatment(props) {
 				<ArunNotes />
 			}
 		</Box>
-		<Drawer 
+		{/*<Drawer 
 			classes={{ paper:(isDrawerOpened === "EDITDISCOUNT") ? gClasses.drawer : gClasses.drawer90}}
 			anchor="right" variant="temporary" open={isDrawerOpened !== ""}
-		>
+		>*/}
+		<Drawer anchor="right" variant="temporary" open={isDrawerOpened !== ""} >
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 		<VsCancel align="right" onClick={() => {setIsDrawerOpened("")}} />
 		{((isDrawerOpened === "ADDTREAT") || (isDrawerOpened === "EDITTREAT")) &&
@@ -885,11 +992,6 @@ export default function DentalTreatment(props) {
 					{((isDrawerOpened === "ADDTREAT") ? "New Treatment" : "Edit Treatment")+` for ${currentPatient}`}
 				</Typography>
 				<br />
-				{/*<TextValidator required fullWidth color="primary"
-					id="newName" label="Treatment type" name="newName"
-					onChange={(event) => setEmurNameWithFilter(event.target.value)}
-					value={emurName}
-				/>*/}
 				<VsTextFilter type="text" label="Treatment type" value={emurName}
 					onChange={(event) => setEmurNameWithFilter(event.target.value)}
 					onClear={() => setEmurNameWithFilter("")}
@@ -906,11 +1008,40 @@ export default function DentalTreatment(props) {
 				}
 				<TextValidator required fullWidth color="primary" type="number" className={gClasses.vgSpacing} 
 					id="newName" label="Professional Charge" name="newName"
-					onChange={(event) => setEmurAmount(Number(event.target.value))}
+					onChange={(event) => verifyAmount("AMOUNT", Number(event.target.value))}
 					value={emurAmount}
 					validators={['minNumber:100']}
 					errorMessages={['Invalid Amount']}
 				/>
+				<VsCheckBox align="left" label="Treatment Discount" checked={isDiscount} onClick={() => verifyAmount("YESNODISCOUNT", !isDiscount)} />
+				{(isDiscount) &&
+					<VsRadioGroup radioList={DISCOUNTTYPE} value={discountStyle} onChange={(event) => verifyAmount('DISCOUNTSTYLE', event.target.value)} />
+				}
+				<div align="left">
+				{((isDiscount) && (discountStyle === "Fixed")) &&
+					<TextValidator required color="primary" type="number" className={gClasses.vgSpacing} 
+						id="newName" label="Discount" name="newName"
+						onChange={(event) => verifyAmount("FIXED", Number(event.target.value))}
+						value={fixedDiscount}
+						validators={['minNumber:0', `maxNumber:${emurAmount}`]}
+						errorMessages={['Invalid Discount Amount', 'Invalid Discount Amount']}
+					/>				
+				}
+				{((isDiscount) && (discountStyle !== "Fixed")) &&
+					<TextValidator align="left" required label="Percentage" color="primary" type="number" className={gClasses.vgSpacing}  
+						onChange={(event) => verifyAmount("PERCENT", Number(event.target.value))}
+						value={percentageDiscount}
+						validators={['minNumber:0', 'maxNumber:100']}
+						errorMessages={['Invalid Percentage', 'Invalid Percentage']}
+					/>				
+				}
+				<br />
+				{(isDiscount) && 
+					<Typography className={gClasses.patientInfo2Blue} >
+					{"Professional Charge payable "+(emurAmount-finalDiscount)}
+					</Typography>
+				}				
+				</div>
 				<ModalResisterStatus />
 				<br />
 				<VsButton type ="submit" name= {(isDrawerOpened === "ADDTREAT") ? "Add" : "Update"} />
@@ -931,7 +1062,7 @@ export default function DentalTreatment(props) {
 				/>
 				<ModalResisterStatus />
 				<br />
-				<VsButton type ="submit" name="Update" />`
+				<VsButton type ="submit" name="Update" />
 			</ValidatorForm>
 		}
 		{(isDrawerOpened === "EDITTREATMENTPLAN") &&
@@ -964,6 +1095,28 @@ export default function DentalTreatment(props) {
 				/>
 				<br />
 				<VsButton name="Update" onClick={handlEditNotes} />
+			</div>
+		}
+		{(isDrawerOpened === "EDITDATE") &&
+			<div>
+			<Typography align="center" className={gClasses.functionSelected}>
+					{`Set treatment date for ${currentPatient}`}
+			</Typography>
+			<br />
+			<br />
+			<Datetime 
+				className={gClasses.dateTimeBlock}
+				inputProps={{className: gClasses.dateTimeNormal}}
+				timeFormat={false} 
+				initialValue={emurNumber}
+				dateFormat="DD/MM/yyyy"
+				isValidDate={disableFutureDt}
+				onClose={setEmurNumber}
+				closeOnSelect={true}
+			/>
+			<br />
+			<br />
+			<VsButton align="center" name="Update" onClick={submitTreatmentDate} />
 			</div>
 		}
 		</Box>

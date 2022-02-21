@@ -454,6 +454,23 @@ router.get('/close/:cid/:pid', async function(req, res, next) {
 	sendok(res, {visitNumber: myRec.visitNumber});	
 });
 
+router.get('/setdate/:cid/:pid/:newDate', async function(req, res, next) {
+  setHeader(res);
+  var {cid, pid, newDate} = req.params;
+	
+	let myRec = await M_Visit.findOne({cid: cid, pid: pid, visitNumber: MAGICNUMBER});
+	if (!myRec) return senderr(res, 601, 'Invalid cid / pid');
+	
+	let visitDate = new Date(
+		Number(newDate.substr(0, 4)),
+		Number(newDate.substr(4, 2))-1,
+		Number(newDate.substr(6, 2)),
+		0, 0, 0
+	);
+	myRec.visitDate = visitDate;
+	myRec.save();
+	sendok(res, myRec);
+});
 
 router.get('/updatenewvisit/:cid/:visitNumber/:visitInfo', async function(req, res, next) {
   setHeader(res);

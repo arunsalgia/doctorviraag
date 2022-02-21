@@ -60,14 +60,38 @@ router.post('/update/:cid/:pid/:newInfo', async function(req, res, next) {
 			MONTHNUMBERSTR[iRec.treatmentDate.getMonth()] + "/" +
 			iRec.treatmentDate.getFullYear();
 		myProfChargeRec.date = iRec.treatmentDate;
-		myProfChargeRec.amount = -(_.sumBy(newInfo.treatment, 'amount')) + iRec.discount;
-		myProfChargeRec.treatmentDetails = _.map(newInfo.treatment,  o => _.pick(o, ['name', 'amount']));
+		myProfChargeRec.amount = -(
+			_.sumBy(newInfo.treatment, 'amount') - 
+			_.sumBy(newInfo.treatment, 'discount')
+		);
+		myProfChargeRec.treatmentDetails = _.map(newInfo.treatment,  
+			o => _.pick(o, ['name', 'amount', 'isDiscount','isPercent', 'discount'])
+		);
 		myProfChargeRec.save();
 	} else {
 		// zero treatment. Thus if entry in payment remove it
 		await M_ProfCharge.deleteOne({treatment: iRec._id});
 	}
 	sendok(res, 'Done');
+});
+
+router.get('/setdate/:cid/:pid/:newDate', async function(req, res, next) {
+  setHeader(res);
+  var {cid, pid, newDate} = req.params;
+	
+	let myRec = await M_DentalTreatment.findOne({cid: cid, pid: pid, treatmentNumber: MAGICNUMBER});
+	if (!myRec) return senderr(res, 601, 'Invalid cid / pid');
+	
+	let treatDate = new Date(
+		Number(newDate.substr(0, 4)),
+		Number(newDate.substr(4, 2))-1,
+		Number(newDate.substr(6, 2)),
+		0, 0, 0
+	);
+	myRec.treatmentDate = treatDate;
+	console.log(myRec);
+	myRec.save();
+	sendok(res, myRec);
 });
 
 router.get('/close/:cid/:pid', async function(req, res, next) {
@@ -113,6 +137,39 @@ router.get('/noteplan', async function(req, res, next) {
 	}
 	//console.log(allRecs);
 	sendok(res, allRecs);
+});
+
+router.get('/test', async function(req, res, next) {
+  setHeader(res);
+  
+	let allRecs = await M_ProfCharge.find({treatment: {$ne: ''}});
+	for(let i=0; i<allRecs.length; ++i) {
+		let myProfChargeRec = allRecs[i];
+		let treatRec = await M_DentalTreatment.findOne({_id: myProfChargeRec.treatment})
+		//console.log(myProfChargeRec.treatmentDetails);
+		myProfChargeRec.treatmentDetails = _.map(treatRec.treatment,  
+			o => _.pick(o, ['name', 'amount', 'isDiscount','isPercent', 'discount'])
+		);
+		myProfChargeRec.amount = -(
+			_.sumBy(treatRec.treatment, 'amount') -
+			_.sumBy(treatRec.treatment, 'discount')
+		);
+		await myProfChargeRec.save();
+		
+		/*for(let t = 0; t < allRecs[i].treatment.length; ++t) {
+			allRecs[i].treatment[t]["isDiscount"] = false;
+			allRecs[i].treatment[t]["isPercent"] = true;
+			allRecs[i].treatment[t]["discount"] = 0;
+		}
+		await allRecs[i].save();*/
+	}
+	/*
+	myProfChargeRec.treatmentDetails = _.map(newInfo.treatment,  
+			o => _.pick(o, ['name', 'amount', 'isDiscount','isPercent', 'discount'])
+		);
+	//console.log(allRecs);
+	*/
+	sendok(res, 'Done');
 });
 
 function sendok(res, usrmsg) { res.send(usrmsg); }

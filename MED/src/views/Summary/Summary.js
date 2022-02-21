@@ -517,9 +517,7 @@ export default function Summary() {
 		<Grid key={"PAT"+m.pid} item xs={12} sm={6} md={3} lg={3} >
 		<DisplayPatientBox patient={m}
 		button1={
-			<IconButton className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  >
-				<VisibilityIcon  />
-			</IconButton>
+			<VisibilityIcon className={gClasses.blue} size="small" onClick={() => handleSelectPatient(m) }  />
 		}
 		/>
 		</Grid>

@@ -269,7 +269,14 @@ DentalTreatmentSchema = mongoose.Schema({
   pid: Number,
 	treatmentNumber: Number,
 	treatmentDate: Date,
-	treatment: [{name: String, amount: Number, toothArray: [Number] }],
+	treatment: [{
+		name: String, 
+		toothArray: [Number],
+		amount: Number, 
+		isDiscount: Boolean,
+		isPercent: Boolean,
+		discount: Number
+	}],
 	discount: Number,
 	plan: String,
 	notes: String,
@@ -293,11 +300,18 @@ ProfessionalChargesSchema = mongoose.Schema({
 	tid: Number,
 	treatment: String,			// id of treatment record will be stored
 	description: String,
-	treatmentDetails: [{name: String, amount: Number}],
+	treatmentDetails: [{
+		name: String, 
+		amount: Number,
+		isDiscount: Boolean,
+		isPercent: Boolean,
+		discount: Number
+	}],
 	date: Date,
 	//charges: Number,
 	//discount: Number,
 	amount: Number,
+	//discount: NUmber,
 	paymentMode: String,
 	enabled: Boolean,
 });
@@ -327,6 +341,8 @@ AppointmentSchema = mongoose.Schema({
 	doctorName: String,
 	doctorMobile: String,
 	cid: String,
+	//bookedSlots: [String],
+	endOrder: Number
 });
 AppointmentSchema.index({cid: 1});
 

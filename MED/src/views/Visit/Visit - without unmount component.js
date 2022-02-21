@@ -2,10 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { InputAdornment, makeStyles, Container, CssBaseline } from '@material-ui/core';
 import axios from "axios";
-import moment from "moment";
-import Datetime from "react-datetime";
-import "react-datetime/css/react-datetime.css";
-
 import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel";
 import VsList from "CustomComponents/VsList";
@@ -42,7 +38,7 @@ import EventNoteIcon from '@material-ui/icons/EventNote';
 */
 
 // icons
-//import IconButton from '@material-ui/core/IconButton';
+import IconButton from '@material-ui/core/IconButton';
 import LeftIcon from '@material-ui/icons/ChevronLeft';
 import RightIcon from '@material-ui/icons/ChevronRight';
 import EditIcon from '@material-ui/icons/Edit';
@@ -76,7 +72,6 @@ MAGICNUMBER,
 import {  
 	isMobile,
 	downloadVisit,
-	disableFutureDt,
 	validateInteger,
 	vsDialog,
 	ordinalSuffix,
@@ -295,16 +290,6 @@ export default function Visit(props) {
 		getAllMedicines();
 		getAllNotes();
 		getAllRemarks();
-		
-		return () => {
-			let lastIndex = visitArray.length - 1;
-			//console.log(visitArray);
-			if ((lastIndex >= 0) && (visitArray[lastIndex].visitNumber === MAGICNUMBER)) {
-				console.log("data has to be saved----");
-			} else {
-				console.log("Nothing to save");
-			}
-		}
   }, []);
 
 
@@ -352,56 +337,35 @@ export default function Visit(props) {
 		setCurrentSelection("Medicine");
 	}
 	
-	function editVisitDate() {
-		setEmedTime(moment(visitArray[visitIndex].visitDate));
-		setIsDrawerOpened("EDITDATE");
-	}
-	
-	async function submitVisitDate() {
-		let d = emedTime.toDate();
-		let myDateStr = `${d.getFullYear()}${MONTHNUMBERSTR[d.getMonth()]}${DATESTR[d.getDate()]}`;
-		console.log(myDateStr);
-		try {
-			let resp = await axios.get(`${process.env.REACT_APP_AXIOS_BASEPATH}/visit/setdate/${userCid}/${currentPatientData.pid}/${myDateStr}`);
-			setVisitArray(visitArray.slice(0, visitArray.length-1).concat([resp.data]));
-		} catch(e) {
-			console.log(e);
-		}
-		setIsDrawerOpened("");
-	}
-	
 	function DisplayVisitDates() {
 		let myDate = "No Visit history available";
-		let newVisit = false;
 		if (visitArray.length > 0) {
 			let v = visitArray[visitIndex];
 			let d = new Date(v.visitDate);
-			myDate = (isMobile()) ? "" : "Visit dated ";
-			myDate += `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;	
-			//if (v.visitNumber === MAGICNUMBER)
-			//		myDate += " (New)";
-			newVisit = (v.visitNumber === MAGICNUMBER);
+			myDate = `Visit dated ${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear().toString().slice(-2)}`;	
+			if (v.visitNumber === MAGICNUMBER)
+					myDate += " (New)";
 		}
-		
 	return (
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 	<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
-		<Grid key={"LEFT1"} item xs={1} sm={1} md={2} lg={2} >
+		<Grid key={"LEFT1"} item xs={2} sm={2} md={2} lg={2} >
 		{(visitArray.length > 0)  &&
-			<LeftIcon color={'primary'} onClick={() => {changIndex(-1)}}  />
+			<IconButton color={'primary'} onClick={() => {changIndex(-1)}}  >
+				<LeftIcon />
+			</IconButton>
 		}
 		</Grid>
-		<Grid key={"VISIST"} item xs={10} sm={10} md={8} lg={8} >
-			<Typography >
-				<span className={gClasses.dateSelection} >{myDate}</span>
-				{(newVisit) &&
-				<span><EditIcon color={'primary'} onClick={editVisitDate} /></span>
-				}
+		<Grid key={"VISIST"} item xs={8} sm={8} md={8} lg={8} >
+			<Typography className={gClasses.dateSelection} >
+				{myDate}
 			</Typography>
 		</Grid>
-		<Grid key="RIGHT1" item xs={1} sm={1} md={2} lg={2} >
+		<Grid key="RIGHT1" item xs={2} sm={2} md={2} lg={2} >
 		{(visitArray.length > 0)  &&
-			<RightIcon color={'primary'} onClick={() => {changIndex(1)}}  />
+			<IconButton color={'primary'} onClick={() => {changIndex(1)}}  >
+					<RightIcon />
+				</IconButton>
 		}
 		</Grid>
 	</Grid>	
@@ -987,7 +951,7 @@ export default function Visit(props) {
 	}	
 	<Box borderColor="primary.main" border={0}>
 	<Grid  key="MEDHDR" container align="center" alignItems="center" >
-		<Grid align="left" item xs={6} sm={6} md={6} lg={6} >
+		<Grid item xs={6} sm={6} md={6} lg={6} >
 			<Typography className={gClasses.patientInfo2Orange}>Medicine</Typography>
 		</Grid>
 		<Grid item xs={3} sm={3} md={2} lg={2} >
@@ -1000,7 +964,7 @@ export default function Visit(props) {
 	</Grid>
 	{x.medicines.map( (m, index) =>
 		<Grid  key={"MED"+x.visitNumber+"-"+index} container align="center" alignItems="center" >
-		<Grid align="left" item xs={6} sm={6} md={6} lg={6} >
+		<Grid item xs={6} sm={6} md={6} lg={6} >
 			<Typography className={gClasses.patientInfo2}>{m.name}</Typography>
 		</Grid>
 		<Grid item xs={3} sm={3} md={2} lg={2} >
@@ -1038,7 +1002,7 @@ export default function Visit(props) {
 	<Box borderColor="primary.main" border={0}>
 	{x.userNotes.map( (un, index) =>
 		<Grid key={"NOTES"+x.visitNumber+"notes"+index} container align="center" alignItems="center" >
-		<Grid align="left" item xs={10} sm={10} md={10} lg={10} >
+		<Grid item xs={10} sm={10} md={10} lg={10} >
 			<Typography className={gClasses.patientInfo2}>{un.name}</Typography>
 		</Grid>
 		<Grid item xs={false} sm={false} md={false} lg={1} >
@@ -1069,7 +1033,7 @@ export default function Visit(props) {
 	<Box borderColor="primary.main" border={0}>
 	{x.remarks.map( (r, index) =>
 		<Grid key={"REM"+x.visitNumber+"-"+index} container align="center" alignItems="center" >
-		<Grid align="left" item xs={10} sm={10} md={10} lg={10} >
+		<Grid item xs={10} sm={10} md={10} lg={10} >
 			<Typography className={gClasses.patientInfo2}>{r.name}</Typography>
 		</Grid>
 		<Grid item xs={false} sm={false} md={false} lg={1} >
@@ -1385,28 +1349,6 @@ export default function Visit(props) {
 				<VsButton type="submit" name= {(isDrawerOpened === "ADDREM") ? "Add" : "Update"}
 				/>
 			</ValidatorForm>
-		}
-		{(isDrawerOpened === "EDITDATE") &&
-			<div>
-			<Typography align="center" className={gClasses.functionSelected}>
-					{`Set visit date for ${currentPatient}`}
-			</Typography>
-			<br />
-			<br />
-			<Datetime 
-				className={gClasses.dateTimeBlock}
-				inputProps={{className: gClasses.dateTimeNormal}}
-				timeFormat={false} 
-				initialValue={emedTime}
-				dateFormat="DD/MM/yyyy"
-				isValidDate={disableFutureDt}
-				onClose={setEmedTime}
-				closeOnSelect={true}
-			/>
-			<br />
-			<br />
-			<VsButton align="center" name="Update" onClick={submitVisitDate} />
-			</div>
 		}
 		</Box>
 		</Drawer>	

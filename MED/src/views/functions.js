@@ -9,12 +9,18 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import 'assets/react-confirm-alert_mod.css'; // Import css
 import {cloneDeep} from "lodash";
 import { func } from "prop-types";
-import {dialogOptions } from "views/globals";
+import {dialogOptions, DATESTR, MONTHNUMBERSTR } from "views/globals";
 
 
 var crypto = require("crypto");
 var ifscsystem = require('ifsc-finder');
 var aadhar = require('aadhaar-validator')
+
+
+export function dateString(dStr) {
+	let d = new Date(dStr);
+	return `${DATESTR[d.getDate()]}/${MONTHNUMBERSTR[d.getMonth()]}/${d.getFullYear() % 100}`;
+}
 
 export function isUserLogged() {
   //console.log("User is", sessionStorage.getItem("userName"));
