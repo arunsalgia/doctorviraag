@@ -72,8 +72,7 @@ export default function Summary() {
 	const [currentPatientData, setCurrentPatientData] = useState({});
 	const [patientMasterArray, setPatientMasterArray] = useState([]);
 	const [patientArray, setPatientArray] = useState([]);
-	const [appointmentArray, setAppointmentArray] = useState([]);
-	
+
 	const [visitArray, setVisitArray] = useState([]);
 	const [billingArray, setBillingArray] = useState([]);
 	const [dueArray, setDueArray] = useState([]);
@@ -148,72 +147,7 @@ export default function Summary() {
 		}
 	}
 
-	async function getPendingAppt() {
-		try {
-			let myUrl = `${process.env.REACT_APP_AXIOS_BASEPATH}/appointment/pendinglist/all/${userCid}`;
-			let resp = await axios.get(myUrl);
-			setAppointmentArray(resp.data);
-		} catch (e) {
-			console.log(e);
-			alert.error(`Error fetching appointment`);
-			setAppointmentArray([]);
-		}
-	}
 
-	function DisplayPendingAppointments() {
-	return (
-		<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
-		<Grid className={gClasses.noPadding} key="APPTSHDR" container align="center" alignItems="center" >
-			<Grid align="left"  item xs={5} sm={5} md={4} lg={4} >
-				<Typography className={gClasses.patientInfo2Orange}>Name</Typography>
-			</Grid>
-			<Grid item xs={3} sm={3} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Orange}>Time</Typography>
-			</Grid>
-			<Grid item xs={false} sm={false} md={1} lg={1} >
-				{(!isMobile()) &&
-				<Typography className={gClasses.patientInfo2Orange}>Age</Typography>
-				}
-			</Grid>
-			<Grid item xs={false} sm={false} md={3} lg={3} >
-			{(!isMobile()) &&
-				<Typography className={gClasses.patientInfo2Orange}>Email</Typography>
-			}
-			</Grid>
-			<Grid align="center" item xs={4} sm={4} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Orange}>Mobile</Typography>
-			</Grid>
-		</Grid>
-		{appointmentArray.map( (v, index) => {
-			let myPat = patientMasterArray.find(x => x.pid === v.pid);
-			if (!myPat) return null;
-			return (
-			<Grid className={gClasses.noPadding} key={"DUES"+index} container align="center" alignItems="center" >
-			<Grid align="left" item xs={5} sm={5} md={4} lg={4} >
-				<Typography className={gClasses.patientInfo2}>{myPat.displayName}</Typography>
-			</Grid>
-			<Grid item xs={3} sm={3} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2}>{`${DATESTR[v.date]}/${MONTHNUMBERSTR[v.month]}/${v.year % 100} ${HOURSTR[v.hour]}:${MINUTESTR[v.minute]}`}</Typography>
-			</Grid>
-			<Grid item xs={false} sm={false} md={1} lg={1} >
-			{(!isMobile()) &&
-				<Typography className={gClasses.patientInfo2}>{dispAge(myPat.age, myPat.gender)}</Typography>
-			}
-			</Grid>
-			<Grid item xs={false} sm={false} md={3} lg={3} >
-			{(!isMobile()) &&
-				<Typography className={gClasses.patientInfo2}>{dispEmail(myPat.email)}</Typography>
-			}
-			</Grid>
-			<Grid align="center" item xs={4} sm={4} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2}>{dispMobile(myPat.mobile)}</Typography>
-			</Grid>
-			</Grid>
-			)}
-		)}
-		</Box>
-	)}
-	
 	function DisplayPatientVisit() {
 	return (
 	<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1}>
@@ -367,8 +301,6 @@ export default function Summary() {
 	async function setSummaryMainSelect(item) {
 		if (item === "Dues") {
 			await getDues()
-		} else if (item === "Appointments") {
-			getPendingAppt();
 		}
 		setCurrentDateWiseSelection(""); 
 		setCurrentPatientWiseSelection("");
@@ -396,7 +328,7 @@ export default function Summary() {
 		setCurrentPatientWiseSelection(item);
 	}
 
-	async function org_handleDateWiseSelect(item) {
+	async function handleDateWiseSelect(item) {
 		//validate start date and end date
 		if (compareDate(date1, date2) > 0) return alert.error('From date later than To date');
 
@@ -541,8 +473,7 @@ export default function Summary() {
 		<DisplayFunctionItem item="Dues"  match={currentSelection}  onClick={setSummaryMainSelect} />
 		<DisplayFunctionItem item="Date wise"  match={currentSelection} onClick={setSummaryMainSelect} />
 		<DisplayFunctionItem item="Patient wise"  match={currentSelection}  onClick={setSummaryMainSelect} />
-		{/*<DisplayFunctionItem item="PendingVisit"  match={currentSelection}  onClick={setSummaryMainSelect} />*/}
-		<DisplayFunctionItem item="Appointments"  match={currentSelection}  onClick={setSummaryMainSelect} />	
+		<DisplayFunctionItem item="PendingVisit"  match={currentSelection}  onClick={setSummaryMainSelect} />
 	</Grid>	
 	)}
 
@@ -567,7 +498,7 @@ export default function Summary() {
 		</Box>
 		)}
 	
-	function DisplayPendingApptFunctionHeader() {
+		function DisplayPendingApptFunctionHeader() {
 			return (
 			<Box  className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 			<Grid className={gClasses.noPadding} key="AllPatients" container align="center">
@@ -791,11 +722,6 @@ export default function Summary() {
 				{((currentPendingApptSelection === "Missed") || (currentPendingApptSelection === "Upcoming")) && 
 					<DisplayPendingVisit />
 				}
-				</div>
-				}	
-				{(currentSelection === "Appointments") && 
-				<div>
-				<DisplayPendingAppointments />
 				</div>
 				}	
 				{/*</Box>*/}

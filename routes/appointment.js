@@ -184,8 +184,9 @@ router.get('/pendinglist/date/:cid/:year/:month/:date/:days', async function (re
 router.get('/pendinglist/all/:cid', async function (req, res) {
   setHeader(res);
   var { cid } = req.params;
-
-	publishAppointments(res, { cid: cid, visit: VISITTYPE.pending })
+	
+	let allRecs = await M_Appointment.find({ cid: cid, visit: VISITTYPE.pending }).sort({order: 1});
+	sendok(res, allRecs);
 });		
 
 router.get('/list/pid/:cid/:pid', async function (req, res) {

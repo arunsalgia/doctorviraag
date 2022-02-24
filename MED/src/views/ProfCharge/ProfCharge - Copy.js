@@ -1,22 +1,26 @@
 import React, { useEffect, useState, useContext } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { InputAdornment, Container, CssBaseline } from '@material-ui/core';
-//import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
-//import SwitchBtn from '@material-ui/core/Switch';
-//import { usePromiseTracker, trackPromise } from "react-promise-tracker";
+import SwitchBtn from '@material-ui/core/Switch';
+import { usePromiseTracker, trackPromise } from "react-promise-tracker";
 import InputLabel from '@material-ui/core/InputLabel';
 import ReactTooltip from "react-tooltip";
+import fileDownload  from 'js-file-download';
 
 import VsButton from "CustomComponents/VsButton";
 import VsCancel from "CustomComponents/VsCancel";
-import VsSelect from "CustomComponents/VsSelect";
+import VsList from "CustomComponents/VsList";
+import VsTeeth from "CustomComponents/VsTeeth";
+import VsTextFilter from "CustomComponents/VsTextFilter";
+import VsCheckBox from "CustomComponents/VsCheckBox";
 
-import Datetime from "react-datetime";
-import "react-datetime/css/react-datetime.css";
-import moment from "moment";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from '@material-ui/core/Radio';
 
-import lodashSortBy from "lodash/sortBy";
 
 import { useLoading, Audio } from '@agney/react-loading';
 import Drawer from '@material-ui/core/Drawer';
@@ -26,9 +30,14 @@ import { useAlert } from 'react-alert'
 //import BorderWrapper from 'react-border-wrapper'
 
 import Grid from "@material-ui/core/Grid";
+import GridItem from "components/Grid/GridItem.js";
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
+//import Select from "@material-ui/core/Select";
+//import MenuItem from '@material-ui/core/MenuItem';
+//import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import Modal from 'react-modal';
 import { borders } from '@material-ui/system';
 // import the stylesheet
 import 'react-step-progress/dist/index.css';
@@ -42,21 +51,21 @@ import {ValidComp, BlankArea,
 } from "CustomComponents/CustomComponents.js"
 
 import {
-	HOURSTR, MINUTESTR, DATESTR, MONTHNUMBERSTR, MONTHSTR, INR
+HOURSTR, MINUTESTR, DATESTR, MONTHNUMBERSTR, MONTHSTR, INR
 } from "views/globals.js";
 
+
+
+
+//colours 
+import { red, blue, green, lightGreen, 
+} from '@material-ui/core/colors';
 
 
 import { 
 	isMobile,
 	vsDialog,
-	disableFutureDt,
 } from "views/functions.js";
-
-/*
-//colours 
-import { red, blue, green, lightGreen, 
-} from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
 	selectedTooth: {
@@ -186,16 +195,12 @@ const useStyles = makeStyles((theme) => ({
 		}
   }));
 
-*/
-
-
 const paymentModeArray = ["Cash", "Cheque", "On-line", "Others"];
-
 var userCid;
 
 export default function ProfCharge(props) {
   
-  //const classes = useStyles();
+  const classes = useStyles();
 	const gClasses = globalStyles();
 	const alert = useAlert();
 	
@@ -207,7 +212,7 @@ export default function ProfCharge(props) {
 	const [currentPatientData, setCurrentPatientData] = useState({});
 	const [isDrawerOpened, setIsDrawerOpened] = useState("");
 
-	const [emurDate, setEmurDate] = useState(moment());
+	
 	const [emurTid, setEmurTid] = useState(0);
 	const [emurAmount, setEmurAmount] = useState(100);
 	const [emurDesc, setEmurDesc] = useState("");
@@ -276,7 +281,6 @@ export default function ProfCharge(props) {
 		setEmurTid(0);
 		setEmurAmount(100);
 		setEmurDesc("");
-		setEmurDate(moment());
 		setIsDrawerOpened("ADDPAY");
 	}
 	
@@ -285,7 +289,6 @@ export default function ProfCharge(props) {
 		setPaymentMode(pRec.paymentMode);
 		setEmurAmount(pRec.amount);
 		setEmurDesc(pRec.description);
-		setEmurDate(moment(pRec.date))
 		setIsDrawerOpened("EDITPAY");
 	}
 	
@@ -343,7 +346,7 @@ export default function ProfCharge(props) {
 
 	async function updatePayment() {
 		let tmp = encodeURIComponent(JSON.stringify({
-			date: emurDate.toDate(),
+			date: new Date(),
 			amount: emurAmount,
 			description: emurDesc,
 			paymentMode: paymentMode
@@ -390,68 +393,41 @@ export default function ProfCharge(props) {
 				handleCancel={handleDeletePayment}
 			/>
 		</Box>
-		<Drawer anchor="right" variant="temporary" open={isDrawerOpened !== ""} >
+		<Drawer
+		anchor="right"
+		variant="temporary"
+		open={isDrawerOpened !== ""}
+		>
 		<Box className={gClasses.boxStyle} borderColor="black" borderRadius={7} border={1} >
 		<VsCancel align="right" onClick={() => {setIsDrawerOpened("")}} />
 		{((isDrawerOpened === "ADDPAY") || (isDrawerOpened === "EDITPAY")) &&
-			<ValidatorForm align="center" onSubmit={updatePayment}>
-				<Typography align="center" className={gClasses.title}>
+			<ValidatorForm align="center" className={gClasses.form} onSubmit={updatePayment}>
+				<Typography align="center" className={classes.modalHeader}>
 					{((isDrawerOpened === "ADDPAY") ? "New payment" : "Edit payment")+` for ${currentPatient}`}
 				</Typography>
-				<br />
-				<br />
-				<Grid className={gClasses.noPadding} key="PAYMENTS1" container align="center" alignItems="center" >
-				<Grid item xs={3} sm={3} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Date:</Typography>
-				</Grid>
-				<Grid item xs={false} sm={false} md={1} lg={1} />
-				<Grid align="left" item xs={9} sm={9} md={9} lg={9} >
-					<Datetime 
-						className={gClasses.dateTimeBlock}
-						timeFormat={false} 
-						initialValue={emurDate}
-						dateFormat="DD/MM/yyyy"
-						isValidDate={disableFutureDt}
-						onClose={setEmurDate}
-						closeOnSelect={true}
-					/>
-				</Grid>
-				</Grid>
-				<Grid className={gClasses.noPadding} key="PAYMENTS2" container align="center" alignItems="center" >
-				<Grid item xs={3} sm={3} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Amount:</Typography>
-				</Grid>
-				<Grid item xs={1} sm={1} md={1} lg={1} />
-				<Grid align="left" item xs={8} sm={8} md={9} lg={9} >
-				<TextValidator required type="number" className={gClasses.vgSpacing} 
+				<BlankArea />
+				<TextValidator required fullWidth color="primary" type="number" className={gClasses.vgSpacing} 
+					id="newName" label="Payment Amount" name="newName"
 					onChange={(event) => setEmurAmount(Number(event.target.value))}
 					value={emurAmount}
 					validators={['minNumber:100']}
 					errorMessages={['Invalid Amount']}
 				/>
-				</Grid>
-				</Grid>
-				<Grid className={gClasses.noPadding} key="PAYMENTS3" container align="center" alignItems="center" >
-				<Grid item xs={3} sm={3} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Desc:</Typography>
-				</Grid>
-				<Grid item xs={1} sm={1} md={1} lg={1} />
-				<Grid align="left" item xs={8} sm={8} md={9} lg={9} >
-				<TextValidator color="primary" type="text" className={gClasses.vgSpacing} 
+				<Typography>Payment Mode</Typography>
+				<FormControl component="fieldset">
+				<RadioGroup row aria-label="unitSelect" name="unitSelect" value={paymentMode} 
+					onChange={() => {setPaymentMode(event.target.value); }}
+				>
+				{paymentModeArray.map ( (r, index) =>
+				<FormControlLabel key={"MODE"+index} className={gClasses.filterRadio} value={r} control={<Radio color="primary"/>} label={r} />
+				)}
+				</RadioGroup>
+				</FormControl>
+				<TextValidator fullWidth color="primary" className={gClasses.vgSpacing} 
+					label="Description"
 					onChange={(event) => setEmurDesc(event.target.value)}
 					value={emurDesc}
 				/>
-				</Grid>
-				</Grid>
-				<Grid className={gClasses.noPadding} key="PAYMENTS4" container align="center" alignItems="center" >
-				<Grid item xs={3} sm={3} md={2} lg={2} >
-				<Typography className={gClasses.patientInfo2Blue}>Mode:</Typography>
-				</Grid>
-				<Grid item xs={1} sm={1} md={1} lg={1} />
-				<Grid item xs={8} sm={8} md={9} lg={9} >
-				<VsSelect options={paymentModeArray} value={paymentMode} onChange={(event) => { setPaymentMode(event.target.value); }} />
-				</Grid>
-				</Grid>
 				<ModalResisterStatus />
 				<BlankArea />
 				<VsButton type ="submit" name= {(isDrawerOpened === "ADDPAY") ? "Add" : "Update"} />
@@ -459,6 +435,7 @@ export default function ProfCharge(props) {
 		}
 		</Box>
 		</Drawer>
+		{/*<DisplayAllToolTips />*/}
 	</div>
   );    
 }

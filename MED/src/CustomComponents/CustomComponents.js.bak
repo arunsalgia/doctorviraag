@@ -1041,8 +1041,8 @@ export function DisplayProfCharge_WO_Name(props) {
 					myInfo += (p.treatmentDetails[i].isPercent) ?
 						Math.floor(p.treatmentDetails[i].discount*100/p.treatmentDetails[i].amount) + "% discount)" :
 						(INR + p.treatmentDetails[i].discount) + " discount)";
+					myInfo += "<br />";
 				}
-				myInfo += "<br />";
 			}
 			//let myDIscount = lodashSumBy(p.treatmentDetails,'amount')+p.amount;
 			//if (myDIscount !== 0)	myInfo += "Discount: "+myDIscount;

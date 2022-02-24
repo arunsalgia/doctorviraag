@@ -147,7 +147,7 @@ router.get('/update/:cid/:pid/:tid/:payInfo', async function(req, res, next) {
 
 	payInfo = JSON.parse(payInfo);
 	myRec.description = payInfo.description;
-	myRec.date = payInfo.date;
+	//myRec.date = payInfo.date;
 	myRec.amount = payInfo.amount;
 	myRec.paymentMode = payInfo.paymentMode;
 	
