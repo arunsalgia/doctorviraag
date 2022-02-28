@@ -6,7 +6,7 @@ const {  akshuGetUser,
 	checkCustomerExpiry,
 } = require('./functions'); 
 
-const { sendAppointmentSms, sendCancelSms } = require("./sms");
+const { sendAppointmentSms, sendRescheduleSms, sendCancelSms } = require("./sms");
 
 var router = express.Router();
 
@@ -120,11 +120,14 @@ router.get('/add/:cid/:apptdata', async function (req, res) {
 	hRec.endOrder = newData.endOrder;
 	//hRec.bookedSlots = newData.bookedSlots;
 	
-	console.log(hRec);
+	//console.log(hRec);
 
 	hRec.save();
 
-	sendAppointmentSms(hRec)
+	if (newData._id !== "")
+		sendRescheduleSms(hRec);
+	else
+		sendAppointmentSms(hRec)
 	sendok(res, hRec);
 });	
 

@@ -174,6 +174,13 @@ async function fast2SmsSendFestival(destMobile, messageId, clinicName) {
 	return status;
 }
 
+async function fast2SmsSendReschedule(destMobile, docName, apptDateStr, clinicMobile) {
+	let myParams = `${docName}|${apptDateStr}|${clinicMobile}`;
+	getSMSIds();
+	//console.log(headerIdList[7], messageIdList[7], myParams, destMobile);
+	let status = await fast2SmsSend(headerIdList[7], messageIdList[7], myParams, destMobile);
+	return status;
+}
 
 
 
@@ -273,6 +280,72 @@ async function sendAppointmentSms(apptRec) {
 		patRec.mobile, 
 		apptRec.doctorName,
 		customerRec.clinicName,
+		makeIstDateTimeString(apptRec.apptTime),
+		customerRec.mobile
+		).
+		then((body) => {
+			++customerSmsLog.bulkSmsCount;
+			//akshuUpdSmsLog(customerSmsLog);
+		}).
+		catch((error) => {
+			console.log("Error sending message. ", error.status_code);
+		});
+
+		// if panel doctor then send message to panel doctor as well
+		//destMobile, docName, clinicName, apptDateStr, clinicMobile)
+	
+	if (apptRec.doctorName !== customerRec.doctorName) {
+		fast2SmsSendAppointment(
+			apptRec.doctorMobile, 
+			patRec.displayName,
+			customerRec.clinicName,
+			makeIstDateTimeString(apptRec.apptTime),
+			customerRec.mobile
+		).
+		then((body) => {
+				++customerSmsLog.bulkSmsCount;
+				//akshuUpdSmsLog(customerSmsLog);
+			}).
+		catch((error) => {
+			console.log("Error sending message. ", error.status_code);
+		});
+	}
+	akshuUpdSmsLog(customerSmsLog);
+}
+
+
+async function sendRescheduleSms(apptRec) {
+	var cid = apptRec.cid;
+	var pid = apptRec.pid;
+
+	// first find out if patinet has mobile number
+	//let patRec = await M_Patient.findOne({cid: cid, pid: pid});
+	let patRec = await getPatientByPid(cid, pid);
+	if (patRec.mobile < 1000000000) {
+		console.log("Mobile number not configured");
+		return;
+	}
+	// find out how many sms sent by user this month
+	let d = new Date();
+	let customerSmsLog = await akshuGetSmsLog(cid, d.getMonth(), d.getFullYear());
+	//console.log(customerSmsLog);
+	if (customerSmsLog.bulkSmsCount >= defaultPatientSms) {
+		// if default count has passed. Check if subscribed for bulk sms for patients
+		if (await hasSubscribed(cid, AddOnList.bulk) === 0) {
+			console.log("Default Sms count Over");
+			// How to inform consumer
+			return;
+		}
+	}
+
+	// now prepare to send SMS
+	let customerRec = await akshuGetCustomer(cid);
+	
+	//console.log(patRec.mobile, apptRec.doctorName, makeIstDateTimeString(apptRec.apptTime),
+	//	customerRec.mobile);
+	fast2SmsSendReschedule(
+		patRec.mobile, 
+		apptRec.doctorName,
 		makeIstDateTimeString(apptRec.apptTime),
 		customerRec.mobile
 		).
@@ -617,6 +690,7 @@ module.exports = {
 	clearSMSLog, getSMSLog,
 	generateSMSLogs,
 	sendAppointmentSms,
+	sendRescheduleSms,
 	sendExpirySms,
 	sendVisitSms,
 	sendCancelSms,
